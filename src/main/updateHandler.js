@@ -30,6 +30,28 @@ class UpdateHandler {
       }
     })
 
+    ipcMain.handle('cleanup-update-downloads', async () => {
+      try {
+        return await this.cleanupUpdateDownloads()
+      } catch (error) {
+        console.error('[UpdateHandler] Error in cleanup handler:', error)
+        return {
+          success: false,
+          error: error.message
+        }
+      }
+    })
+
+    ipcMain.on('cleanup-update-downloads-internal', async (event, callback) => {
+      try {
+        const result = await this.cleanupUpdateDownloads()
+        if (callback) callback(result)
+      } catch (error) {
+        console.error('[UpdateHandler] Error in internal cleanup handler:', error)
+        if (callback) callback({ success: false, error: error.message })
+      }
+    })
+
     ipcMain.handle('install-windows-updates', async (event, updateIds) => {
       try {
         return await this.installUpdates(updateIds)
@@ -260,6 +282,17 @@ try {
 
   async installUpdates(updateIds) {
     console.log('Installing updates:', updateIds)
+    
+    // Create restore point before installing updates
+    try {
+      const { ipcMain } = await import('electron')
+      const restorePointResult = await new Promise((resolve) => {
+        ipcMain.emit('create-sparkle-restore-point-internal', null, resolve)
+      })
+      console.log('[UpdateHandler] Created restore point before updates:', restorePointResult)
+    } catch (error) {
+      console.warn('[UpdateHandler] Failed to create restore point before updates:', error)
+    }
     
     try {
       const idsString = updateIds && updateIds.length > 0 
@@ -555,6 +588,102 @@ shutdown /r /t 30 /c "Restarting to complete Windows updates installation"
     } catch (error) {
       console.error('Error restarting Windows:', error)
       return { success: false, error: error.message }
+    }
+  }
+
+  async cleanupUpdateDownloads() {
+    console.log('[UpdateHandler] Cleaning up Windows Update downloads...')
+    
+    try {
+      const script = `
+# Clean up Windows Update download cache
+try {
+    Write-Host "Stopping Windows Update service..."
+    Stop-Service -Name wuauserv -Force -ErrorAction SilentlyContinue
+    Stop-Service -Name bits -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+    
+    # Clear SoftwareDistribution Download folder
+    $downloadPath = "$env:SystemRoot\\SoftwareDistribution\\Download"
+    if (Test-Path $downloadPath) {
+        Write-Host "Clearing SoftwareDistribution Download folder..."
+        Get-ChildItem -Path $downloadPath -Recurse -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        Write-Host "Cleared $downloadPath"
+    }
+    
+    # Clear Windows Update cache
+    $cachePath = "$env:SystemRoot\\SoftwareDistribution\\DataStore"
+    if (Test-Path $cachePath) {
+        Write-Host "Clearing Windows Update DataStore..."
+        Get-ChildItem -Path $cachePath -Recurse -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        Write-Host "Cleared $cachePath"
+    }
+    
+    # Clear BITS transfer queue
+    Import-Module BitsTransfer -ErrorAction SilentlyContinue
+    Get-BitsTransfer -AllUsers -ErrorAction SilentlyContinue | Remove-BitsTransfer -ErrorAction SilentlyContinue
+    
+    # Restart services
+    Write-Host "Restarting services..."
+    Start-Service -Name wuauserv -ErrorAction SilentlyContinue
+    Start-Service -Name bits -ErrorAction SilentlyContinue
+    
+    @{
+        success = $true
+        message = "Windows Update downloads cleaned up successfully"
+        freedSpace = $true
+    } | ConvertTo-Json
+} catch {
+    @{
+        success = $false
+        error = $_.Exception.Message
+    } | ConvertTo-Json
+}
+      `.trim()
+      
+      const result = await executePowerShell(null, {
+        script: script,
+        name: 'cleanup-update-downloads'
+      })
+      
+      console.log('[UpdateHandler] Cleanup PowerShell result:', JSON.stringify(result))
+      
+      if (result.success && result.output) {
+        try {
+          const jsonMatch = result.output.match(/\{[\s\S]*\}/)
+          if (jsonMatch) {
+            const cleanupData = JSON.parse(jsonMatch[0])
+            console.log('[UpdateHandler] Parsed cleanup data:', cleanupData)
+            return cleanupData
+          } else {
+            console.error('[UpdateHandler] No JSON found in cleanup output')
+            console.log('[UpdateHandler] Raw cleanup output:', result.output)
+            return {
+              success: false,
+              error: 'Invalid response format from cleanup script'
+            }
+          }
+        } catch (parseError) {
+          console.error('[UpdateHandler] Failed to parse cleanup result:', parseError)
+          console.log('[UpdateHandler] Raw cleanup output:', result.output)
+          return {
+            success: false,
+            error: `Cleanup parse error: ${parseError.message}`
+          }
+        }
+      } else {
+        console.error('[UpdateHandler] Cleanup PowerShell execution failed or no output')
+        return {
+          success: false,
+          error: result.error || 'Failed to execute cleanup. Make sure you are running as administrator.'
+        }
+      }
+    } catch (error) {
+      console.error('Error cleaning up update downloads:', error)
+      return {
+        success: false,
+        error: error.message
+      }
     }
   }
 }

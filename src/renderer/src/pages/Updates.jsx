@@ -4,12 +4,14 @@ import Loading from '../components/Loading'
 import RootDiv from '../components/RootDiv'
 import Modal from '../components/ui/modal'
 import { invoke } from '../lib/electron'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Trash2 } from 'lucide-react'
+import { toast } from 'react-toastify'
 
 const Updates = () => {
   const [loading, setLoading] = useState(false)
   const [checkingUpdates, setCheckingUpdates] = useState(false)
   const [installing, setInstalling] = useState(false)
+  const [cleaning, setCleaning] = useState(false)
   const [updates, setUpdates] = useState([])
   const [updateStatus, setUpdateStatus] = useState('')
   const [lastCheck, setLastCheck] = useState(null)
@@ -235,6 +237,34 @@ const Updates = () => {
     }
   }
 
+  const cleanupDownloads = async () => {
+    setCleaning(true)
+    setUpdateStatus('Cleaning up downloaded update files...')
+    
+    try {
+      const result = await invoke({ channel: 'cleanup-update-downloads' })
+      
+      if (result.success) {
+        setUpdateStatus('Update downloads cleaned up successfully')
+        toast.success('Downloaded update files have been cleaned up')
+        
+        // Reset download status for all updates since cache is cleared
+        setUpdates(prevUpdates => 
+          prevUpdates.map(u => ({ ...u, downloaded: false }))
+        )
+      } else {
+        setUpdateStatus(result.error || 'Failed to clean up downloads')
+        toast.error('Failed to clean up downloaded files')
+      }
+    } catch (error) {
+      console.error('Error cleaning up downloads:', error)
+      setUpdateStatus('Failed to clean up downloads')
+      toast.error('Failed to clean up downloaded files')
+    } finally {
+      setCleaning(false)
+    }
+  }
+
   if (loading) {
     return (
       <RootDiv>
@@ -261,13 +291,24 @@ const Updates = () => {
                 <p className="text-sm text-gray-400">Last checked: {lastCheck}</p>
               )}
             </div>
-            <Button
-              onClick={checkForUpdates}
-              disabled={checkingUpdates || installing}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {checkingUpdates ? 'Checking...' : 'Check for Updates'}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={cleanupDownloads}
+                disabled={checkingUpdates || installing || cleaning}
+                className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+                size="sm"
+              >
+                <Trash2 size={16} />
+                {cleaning ? 'Cleaning...' : 'Cleanup Downloads'}
+              </Button>
+              <Button
+                onClick={checkForUpdates}
+                disabled={checkingUpdates || installing || cleaning}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {checkingUpdates ? 'Checking...' : 'Check for Updates'}
+              </Button>
+            </div>
           </div>
           
           <div className="bg-yellow-900/20 text-yellow-400 p-3 rounded-lg mb-4 text-sm">
@@ -285,7 +326,7 @@ const Updates = () => {
             </div>
           )}
 
-          {installing && (
+          {(installing || cleaning) && (
             <div className="mb-4">
               <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
                 <div 
@@ -345,7 +386,7 @@ const Updates = () => {
                             {!update.downloaded && (
                               <Button
                                 onClick={() => downloadUpdate(update.id)}
-                                disabled={installing}
+                                disabled={installing || cleaning}
                                 size="sm"
                                 className={isRisky 
                                   ? "bg-orange-600 hover:bg-orange-700 border border-orange-500/50" 
@@ -357,7 +398,7 @@ const Updates = () => {
                             )}
                             <Button
                               onClick={() => installSingleUpdate(update.id)}
-                              disabled={installing || !update.downloaded}
+                              disabled={installing || cleaning || !update.downloaded}
                               size="sm"
                               className={isRisky 
                                 ? "bg-red-600 hover:bg-red-700 border border-red-500/50" 
