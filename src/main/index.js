@@ -12,6 +12,7 @@ import "./rpc"
 import "./tweakHandler"
 import "./dnsHandler"
 import "./backup"
+import UpdateHandler from "./updateHandler"
 import { executePowerShell } from "./powershell"
 import { createTray } from "./tray"
 import { setupTweaksHandlers } from "./tweakHandler"
@@ -153,6 +154,7 @@ app.whenReady().then(() => {
   createWindow()
   setupTweaksHandlers()
   setupDNSHandlers()
+  new UpdateHandler()
   if (app.isPackaged) {
     globalShortcut.register("CommandOrControl+R", () => {})
     globalShortcut.register("F5", () => {})

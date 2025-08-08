@@ -1,0 +1,7 @@
+{
+  "title": "Disable Windows Updates",
+  "description": "Disables automatic Windows updates to prevent reverting optimizations. Use the Updates page to manually check for updates.",
+  "category": "System",
+  "severity": "medium",
+  "requiresRestart": true
+}
