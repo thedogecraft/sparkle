@@ -293,7 +293,7 @@ const Updates = () => {
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <p className="text-sm text-gray-400 text-center">{progress}% Complete</p>
+              <p className="text-sm text-gray-400 text-center">{Math.round(progress)}% Complete</p>
             </div>
           )}
         </div>
