@@ -36,7 +36,7 @@ function getTimestamp() {
   return `${yyyy}-${mm}-${dd}_${hh}-${mi}-${ss}`
 }
 
-ipcMain.handle('create-sparkle-restore-point', async () => {
+async function createSparkleRestorePoint() {
   const label = `SparkleBackup-${getTimestamp()}`
   try {
     await runPowerShell(`Checkpoint-Computer -Description '${label}'`)
@@ -46,6 +46,15 @@ ipcMain.handle('create-sparkle-restore-point', async () => {
     console.error(error)
     return { success: false, error: error.message }
   }
+}
+
+ipcMain.handle('create-sparkle-restore-point', async () => {
+  return await createSparkleRestorePoint()
+})
+
+ipcMain.on('create-sparkle-restore-point-internal', async (event, callback) => {
+  const result = await createSparkleRestorePoint()
+  if (callback) callback(result)
 })
 
 ipcMain.handle('create-restore-point', async (_, name) => {
@@ -95,6 +104,18 @@ ipcMain.handle('get-restore-points', async () => {
 
 ipcMain.handle('restore-restore-point', async (_, sequenceNumber) => {
   try {
+    // Clean up Windows Update downloads before restoring
+    console.log('Cleaning up Windows Update downloads before restore...')
+    try {
+      const { ipcMain } = await import('electron')
+      const cleanupResult = await new Promise((resolve) => {
+        ipcMain.emit('cleanup-update-downloads-internal', null, resolve)
+      })
+      console.log('Update cleanup result:', cleanupResult)
+    } catch (cleanupError) {
+      console.warn('Failed to clean up update downloads:', cleanupError)
+    }
+
     await runPowerShell(`Restore-Computer -RestorePoint ${sequenceNumber}`)
     await changeRestorePointCooldown()
     return { success: true }

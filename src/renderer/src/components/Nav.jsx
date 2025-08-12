@@ -12,6 +12,7 @@ import DiscordIcon from './Discordicon'
 import { Box } from 'lucide-react'
 import { Settings } from 'lucide-react'
 import { RefreshCw } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
 
 const tabIcons = {
@@ -22,6 +23,7 @@ const tabIcons = {
   utilities: <Box size={20} />,
   dns: <Globe size={20} />,
   apps: <LayoutGrid size={20} />,
+  updates: <Download size={20} />,
   settings: <Settings size={20} />
 }
 
@@ -33,6 +35,7 @@ const tabs = {
   utilities: { label: 'Utilities', path: '/utilities' },
   dns: { label: 'DNS Manager', path: '/dns' },
   apps: { label: 'Apps', path: '/apps' },
+  updates: { label: 'Updates', path: '/updates' },
   settings: { label: 'Settings', path: '/settings' }
 }
 
