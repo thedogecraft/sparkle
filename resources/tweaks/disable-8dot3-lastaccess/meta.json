@@ -1,0 +1,15 @@
+{
+  "name": "disable-8dot3-lastaccess",
+  "title": "Disable 8dot3 Filenames and Last Access Time",
+  "description": "Disables 8dot3 name creation and last access time updates for performance improvements.",
+  "deepDescription": "Disables creation of legacy 8.3 format filenames on the C: drive and globally. Strips existing 8dot3 names from C:. Disables last access time updates to improve performance. Note: stripping 8dot3 names is irreversible.",
+  "category": ["Performance", "System"],
+  "reversible": true,
+  "restart": false,
+  "warning": "Stripping 8dot3 filenames on C: is irreversible. Ensure no legacy applications depend on them.",
+  "links": [
+    "https://archive.techarp.com/showarticle53b4.html?artno=827&pgno=1",
+    "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-8dot3name",
+    "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior"
+  ]
+}
