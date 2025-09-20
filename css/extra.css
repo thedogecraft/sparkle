@@ -1,0 +1,69 @@
+
+:root  > * {
+  --md-primary-fg-color:        #3b82f6;
+
+}
+[data-md-color-scheme=default] {
+ * {
+  --md-primary-fg-color:        #3b82f6;
+  --md-primary-fg-color--light: #ECB7B7;
+  --md-primary-fg-color--dark:  #90030C;
+}
+.md-header, .md-tabs {
+    background-color: #5e5e5e;
+}
+}
+[data-md-color-scheme=slate] {
+ * {
+  --md-primary-fg-color:        #3b82f6;
+  --md-primary-fg-color--light: #ECB7B7;
+  --md-primary-fg-color--dark:  #90030C;
+}
+.md-header, .md-tabs {
+    background-color: #131c2c
+}
+.md-container {
+    background-color: #0c121f;
+}
+table, code {
+    background-color: #131c2c !important;
+}
+}
+table, code {
+      border-radius: 10px !important;
+}
+nav label {
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+.admonition {
+    background-color: transparent !important;
+}
+.md-button {
+    border-radius: 10px !important;
+    padding: 0.5em 1em !important;
+    display: inline-block;
+    text-align: center !important;
+    vertical-align: middle;
+    line-height: 1;       
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 1em;     
+    transition: all 0.3s ease-in-out;
+ 
+}
+
+.md-button:active {
+    transform: scale(0.95);
+}
+
+.admonition {
+border-radius: 10px !important;
+overflow: hidden;
+}
+.grid.cards ul li {
+    border-radius: 10px !important;
+}
+.grid.cards ul li:hover {
+    border-color: #3b82f6 !important;
+}
