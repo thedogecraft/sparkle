@@ -36,8 +36,8 @@ $dnsConfigs = @{
         Name = "Quad9"
     }
     "adguard" = @{
-        Primary = "94.140.14.14"
-        Secondary = "94.140.15.15"
+        Primary = "94.140.14.49"
+        Secondary = "94.140.14.59"
         Name = "Adguard DN"
     }
     "automatic" = @{
