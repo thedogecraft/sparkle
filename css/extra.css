@@ -28,6 +28,14 @@
 table, code {
     background-color: #131c2c !important;
 }
+.md-dialog {
+    background-color: #131c2c  !important;
+    color: white !important;
+    border-radius: 10px !important;
+}
+.md-dialog__inner {
+    color: white !important;
+}
 }
 table, code {
       border-radius: 10px !important;
