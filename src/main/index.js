@@ -14,6 +14,8 @@ import { executePowerShell } from "./powershell"
 import { createTray } from "./tray"
 import { setupTweaksHandlers } from "./tweakHandler"
 import { setupDNSHandlers } from "./dnsHandler"
+import { setupPermissionHandlers } from "./permissionHandlers.js"
+import { logger } from "./logger.js"
 import Store from "electron-store"
 import { startDiscordRPC, stopDiscordRPC } from "./rpc"
 import { initAutoUpdater, triggerAutoUpdateCheck } from "./updates.js"
@@ -22,12 +24,15 @@ Sentry.init({
   dsn: "https://d1e8991c715dd717e6b7b44dbc5c43dd@o4509167771648000.ingest.us.sentry.io/4509167772958720",
   ipcMode: IPCMode.Both,
 })
-console.log = log.log
-console.error = log.error
-console.warn = log.warn
+
+// Initialize structured logger (this redirects console to logger)
+logger.initializeLogging()
 
 export const logo = "[Sparkle]:"
 log.initialize()
+
+// Setup permission handlers
+setupPermissionHandlers()
 async function Defender() {
   const Apppath = path.dirname(process.execPath)
   if (app.isPackaged) {
