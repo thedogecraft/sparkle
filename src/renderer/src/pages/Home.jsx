@@ -141,7 +141,7 @@ function Home() {
     <RootDiv>
       <div className="max-w-[1800px] mx-auto ">
         <Greeting />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <InfoCard
             icon={Cpu}
             iconBgColor="bg-blue-500/10"
@@ -214,7 +214,7 @@ function Home() {
             ]}
           />
         </div>
-        <Card className="bg-sparkle-card backdrop-blur-xs rounded-xl border border-sparkle-border hover:shadow-xs overflow-hidden p-3 w-full mt-5 flex gap-4 items-center">
+        <Card className="bg-sparkle-card/60 backdrop-blur-md rounded-3xl border border-white/5 hover:border-sparkle-primary/50 overflow-hidden p-3 w-full mt-4 flex gap-4 items-center">
           <div className="p-3 bg-green-500/10 rounded-lg items-center justify-center text-center">
             <Wrench className="text-green-500" size={24} />
           </div>

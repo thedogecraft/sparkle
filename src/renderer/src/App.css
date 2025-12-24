@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap")
-layer(base);
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap") layer(base);
 
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
@@ -28,6 +27,7 @@ layer(base);
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -40,6 +40,7 @@ layer(base);
 @utility no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -66,6 +67,7 @@ layer(base);
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-secondary);
   }
+
   .light {
     --color-sparkle-bg: #f0f0f0;
     --color-sparkle-text: #1e293b;
@@ -140,12 +142,14 @@ layer(base);
     --color-sparkle-secondary: #2dac7d;
     --color-sparkle-accent: #2e394b;
   }
+
   .Toastify__toast {
     background-color: var(--color-sparkle-card) !important;
     border: 1px solid var(--color-sparkle-border) !important;
     color: var(--color-sparkle-text) !important;
     --toastify-icon-color-success: var(--color-sparkle-secondary) !important;
   }
+
   .Toastify__close-button {
     color: var(--color-sparkle-text-secondary) !important;
   }
@@ -156,6 +160,7 @@ layer(base);
     font-family: "Poppins", sans-serif;
   }
 }
+
 @layer utilities {
   * {
     user-select: none;

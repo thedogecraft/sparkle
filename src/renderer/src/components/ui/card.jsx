@@ -4,7 +4,7 @@ function Card({ children, className, ...props }) {
   return (
     <div
       className={cn(
-        "bg-sparkle-card border border-sparkle-border rounded-xl hover:border-sparkle-primary transition group",
+        "bg-sparkle-card border border-sparkle-border/50 rounded-3xl hover:border-sparkle-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out group backdrop-blur-md",
         className,
       )}
       {...props}

@@ -391,11 +391,10 @@ function Tweaks() {
                 {categories.map((category) => (
                   <button
                     key={category}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 active:scale-95  ${
-                      activeCategory === category
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 active:scale-95  ${activeCategory === category
                         ? "bg-sparkle-primary text-white shadow-lg border border-sparkle-border"
                         : "bg-sparkle-card/50 text-sparkle-text-secondary  hover:bg-sparkle-border border border-sparkle-border-secondary"
-                    }`}
+                      }`}
                     onClick={() => setActiveCategory(category)}
                   >
                     {category}
@@ -410,8 +409,8 @@ function Tweaks() {
               sortedTweaks.map((tweak, index) => {
                 const originalIndex = tweaks.indexOf(tweak)
                 return (
-                  <Card key={originalIndex} className=" p-0 h-52">
-                    <div className="p-5 flex flex-col h-[260px]">
+                  <Card key={originalIndex} className=" p-0 h-44">
+                    <div className="p-4 flex flex-col h-full">
                       <div className="flex items-center justify-between mb-3">
                         {tweak.category && (
                           <div className="flex items-center gap-2 flex-wrap">

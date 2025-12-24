@@ -14,12 +14,12 @@ const InfoCard = ({
   return (
     <Card
       className={cn(
-        "bg-sparkle-card backdrop-blur-xs rounded-xl border border-sparkle-border hover:shadow-xs overflow-hidden p-5",
+        "bg-sparkle-card/60 backdrop-blur-md rounded-3xl border-white/5 hover:border-sparkle-primary/50 p-4 hover:bg-sparkle-card/80",
         className,
       )}
       {...props}
     >
-      <div className="flex items-start gap-3 mb-4">
+      <div className="flex items-start gap-3 mb-2">
         <div className={cn("p-3 rounded-lg", iconBgColor)}>
           <Icon className={cn("text-lg", iconColor)} size={24} />
         </div>
