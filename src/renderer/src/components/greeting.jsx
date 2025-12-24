@@ -1,6 +1,12 @@
 import { useMemo, useState, useEffect } from "react"
 import { invoke } from "@/lib/electron"
 
+/**
+ * Renders a personalized greeting header that shows a random salutation and the user's name (or "friend").
+ *
+ * On mount, attempts to read the user name from localStorage under "sparkle:user"; if absent, requests it via the "get-user-name" IPC channel and caches it on success. The displayed salutation is chosen once on mount from a set of general greetings combined with a time-of-day greeting.
+ * @returns {JSX.Element} An <h1> element containing the selected greeting and the user's name (or "friend" when no name is available).
+ */
 function Greeting() {
   const [name, setName] = useState("")
 
@@ -48,7 +54,7 @@ function Greeting() {
   }, [])
 
   return (
-    <h1 className="text-2xl font-bold mb-4">
+    <h1 className="text-3xl font-bold mb-5">
       {randomGreeting},{" "}
       <span className="bg-linear-to-r from-sparkle-primary to-sparkle-secondary bg-clip-text text-transparent">
         {name || "friend"}

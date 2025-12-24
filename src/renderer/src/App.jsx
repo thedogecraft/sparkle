@@ -15,8 +15,19 @@ import Backup from "./pages/Backup"
 import FirstTime from "./components/firsttime"
 import UpdateManager from "./components/updatemanager"
 
+import useSidebarStore from "@/store/sidebarStore"
+import { clsx } from "clsx"
+
+/**
+ * Root application component that initializes and applies the UI theme, reacts to system and storage theme changes, and renders the main app layout and routes.
+ *
+ * The component synchronizes theme state with localStorage and the system color scheme, toggles the PostHog capture CSS class based on localStorage, and sets up/cleans up the related event listeners.
+ *
+ * @returns {JSX.Element} The application's rendered element containing the title bar, navigation, main route views, update manager, and toast container.
+ */
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
+  const { isCollapsed } = useSidebarStore()
 
   useEffect(() => {
     const applyTheme = (theme) => {
@@ -64,8 +75,13 @@ function App() {
       <FirstTime />
       <TitleBar />
       <Nav />
-      <div className="flex flex-1 pt-[50px] relative">
-        <main className="flex-1 p-6 rounded-tl-2xl border-t border-l border-sparkle-border ml-52">
+      <div className="flex flex-1 pt-8 relative">
+        <main
+          className={clsx(
+            "flex-1 p-6 rounded-tl-2xl border-t border-l border-sparkle-border transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)]",
+            isCollapsed ? "ml-14" : "ml-60",
+          )}
+        >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/tweaks" element={<Tweaks />} />

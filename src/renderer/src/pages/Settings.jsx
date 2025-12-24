@@ -17,6 +17,15 @@ const themes = [
   { label: "Classic", value: "classic" },
 ]
 
+/**
+ * Render the Settings UI allowing users to view and modify application preferences and perform maintenance actions.
+ *
+ * Renders controls for appearance (theme), Discord Rich Presence, update checks, profile name, privacy (analytics), data management (cache and legacy backups), tray visibility, troubleshooting (restart Explorer), and an About section. State for each setting is persisted or queried via localStorage and backend IPC channels; user actions may trigger toasts and invoke platform operations.
+ *
+ * @param {{ onCheckForUpdates?: Function }} props - Component props.
+ * @param {Function} [props.onCheckForUpdates] - Optional callback invoked when an update check is requested.
+ * @returns {JSX.Element} The Settings component UI.
+ */
 function Settings({ onCheckForUpdates }) {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
   const [checking, setChecking] = useState(false)
@@ -161,9 +170,8 @@ function Settings({ onCheckForUpdates }) {
                     {themes.map((t) => (
                       <label
                         key={t.value}
-                        className={`flex items-center justify-center gap-2 cursor-pointer p-3 rounded-lg border transition-all duration-200 active:scale-95 ${
-                          theme === t.value ? "border-sparkle-primary" : "border-sparkle-border"
-                        }`}
+                        className={`flex items-center justify-center gap-2 cursor-pointer p-3 rounded-full border transition-all duration-200 active:scale-95 ${theme === t.value ? "border-sparkle-primary" : "border-sparkle-border"
+                          }`}
                       >
                         <input
                           type="radio"
@@ -199,11 +207,10 @@ function Settings({ onCheckForUpdates }) {
                       disabled={discordLoading}
                     />
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        discordEnabled
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${discordEnabled
                           ? "text-green-400 bg-green-400/10"
                           : "text-sparkle-text-secondary bg-sparkle-border-secondary/20"
-                      }`}
+                        }`}
                     >
                       {discordEnabled ? "Enabled" : "Disabled"}
                     </span>
@@ -274,11 +281,10 @@ function Settings({ onCheckForUpdates }) {
                       onChange={() => setPosthogDisabled((v) => !v)}
                     />
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        posthogDisabled
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${posthogDisabled
                           ? "text-green-400 bg-green-400/10"
                           : "text-sparkle-text-secondary bg-sparkle-border-secondary/20"
-                      }`}
+                        }`}
                     >
                       {posthogDisabled ? "Disabled" : "Enabled"}
                     </span>
@@ -348,11 +354,10 @@ function Settings({ onCheckForUpdates }) {
                       disabled={trayLoading}
                     />
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        trayEnabled
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${trayEnabled
                           ? "text-green-400 bg-green-400/10"
                           : "text-sparkle-text-secondary bg-sparkle-border-secondary/20"
-                      }`}
+                        }`}
                     >
                       {trayEnabled ? "Enabled" : "Disabled"}
                     </span>
