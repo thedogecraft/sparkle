@@ -18,7 +18,7 @@ const Button = ({
   ...props
 }) => {
   const base =
-    "flex items-center rounded-xl shadow-sm hover:shadow-md font-medium transition-all duration-200 select-none focus:outline-hidden active:scale-90"
+    "flex items-center rounded-xl shadow-sm hover:shadow-md font-medium transition-all duration-200 select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sparkle-primary active:scale-90"
 
   const variants = {
     primary:

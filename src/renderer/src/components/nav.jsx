@@ -77,7 +77,7 @@ function Nav() {
     >
       <button
         onClick={toggle}
-        className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-sparkle-card border border-sparkle-border rounded-full flex items-center justify-center text-sparkle-text shadow-md hover:bg-sparkle-border transition-all duration-300 z-50 focus:outline-hidden opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+        className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-sparkle-card border border-sparkle-border rounded-full flex items-center justify-center text-sparkle-text shadow-md hover:bg-sparkle-border transition-all duration-300 z-50 focus:outline-hidden opacity-0 group-hover:opacity-100 focus:opacity-100 pointer-events-none group-hover:pointer-events-auto focus:pointer-events-auto"
       >
         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
