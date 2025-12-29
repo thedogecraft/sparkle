@@ -70,6 +70,7 @@ function Nav() {
 
   return (
     <nav
+      aria-label="Main sidebar"
       className={clsx(
         "h-screen text-sparkle-text fixed left-0 top-0 flex flex-col pt-4 pb-6 z-40 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group",
         isCollapsed ? "w-14" : "w-60",
@@ -77,7 +78,9 @@ function Nav() {
     >
       <button
         onClick={toggle}
-        className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-sparkle-card border border-sparkle-border rounded-full flex items-center justify-center text-sparkle-text shadow-md hover:bg-sparkle-border transition-all duration-300 z-50 focus:outline-hidden opacity-0 group-hover:opacity-100 focus:opacity-100 pointer-events-none group-hover:pointer-events-auto focus:pointer-events-auto"
+        aria-expanded={String(!isCollapsed)}
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-sparkle-card border border-sparkle-border rounded-full flex items-center justify-center text-sparkle-text shadow-md hover:bg-sparkle-border transition-all duration-300 z-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sparkle-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sparkle-bg opacity-0 group-hover:opacity-100 focus:opacity-100 pointer-events-none group-hover:pointer-events-auto focus:pointer-events-auto"
       >
         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
