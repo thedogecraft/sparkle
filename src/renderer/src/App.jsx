@@ -15,8 +15,19 @@ import Backup from "./pages/Backup"
 import FirstTime from "./components/firsttime"
 import UpdateManager from "./components/updatemanager"
 
+import useSidebarStore from "@/store/sidebarStore"
+import { clsx } from "clsx"
+
+/**
+ * Render the application's main layout, initialize theme and sidebar state, and provide the app's route container and global UI.
+ *
+ * Manages the active theme (including honoring stored preference and system preference changes), syncs theme changes from storage, applies posthog opt-out class when set, and adapts main content layout based on sidebar collapsed state.
+ *
+ * @returns {JSX.Element} The root React element containing global UI (first-time flow, title bar, navigation, update manager, toast container) and the routes for the app.
+ */
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
+  const { isCollapsed } = useSidebarStore()
 
   useEffect(() => {
     const applyTheme = (theme) => {
@@ -64,8 +75,13 @@ function App() {
       <FirstTime />
       <TitleBar />
       <Nav />
-      <div className="flex flex-1 pt-[50px] relative">
-        <main className="flex-1 p-6 rounded-tl-2xl border-t border-l border-sparkle-border ml-52">
+      <div className="flex flex-1 pt-8 relative">
+        <main
+          className={clsx(
+            "flex-1 p-6 rounded-tl-2xl border-t border-l border-sparkle-border transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)]",
+            isCollapsed ? "ml-14" : "ml-60",
+          )}
+        >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/tweaks" element={<Tweaks />} />

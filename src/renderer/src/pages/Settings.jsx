@@ -17,6 +17,19 @@ const themes = [
   { label: "Classic", value: "classic" },
 ]
 
+/**
+ * Render the Settings page for Sparkle, providing controls for appearance, updates, profile,
+ * privacy, data management, integrations, and troubleshooting.
+ *
+ * The component persists selected settings to localStorage, updates document body classes for
+ * theme and analytics capture, and communicates with the host via IPC channels for actions
+ * like checking for updates, toggling Discord Rich Presence, managing the tray icon, clearing
+ * cache, and restarting Explorer.
+ *
+ * @param {{ onCheckForUpdates?: Function }} props
+ * @param {Function} [props.onCheckForUpdates] - Optional callback invoked to trigger an external update check.
+ * @returns {import('react').ReactElement} The Settings React element.
+ */
 function Settings({ onCheckForUpdates }) {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
   const [checking, setChecking] = useState(false)
@@ -161,9 +174,8 @@ function Settings({ onCheckForUpdates }) {
                     {themes.map((t) => (
                       <label
                         key={t.value}
-                        className={`flex items-center justify-center gap-2 cursor-pointer p-3 rounded-lg border transition-all duration-200 active:scale-95 ${
-                          theme === t.value ? "border-sparkle-primary" : "border-sparkle-border"
-                        }`}
+                        className={`flex items-center justify-center gap-2 cursor-pointer p-3 rounded-full border transition-all duration-200 active:scale-95 ${theme === t.value ? "border-sparkle-primary" : "border-sparkle-border"
+                          }`}
                       >
                         <input
                           type="radio"
@@ -199,11 +211,10 @@ function Settings({ onCheckForUpdates }) {
                       disabled={discordLoading}
                     />
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        discordEnabled
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${discordEnabled
                           ? "text-green-400 bg-green-400/10"
                           : "text-sparkle-text-secondary bg-sparkle-border-secondary/20"
-                      }`}
+                        }`}
                     >
                       {discordEnabled ? "Enabled" : "Disabled"}
                     </span>
@@ -274,11 +285,10 @@ function Settings({ onCheckForUpdates }) {
                       onChange={() => setPosthogDisabled((v) => !v)}
                     />
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        posthogDisabled
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${posthogDisabled
                           ? "text-green-400 bg-green-400/10"
                           : "text-sparkle-text-secondary bg-sparkle-border-secondary/20"
-                      }`}
+                        }`}
                     >
                       {posthogDisabled ? "Disabled" : "Enabled"}
                     </span>
@@ -348,11 +358,10 @@ function Settings({ onCheckForUpdates }) {
                       disabled={trayLoading}
                     />
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        trayEnabled
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${trayEnabled
                           ? "text-green-400 bg-green-400/10"
                           : "text-sparkle-text-secondary bg-sparkle-border-secondary/20"
-                      }`}
+                        }`}
                     >
                       {trayEnabled ? "Enabled" : "Disabled"}
                     </span>

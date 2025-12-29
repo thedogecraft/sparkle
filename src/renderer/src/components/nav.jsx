@@ -21,6 +21,11 @@ import GithubIcon from "./githubicon"
 import Button from "./ui/button"
 import Modal from "./ui/modal"
 
+import useSidebarStore from "../store/sidebarStore"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+
+import sparkleLogo from "../../../../resources/sparklelogo.png"
+
 const tabIcons = {
   home: <Home size={20} />,
   tweaks: <Wrench size={20} />,
@@ -43,6 +48,14 @@ const tabs = {
   settings: { label: "Settings", path: "/settings" },
 }
 
+/**
+ * Render the main vertical sidebar navigation for the application.
+ *
+ * The sidebar includes a collapsible toggle, branding, primary navigation tabs (with icons and active state),
+ * a conditional restart prompt and confirmation modal, social links, and the application version.
+ *
+ * @returns {JSX.Element} The sidebar element containing navigation tabs, collapse/expand controls, restart UI, social links, and version display.
+ */
 function Nav() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -50,8 +63,9 @@ function Nav() {
 
   const tabRefs = useRef({})
   const containerRef = useRef(null)
-  const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 0 })
   const [showRestartModal, setShowRestartModal] = useState(false)
+
+  const { isCollapsed, toggle } = useSidebarStore()
 
   const getActiveTab = () => {
     const path = location.pathname
@@ -62,35 +76,36 @@ function Nav() {
 
   const activeTab = getActiveTab()
 
-  useEffect(() => {
-    const updateIndicator = () => {
-      const ref = tabRefs.current[activeTab]
-      const container = containerRef.current
-      if (ref && ref instanceof HTMLElement && container) {
-        const tabRect = ref.getBoundingClientRect()
-        const containerRect = container.getBoundingClientRect()
-        setIndicatorStyle({
-          top: tabRect.top - containerRect.top,
-          height: tabRect.height,
-        })
-      }
-    }
-    updateIndicator()
-    window.addEventListener("resize", updateIndicator)
-    return () => window.removeEventListener("resize", updateIndicator)
-  }, [activeTab])
-
   return (
-    <nav className="h-screen text-sparkle-text fixed left-0 top-0 flex flex-col py-6 z-40 w-52">
-      <div className="flex-1 flex flex-col gap-2 px-3 mt-10 relative" ref={containerRef}>
-        <div
-          className="absolute left-0 w-1 bg-sparkle-primary rounded-sm transition-all duration-300"
-          style={{
-            top: indicatorStyle.top,
-            height: indicatorStyle.height,
-            transition: "top 0.2s ease, height 0.2s ease",
-          }}
-        />
+    <nav
+      aria-label="Main sidebar"
+      className={clsx(
+        "h-screen text-sparkle-text fixed left-0 top-0 flex flex-col pt-4 pb-6 z-40 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group",
+        isCollapsed ? "w-14" : "w-60",
+      )}
+    >
+      <button
+        onClick={toggle}
+        aria-expanded={String(!isCollapsed)}
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-sparkle-card border border-sparkle-border rounded-full flex items-center justify-center text-sparkle-text shadow-md hover:bg-sparkle-border transition-all duration-300 z-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sparkle-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sparkle-bg opacity-0 group-hover:opacity-100 focus:opacity-100 pointer-events-none group-hover:pointer-events-auto focus:pointer-events-auto"
+      >
+        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+      </button>
+      <div className={clsx("mb-6 flex items-center transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] pl-3", isCollapsed ? "gap-0" : "gap-3")}>
+        <img src={sparkleLogo} alt="Sparkle" className="h-8 w-8 shrink-0" />
+        <div className={clsx("overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)]", isCollapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <span className="text-xl font-bold bg-linear-to-r from-white to-white/80 bg-clip-text text-transparent">
+              Sparkle
+            </span>
+            <div className="bg-sparkle-primary/10 text-sparkle-primary border border-sparkle-primary/20 px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider">
+              Beta
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 flex flex-col gap-2 relative px-2" ref={containerRef}>
         {Object.entries(tabs).map(([id, { label, path }]) => (
           <Button
             variant=""
@@ -98,18 +113,23 @@ function Nav() {
             ref={(el) => (tabRefs.current[id] = el)}
             onClick={() => navigate(path)}
             className={clsx(
-              "flex items-center gap-3 py-2 rounded-lg transition-all duration-200 border relative px-3",
+              "flex items-center py-2.5 rounded-2xl transition-all duration-200 border-none relative font-medium overflow-hidden pl-2.5 w-full",
+              isCollapsed ? "gap-0" : "gap-3",
               activeTab === id
-                ? "border-transparent text-sparkle-primary"
-                : "text-sparkle-text-secondary hover:bg-sparkle-border-secondary hover:text-sparkle-text border-transparent",
+                ? clsx("text-sparkle-primary", !isCollapsed && "bg-sparkle-primary/15")
+                : "text-sparkle-text-secondary hover:text-sparkle-text",
             )}
+            title={isCollapsed ? label : ""}
           >
-            <div>{tabIcons[id]}</div>
-            <span className="text-sm">{label}</span>
-            {id === "utilities" && (
-              <span className="text-xs bg-sparkle-primary text-sparkle-bg px-1.5 py-0.5 rounded-full">
+            <div className="shrink-0">{tabIcons[id]}</div>
+            <span className={clsx("text-sm transition-[max-width,opacity] duration-500 ease-[cubic-bezier(0.2,0,0,1)] whitespace-nowrap overflow-hidden delay-100", isCollapsed ? "max-w-0 opacity-0 delay-0" : "max-w-[150px] opacity-100")}>{label}</span>
+            {id === "utilities" && !isCollapsed && (
+              <span className="text-xs bg-sparkle-primary text-sparkle-bg px-1.5 py-0.5 rounded-full ml-auto">
                 New
               </span>
+            )}
+            {id === "utilities" && isCollapsed && (
+              <div className="absolute top-2 right-2 w-2 h-2 bg-sparkle-primary rounded-full" />
             )}
           </Button>
         ))}
@@ -117,16 +137,18 @@ function Nav() {
       {needsRestart && (
         <button
           className={clsx(
-            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 border m-3",
+            "flex items-center py-2 rounded-lg transition-all duration-200 border mx-2 mb-3 mt-auto overflow-hidden whitespace-nowrap pl-2.5",
+            isCollapsed ? "gap-0" : "gap-3",
             "bg-sparkle-card text-sparkle-text border-sparkle-border-secondary hover:bg-sparkle-border-secondary hover:text-sparkle-text",
           )}
           onClick={() => setShowRestartModal(true)}
+          title="Restart Windows"
         >
           <span
-            className="flex text-center items-center gap-2 text-red-500"
-            title="Restart Windows"
+            className={clsx("flex text-center items-center text-red-500", isCollapsed ? "gap-0" : "gap-2")}
           >
-            <RefreshCw size={16} /> Restart Now
+            <RefreshCw size={16} className="shrink-0" />
+            <span className={clsx("transition-[max-width,opacity] duration-500 ease-[cubic-bezier(0.2,0,0,1)] overflow-hidden whitespace-nowrap", isCollapsed ? "max-w-0 opacity-0" : "max-w-[150px] opacity-100")}>Restart Now</span>
           </span>
         </button>
       )}
@@ -150,7 +172,7 @@ function Nav() {
           </div>
         </div>
       </Modal>
-      <div className="flex items-center justify-center gap-2 mt-4 mb-2">
+      <div className={clsx("flex items-center justify-center gap-4 mt-4 mb-2", isCollapsed ? "flex-col" : "flex-row")}>
         <a href="https://github.com/parcoil/sparkle" target="_blank">
           <GithubIcon className="w-5 fill-sparkle-primary" />
         </a>
