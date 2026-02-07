@@ -2,7 +2,10 @@ import { Tray, Menu, app, BrowserWindow } from "electron"
 import path from "path"
 
 export function createTray(mainWindow: BrowserWindow): Tray {
-  const tray = new Tray(path.join(__dirname, "../../resources/sparkle2.ico"))
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, "sparkle2.ico")
+    : path.join(__dirname, "../../resources/sparkle2.ico")
+  const tray = new Tray(iconPath)
 
   const contextMenu = Menu.buildFromTemplate([
     { label: "Open Window", click: (): void => mainWindow.show() },

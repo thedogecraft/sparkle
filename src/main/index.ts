@@ -97,8 +97,6 @@ const initDiscordRPC = (): void => {
   }
 }
 
-initDiscordRPC()
-
 ipcMain.handle(
   "discord-rpc:toggle",
   async (_event: Electron.IpcMainInvokeEvent, value: boolean) => {
@@ -167,67 +165,70 @@ function createWindow(): void {
   })
 }
 
-app.whenReady().then(() => {
-  createWindow()
-  initAutoUpdater(() => mainWindow)
-  if (store.get("showTray")) {
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on("second-instance", () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.show()
+      mainWindow.focus()
+    }
+  })
+
+  app.whenReady().then(() => {
+    createWindow()
+    initDiscordRPC()
+    initAutoUpdater(() => mainWindow)
+    if (store.get("showTray")) {
+      setTimeout(() => {
+        trayInstance = createTray(mainWindow!)
+      }, 50)
+    }
     setTimeout(() => {
-      trayInstance = createTray(mainWindow!)
-    }, 50)
-  }
-  setTimeout(() => {
-    void triggerAutoUpdateCheck()
-  }, 1500)
+      void triggerAutoUpdateCheck()
+    }, 1500)
 
-  setTimeout(() => {
-    void Defender()
-    setupTweaksHandlers()
-    setupDNSHandlers()
-  }, 0)
+    setTimeout(() => {
+      void Defender()
+      setupTweaksHandlers()
+      setupDNSHandlers()
+    }, 0)
 
-  electronApp.setAppUserModelId("com.parcoil.sparkle")
+    electronApp.setAppUserModelId("com.parcoil.sparkle")
 
-  app.on("browser-window-created", (_, window: BrowserWindow) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+    app.on("browser-window-created", (_, window: BrowserWindow) => {
+      optimizer.watchWindowShortcuts(window)
+    })
 
-  ipcMain.on("window-minimize", () => {
-    if (mainWindow) mainWindow.minimize()
-  })
+    ipcMain.on("window-minimize", () => {
+      if (mainWindow) mainWindow.minimize()
+    })
 
-  ipcMain.on("window-toggle-maximize", () => {
-    if (mainWindow) {
-      if (mainWindow.isMaximized()) {
-        mainWindow.unmaximize()
-      } else {
-        mainWindow.maximize()
-      }
-    }
-  })
-
-  ipcMain.on("window-close", () => {
-    if (mainWindow) {
-      if (store.get("showTray")) {
-        mainWindow.hide()
-      } else {
-        app.quit()
-      }
-    }
-  })
-
-  const gotTheLock = app.requestSingleInstanceLock()
-
-  if (!gotTheLock) {
-    app.quit()
-  } else {
-    app.on("second-instance", () => {
+    ipcMain.on("window-toggle-maximize", () => {
       if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore()
-        mainWindow.focus()
+        if (mainWindow.isMaximized()) {
+          mainWindow.unmaximize()
+        } else {
+          mainWindow.maximize()
+        }
       }
     })
-  }
-  app.on("activate", function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+
+    ipcMain.on("window-close", () => {
+      if (mainWindow) {
+        if (store.get("showTray")) {
+          mainWindow.hide()
+        } else {
+          app.quit()
+        }
+      }
+    })
+
+    app.on("activate", function () {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
   })
-})
+}

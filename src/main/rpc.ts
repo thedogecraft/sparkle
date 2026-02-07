@@ -77,7 +77,11 @@ async function startDiscordRPC(): Promise<boolean> {
 
 function stopDiscordRPC(): boolean {
   if (rpcClient) {
-    rpcClient.destroy()
+    try {
+      rpcClient.destroy()
+    } catch {
+      // ignore errors when transport is already closed
+    }
     rpcClient = null
     console.log("(rpc.js) ", "Discord RPC disconnected")
   }
