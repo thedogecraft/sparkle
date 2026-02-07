@@ -1,3 +1,11 @@
+process.on("uncaughtException", (err) => {
+  if (err.message?.includes("EPIPE")) {
+    // Ignore broken pipe errors during shutdown
+    return
+  }
+  throw err
+})
+
 import { app, shell, BrowserWindow, ipcMain } from "electron"
 import path, { join } from "path"
 import { electronApp, optimizer, is } from "@electron-toolkit/utils"
