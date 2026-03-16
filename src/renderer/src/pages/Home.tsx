@@ -1,245 +1,109 @@
-import { useState, useEffect } from "react"
 import RootDiv from "@/components/rootdiv"
-import { Cpu, HardDrive, Zap, MemoryStick, Gpu } from "lucide-react"
-import InfoCard from "@/components/infocard"
-import { invoke } from "@/lib/electron"
+import { Zap, Wrench, ExternalLink, Shield, Cpu, Box, LayoutGrid } from "lucide-react"
 import Button from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
-import useSystemStore from "@/store/systemInfo"
-import log from "electron-log/renderer"
-import Greeting from "@/components/greeting"
-import { MonitorCog } from "lucide-react"
-import { Wrench } from "lucide-react"
 import Card from "@/components/ui/Card"
+
 function Home() {
-  const systemInfo = useSystemStore((state) => state.systemInfo)
-  const setSystemInfo = useSystemStore((state) => state.setSystemInfo)
-  const [tweakInfo, setTweakInfo] = useState(() => {
-    try {
-      const cached = localStorage.getItem("sparkle:tweakInfo")
-      return cached ? JSON.parse(cached) : null
-    } catch (err) {
-      console.error("Failed to parse tweakInfo cache", err)
-      return null
-    }
-  })
   const router = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [usingCache, setUsingCache] = useState(false)
-  const [activeTweaks, setActiveTweaks] = useState(() => {
-    try {
-      const cached = localStorage.getItem("sparkle:activeTweaks")
-      return cached ? JSON.parse(cached) : []
-    } catch {
-      return []
-    }
-  })
-
-  const goToTweaks = () => {
-    router("tweaks")
-  }
-
-  const fetchActiveTweaks = async () => {
-    try {
-      const active = await invoke({ channel: "tweak:active" })
-      setActiveTweaks(active)
-      localStorage.setItem("sparkle:activeTweaks", JSON.stringify(active))
-    } catch (err) {
-      console.error("Failed to fetch active tweaks:", err)
-    }
-  }
-
-  useEffect(() => {
-    const idleHandle = requestIdleCallback(() => {
-      const cached = localStorage.getItem("sparkle:systemInfo")
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached)
-          setSystemInfo(parsed)
-          setUsingCache(true)
-          setLoading(false)
-        } catch (err) {
-          console.warn("Failed to parse systemInfo cache", err)
-        }
-      }
-
-      invoke({ channel: "get-system-info" })
-        .then((info) => {
-          setSystemInfo(info)
-          localStorage.setItem("sparkle:systemInfo", JSON.stringify(info))
-          setUsingCache(false)
-          log.info("Fetched system info")
-        })
-        .catch((err) => {
-          log.error("Error fetching system info:", err)
-          console.error("Error fetching system info:", err)
-        })
-        .finally(() => setLoading(false))
-    })
-
-    return () => cancelIdleCallback(idleHandle)
-  }, [])
-
-  useEffect(() => {
-    const idleHandle = requestIdleCallback(() => {
-      const cached = localStorage.getItem("sparkle:tweakInfo")
-      if (cached) {
-        try {
-          setTweakInfo(JSON.parse(cached))
-        } catch (err) {
-          console.error("Failed to parse tweakInfo cache", err)
-        }
-      }
-
-      invoke({ channel: "tweaks:fetch" })
-        .then((tweaks) => {
-          setTweakInfo(tweaks)
-          localStorage.setItem("sparkle:tweakInfo", JSON.stringify(tweaks))
-        })
-        .catch((err) => {
-          console.error("Error fetching tweak info:", err)
-        })
-    })
-
-    return () => cancelIdleCallback(idleHandle)
-  }, [])
-
-  useEffect(() => {
-    const idleHandle = requestIdleCallback(() => {
-      fetchActiveTweaks()
-    })
-
-    return () => cancelIdleCallback(idleHandle)
-  }, [])
-
-  const formatBytes = (bytes) => {
-    if (bytes === 0 || !bytes) return "0 GB"
-    return (bytes / 1024 / 1024 / 1024).toFixed(2) + " GB"
-  }
-
-  if (loading) {
-    return (
-      <RootDiv>
-        <div className="flex items-center justify-center h-64 flex-col gap-5">
-          <div className="">
-            <div
-              className="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-sparkle-primary rounded-full ml-3"
-              role="status"
-              aria-label="loading"
-            ></div>
-          </div>
-          <div className="text-sparkle-text-secondary">Loading system information...</div>
-          <p className="text-sm text-sparkle-primary">
-            You may use other parts of sparkle while this loads
-          </p>
-        </div>
-      </RootDiv>
-    )
-  }
+  const goToTweaks = () => router("tweaks")
+  const goToUtilities = () => router("utilities")
+  const goToApps = () => router("apps")
 
   return (
     <RootDiv>
-      <div className="max-w-[1800px] mx-auto ">
-        <Greeting />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <InfoCard
-            icon={Cpu}
-            iconBgColor="bg-blue-500/10"
-            iconColor="text-blue-500"
-            title="CPU"
-            subtitle="Processor Information"
-            items={[
-              { label: "Model", value: systemInfo?.cpu_model || "Unknown" },
-              { label: "Cores", value: `${systemInfo?.cpu_cores || "0"} Cores` },
-            ]}
-          />
-
-          <InfoCard
-            icon={Gpu}
-            iconBgColor="bg-teal-500/10"
-            iconColor="text-teal-500"
-            title="GPU"
-            subtitle="Graphics Information"
-            items={
-              systemInfo?.hasGPU
-                ? [
-                    { label: "Model", value: systemInfo?.gpu_model || "Unknown" },
-                    { label: "VRAM", value: systemInfo?.vram || "Unknown" },
-                  ]
-                : [
-                    { label: "Model", value: systemInfo?.integrated_gpu || "Unknown" },
-                    { label: "Type", value: "Integrated" },
-                  ]
-            }
-          />
-
-          <InfoCard
-            icon={MemoryStick}
-            iconBgColor="bg-purple-500/10"
-            iconColor="text-purple-500"
-            title="Memory"
-            subtitle="RAM Information"
-            items={[
-              { label: "Total Memory", value: formatBytes(systemInfo?.memory_total) },
-              { label: "Type", value: systemInfo?.memory_type || "Unknown" },
-            ]}
-          />
-
-          <InfoCard
-            icon={MonitorCog}
-            iconBgColor="bg-red-500/10"
-            iconColor="text-red-500"
-            title="System"
-            subtitle="OS Information"
-            items={[
-              { label: "Operating System", value: systemInfo?.os || "Unknown" },
-              { label: "Version", value: systemInfo?.os_version || "Unknown" },
-            ]}
-          />
-
-          <InfoCard
-            icon={HardDrive}
-            iconBgColor="bg-orange-500/10"
-            iconColor="text-orange-500"
-            title="Storage"
-            subtitle="Disk Information"
-            items={[
-              { label: "Primary Disk", value: systemInfo?.disk_model || "Unknown" },
-              { label: "Total Space", value: systemInfo?.disk_size || "Unknown" },
-            ]}
-          />
-
-          <InfoCard
-            icon={Wrench}
-            iconBgColor="bg-green-500/10"
-            iconColor="text-green-500"
-            title="Tweaks"
-            subtitle="Applied Tweaks"
-            items={[
-              { label: "Available Tweaks", value: `${tweakInfo?.length || 0} Tweaks` },
-              { label: "Active Tweaks", value: `${activeTweaks.length || 0} Active` },
-            ]}
-          />
-        </div>
-        <Card className="bg-sparkle-card backdrop-blur-xs rounded-xl border border-sparkle-border hover:shadow-xs overflow-hidden p-3 w-full mt-4 flex gap-4 items-center">
-          <div className="p-3 bg-green-500/10 rounded-lg items-center justify-center text-center">
-            <Wrench className="text-green-500" size={24} />
+      <div className="max-w-450 mx-auto px-4">
+        <div className="text-center py-16">
+          <h1 className="text-5xl font-bold text-sparkle-text mb-4 tracking-tight">
+            Welcome to Sparkle
+          </h1>
+          <p className="text-lg text-sparkle-text-secondary mb-8 max-w-md mx-auto">
+            The ultimate tool to debloat and optimize Windows, and enhance your privacy.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button onClick={goToTweaks}>
+              <Wrench size={16} className="mr-2" /> Browse Tweaks
+            </Button>
+            <Button onClick={goToUtilities}>
+              <Box size={16} className="mr-2" /> Go To Utilities
+            </Button>
+            <Button onClick={goToApps}>
+              <LayoutGrid size={16} className="mr-2" /> Go To Apps
+            </Button>
           </div>
-          <div>
-            <h1 className="font-medium text-sparkle-text">PC Running slow?</h1>
-            <p className="text-sparkle-text-secondary">
-              Try Using Tweaks to improve system performance and privacy.
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <Card className="bg-sparkle-card border border-sparkle-border rounded-xl p-5 flex flex-col gap-3 hover:border-sparkle-primary/40 transition-colors">
+            <div className="p-2.5 bg-blue-500/10 rounded-lg w-fit">
+              <Cpu className="text-blue-400" size={20} />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sparkle-text text-sm">Performance Tweaks</h3>
+              <p className="text-sparkle-text-secondary text-xs mt-1 leading-relaxed">
+                Speed up boot times on low end systems and reduce latency
+              </p>
+            </div>
+          </Card>
+
+          <Card className="bg-sparkle-card border border-sparkle-border rounded-xl p-5 flex flex-col gap-3 hover:border-sparkle-primary/40 transition-colors">
+            <div className="p-2.5 bg-green-500/10 rounded-lg w-fit">
+              <Shield className="text-green-400" size={20} />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sparkle-text text-sm">Privacy Controls</h3>
+              <p className="text-sparkle-text-secondary text-xs mt-1 leading-relaxed">
+                Disable telemetry and lock down Windows data collection settings.
+              </p>
+            </div>
+          </Card>
+
+          <Card className="bg-sparkle-card border border-sparkle-border rounded-xl p-5 flex flex-col gap-3 hover:border-sparkle-primary/40 transition-colors">
+            <div className="p-2.5 bg-purple-500/10 rounded-lg w-fit">
+              <Wrench className="text-purple-400" size={20} />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sparkle-text text-sm">Customization</h3>
+              <p className="text-sparkle-text-secondary text-xs mt-1 leading-relaxed">
+                Personalize the Windows experience to match your workflow and preferences.
+              </p>
+            </div>
+          </Card>
+        </div>
+
+        {/* CTA Banner */}
+        <Card className="bg-sparkle-card border border-sparkle-border rounded-xl p-4 w-full mb-6 flex gap-4 items-center hover:border-green-500/30 transition-colors">
+          <div className="p-3 bg-green-500/10 rounded-lg shrink-0">
+            <Zap className="text-green-500" size={22} />
+          </div>
+          <div className="min-w-0">
+            <h2 className="font-semibold text-sparkle-text text-sm">PC Running Slow?</h2>
+            <p className="text-sparkle-text-secondary text-xs mt-0.5">
+              Apply recommended tweaks to improve performance and privacy in minutes.
             </p>
           </div>
-          <div className="ml-auto">
-            <Button variant="outline" className="flex items-center gap-2" onClick={goToTweaks}>
-              <Zap size={18} /> Visit Tweaks
+          <div className="ml-auto shrink-0">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 text-sm"
+              onClick={goToTweaks}
+            >
+              <Wrench size={15} /> Open Tweaks
             </Button>
           </div>
         </Card>
-        <p className="text-xs text-sparkle-text-secondary text-center mt-4">
-          {usingCache ? "Loading latest system data..." : ""}
-        </p>
+
+        {/* Footer note */}
+        <div className="text-center text-xs text-sparkle-text-secondary pb-6">
+          <a
+            href="https://github.com/anomalyco/sparkle/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-sparkle-primary transition-colors"
+          >
+            <ExternalLink size={12} />
+            Why was system info removed?
+          </a>
+        </div>
       </div>
     </RootDiv>
   )
