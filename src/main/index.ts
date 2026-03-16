@@ -4,7 +4,6 @@ import { electronApp, optimizer, is } from "@electron-toolkit/utils"
 import log from "electron-log"
 import "./system"
 import "./powershell"
-
 import "./tweakHandler"
 import "./dnsHandler"
 import "./backup"

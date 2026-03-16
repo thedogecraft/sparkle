@@ -33,7 +33,7 @@ const tabIcons = {
 }
 
 const tabs = {
-  home: { label: "Dashboard", path: "/" },
+  home: { label: "Home", path: "/" },
   tweaks: { label: "Tweaks", path: "/tweaks" },
   utilities: { label: "Utilities", path: "/utilities" },
   clean: { label: "Cleaner", path: "/clean" },

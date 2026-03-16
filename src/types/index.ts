@@ -1,31 +1,5 @@
 import React from "react"
 
-export interface SystemInfo {
-  platform?: string
-  arch?: string
-  version?: string
-  hostname?: string
-  userInfo?: {
-    username: string
-    homedir: string
-  }
-  cpu_model?: string
-  cpu_cores?: number
-  cpu_threads?: number
-  gpu_model?: string
-  vram?: string
-  hasGPU?: boolean
-  isNvidia?: boolean
-  integrated_gpu?: string
-  hasIntegratedGPU?: boolean
-  memory_total?: number
-  memory_type?: string
-  os?: string
-  os_version?: string
-  disk_model?: string
-  disk_size?: string
-}
-
 export interface Tweak {
   id: string
   name: string
@@ -86,7 +60,6 @@ export interface ElectronAPI {
   minimizeWindow: () => void
   maximizeWindow: () => void
   closeWindow: () => void
-  getSystemInfo: () => Promise<SystemInfo>
   applyTweak: (tweakId: string) => Promise<boolean>
   unapplyTweak: (tweakId: string) => Promise<boolean>
   getTweaks: () => Promise<Tweak[]>

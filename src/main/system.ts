@@ -1,26 +1,15 @@
 import os from "os"
 import { ipcMain } from "electron"
-import si from "systeminformation"
 import { exec } from "child_process"
 import fs from "fs"
 import path from "path"
 import log from "electron-log"
 import { shell } from "electron"
 import { executePowerShell } from "./powershell"
-import type { SystemInfo } from "../types"
 
 console.log = log.log
 console.error = log.error
 console.warn = log.warn
-
-interface GPUInfo {
-  model: string
-  vram: string
-  hasGPU: boolean
-  isNvidia: boolean
-  integratedModel: string
-  hasIntegratedGPU: boolean
-}
 
 interface PowerShellResult {
   success: boolean
@@ -31,146 +20,6 @@ interface PowerShellResult {
 interface ClearCacheResult {
   success: boolean
   error?: string
-}
-
-async function getSystemInfo(): Promise<SystemInfo> {
-  try {
-    const [cpuData, graphicsData, osInfo, memLayout, diskLayout, fsSize, blockDevices] =
-      await Promise.all([
-        si.cpu(),
-        si.graphics(),
-        si.osInfo(),
-        si.memLayout(),
-        si.diskLayout(),
-        si.fsSize(),
-        si.blockDevices(),
-      ])
-
-    let totalMemory = os.totalmem()
-    const memoryType = (memLayout as any).length > 0 ? (memLayout as any)[0].type : "Unknown"
-    const cDrive = (fsSize as any).find((d: any) => d.mount.toUpperCase().startsWith("C:"))
-
-    let primaryDisk: any = null
-    if (cDrive) {
-      const cBlock = (blockDevices as any).find(
-        (b: any) => b.mount && b.mount.toUpperCase().startsWith("C:"),
-      )
-
-      if (cBlock) {
-        primaryDisk =
-          (diskLayout as any).find(
-            (disk: any) =>
-              disk.device?.toLowerCase() === cBlock.device?.toLowerCase() ||
-              disk.name?.toLowerCase().includes(cBlock.name?.toLowerCase()),
-          ) || null
-      }
-    }
-
-    let gpuInfo: GPUInfo = {
-      model: "GPU not found",
-      vram: "N/A",
-      hasGPU: false,
-      isNvidia: false,
-      integratedModel: "Not detected",
-      hasIntegratedGPU: false,
-    }
-
-    if (graphicsData.controllers && graphicsData.controllers.length > 0) {
-      const integratedControllers = graphicsData.controllers.filter((controller: any) => {
-        const model = (controller.model || "").toLowerCase()
-        return (
-          model.includes("integrated") ||
-          (model.includes("intel") &&
-            (model.includes("hd") || model.includes("uhd") || model.includes("iris"))) ||
-          (model.includes("amd") && model.includes("radeon") && model.includes("graphics")) ||
-          (model.includes("amd") && model.includes("vega") && !model.includes("rx")) ||
-          model.includes("intel graphics")
-        )
-      })
-
-      const dedicatedControllers = graphicsData.controllers.filter((controller: any) => {
-        const model = (controller.model || "").toLowerCase()
-        const isIntegrated =
-          model.includes("integrated") ||
-          (model.includes("intel") &&
-            (model.includes("hd") || model.includes("uhd") || model.includes("iris"))) ||
-          (model.includes("amd") && model.includes("radeon") && model.includes("graphics")) ||
-          (model.includes("amd") && model.includes("vega") && !model.includes("rx")) ||
-          model.includes("intel graphics")
-
-        return (
-          !isIntegrated &&
-          (model.includes("nvidia") ||
-            (model.includes("amd") &&
-              (model.includes("radeon") ||
-                model.includes("rx") ||
-                model.includes("vega") ||
-                model.includes("firepro") ||
-                model.includes("instinct"))) ||
-            (model.includes("intel") && model.includes("arc")))
-        )
-      })
-
-      const dedicatedGPU = dedicatedControllers.sort(
-        (a: any, b: any) => (b.vram || 0) - (a.vram || 0),
-      )[0]
-
-      const integratedGPU = integratedControllers.sort(
-        (a: any, b: any) => (b.vram || 0) - (a.vram || 0),
-      )[0]
-
-      if (integratedGPU) {
-        gpuInfo.integratedModel = integratedGPU.model || "Unknown Integrated GPU"
-        gpuInfo.hasIntegratedGPU = true
-      }
-
-      if (dedicatedGPU) {
-        const hasGPU = true
-        const isNvidia = dedicatedGPU.model.toLowerCase().includes("nvidia")
-        gpuInfo = {
-          ...gpuInfo,
-          model: dedicatedGPU.model || "Unknown GPU",
-          vram: dedicatedGPU.vram ? `${Math.round(dedicatedGPU.vram / 1024)} GB` : "Unknown",
-          hasGPU,
-          isNvidia,
-        }
-      }
-    }
-
-    const versionScript = `(Get-ItemProperty -Path "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion").DisplayVersion`
-    const versionPsResult = await executePowerShell(null, {
-      script: versionScript,
-      name: "GetWindowsVersion",
-    })
-    const windowsVersion = versionPsResult.success ? versionPsResult.output!.trim() : "Unknown"
-
-    return {
-      cpu_model: (cpuData as any).brand,
-      cpu_cores: (cpuData as any).physicalCores,
-      cpu_threads: (cpuData as any).threads || (cpuData as any).physicalCores,
-
-      gpu_model: gpuInfo.model,
-      vram: gpuInfo.vram,
-      hasGPU: gpuInfo.hasGPU,
-      isNvidia: gpuInfo.isNvidia,
-      integrated_gpu: gpuInfo.integratedModel,
-      hasIntegratedGPU: gpuInfo.hasIntegratedGPU,
-
-      memory_total: totalMemory,
-      memory_type: memoryType,
-
-      os: osInfo.distro || "Windows",
-      os_version: windowsVersion || "Unknown",
-
-      disk_model: primaryDisk?.name || primaryDisk?.device || "Unknown Storage",
-      disk_size: cDrive?.size
-        ? `${Math.round(cDrive.size / 1024 / 1024 / 1024).toFixed(1)} GB`
-        : "Unknown",
-    }
-  } catch (error) {
-    console.error("Failed to get system info:", error)
-    throw error
-  }
 }
 
 function restartSystem(): { success: boolean } {
@@ -523,7 +372,6 @@ export { ensureWinget }
 ipcMain.handle("restart", restartSystem)
 ipcMain.handle("open-log-folder", openLogFolder)
 ipcMain.handle("clear-sparkle-cache", clearSparkleCache)
-ipcMain.handle("get-system-info", getSystemInfo)
 ipcMain.handle("get-user-name", getUserName)
 ipcMain.handle("restart-explorer", restartExplorer)
 ipcMain.handle("check-winget", async () => {

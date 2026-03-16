@@ -40,7 +40,6 @@ irm https://raw.githubusercontent.com/Parcoil/Sparkle/v2/get.ps1 | iex
     <li>🗑️ Manage All Temp files in one place</li>
     <li>🎛️ Install apps with the built-in Winget integration</li>
     <li>📁 Backup and Revert changes</li>
-    <li>⚙️ View Basic System info</li>
   </ul>
 </div>
 

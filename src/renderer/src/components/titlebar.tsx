@@ -14,7 +14,7 @@ function TitleBar({
   return (
     <div
       style={{ WebkitAppRegion: "drag" } as any}
-      className="h-[50px] fixed top-0 left-0 right-0 flex justify-between items-center pl-4 bg-sparkle-bg z-50"
+      className="h-12.5 fixed top-0 left-0 right-0 flex justify-between items-center pl-4 bg-sparkle-bg z-50"
     >
       <div className="flex items-center gap-3 h-full pr-4">
         <button
