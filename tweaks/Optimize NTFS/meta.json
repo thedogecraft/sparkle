@@ -1,0 +1,8 @@
+{
+  "name": "optimize-ntfs",
+  "title": "Optimize NTFS",
+  "description": "Improves drive performance by reducing unnecessary background file system tasks.",
+  "deepDescription": "Disables last access timestamps and 8.3 short name creation. This reduces disk overhead and improves file system performance, especially on drives with many files.",
+  "category": ["Performance", "System"],
+  "addedversion": "1.0.0"
+}
