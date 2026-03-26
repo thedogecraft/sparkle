@@ -15,7 +15,7 @@ html,body {
   --md-primary-fg-color--dark:  #90030C;
 }
 .md-header, .md-tabs {
-    background-color: #5e5e5e;
+    background-color: #334c75;
 }
 }
 [data-md-color-scheme=slate] {
@@ -25,7 +25,7 @@ html,body {
   --md-primary-fg-color--dark:  #90030C;
 }
 .md-header, .md-tabs {
-    background-color: #131c2c
+    background-color: #131c2c;
 }
 .md-container {
     background-color: #0c121f;
@@ -90,4 +90,7 @@ h1 {
 }
  img  {
     border-radius: 5px !important;
+ }
+ .md-footer {
+    display: none;
  }
