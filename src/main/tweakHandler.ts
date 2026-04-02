@@ -252,20 +252,20 @@ export const setupTweaksHandlers = (): void => {
     return NvidiaProfileInspector()
   })
 
-  ipcMain.handle("tweak:active", (): Record<string, boolean> | {} => {
+  ipcMain.handle("tweak:active", (): string[] => {
     return getActiveTweaks()
   })
   console.log("[Sparkle main/tweakHandler.ts]: Tweak handlers setup complete")
 }
 
-const getActiveTweaks = (): Record<string, boolean> | {} => {
+const getActiveTweaks = (): string[] => {
   try {
     const data = fsSync.readFileSync(tweaksStatePath, "utf8")
     const parsed = JSON.parse(data)
     return Object.keys(parsed).filter((key) => parsed[key])
   } catch (error) {
     console.error("Error loading tweak states:", error)
-    return {}
+    return []
   }
 }
 
