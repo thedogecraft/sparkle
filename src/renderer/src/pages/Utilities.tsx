@@ -168,15 +168,27 @@ if ($gpus) {
 `,
   },
   {
-    name: "Windows Search",
-    description: "Restart your Windows Search to fix display issues.",
+    name: "Windows Search and UI",
+    description: "Restart your Windows Search and UI to fix display issues.",
     state: false,
-    icon: <GpuIcon />,
+    icon: <Monitor />,
     type: "button",
     buttonText: "Restart",
     runScript: `
-Get-AppxPackage Microsoft.Windows.Search | Reset-AppxPackage
-Write-Output "Windows Search restart completed."
+try {
+    Get-AppxPackage Microsoft.Windows.Search | Reset-AppxPackage
+    Write-Output "Microsoft.Windows.Search restart completed."
+}
+catch {
+    Write-Output "An error occured while resetting Microsoft.Windows.Search."
+}
+try {
+    Get-AppxPackage MicrosoftWindows.Client.CBS | Reset-AppxPackage
+    Write-Output "MicrosoftWindows.Client.CBS restart completed."
+}
+catch {
+    Write-Output "An error occured while resetting MicrosoftWindows.Client.CBS."
+}
 `,
   },
   {
