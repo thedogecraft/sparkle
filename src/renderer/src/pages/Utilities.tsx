@@ -168,6 +168,18 @@ if ($gpus) {
 `,
   },
   {
+    name: "Windows Search",
+    description: "Restart your Windows Search to fix display issues.",
+    state: false,
+    icon: <GpuIcon />,
+    type: "button",
+    buttonText: "Restart",
+    runScript: `
+Get-AppxPackage Microsoft.Windows.Search | Reset-AppxPackage
+Write-Output "Windows Search restart completed."
+`,
+  },
+  {
     name: "Power Plan",
     description: "Choose how your computer manages power and performance.",
     state: false,
