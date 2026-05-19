@@ -1,15 +1,35 @@
 import Button from "@/components/ui/button"
 import Toggle from "@/components/ui/Toggle"
-import { useState, useEffect } from "react"
+import { useState, useEffect, type ReactNode } from "react"
 import { invoke } from "@/lib/electron"
+import { REGISTRY_CLEANER_SCRIPT } from "@/lib/registryCleanerScript"
 import RootDiv from "@/components/rootdiv"
-import { RefreshCw, Icon, FileX, Gauge, Trash2, Download, Image, Bug } from "lucide-react"
+import { RefreshCw, Icon, FileX, Gauge, Trash2, Download, Image, Bug, Database } from "lucide-react"
 import { broom } from "@lucide/lab"
 import { toast } from "react-toastify"
 import log from "electron-log/renderer"
 import Card from "@/components/ui/Card"
 
-const cleanups = [
+type CleanupResult = {
+  bytes?: number
+  found?: number
+  removed?: number
+  skipped?: number
+  backupPath?: string
+}
+
+type Cleanup = {
+  id: string
+  label: string
+  path: string
+  description: string
+  icon: ReactNode
+  script: string
+  sizeScript?: string
+  resultKind?: "space" | "registry"
+}
+
+const cleanups: Cleanup[] = [
   {
     id: "temp",
     label: "Clean Temporary Files",
@@ -168,6 +188,15 @@ const cleanups = [
       Write-Output $totalSize
     `,
   },
+  {
+    id: "registry",
+    label: "Clean Invalid Registry Entries",
+    path: "HKCU, HKLM, HKCR",
+    description: "Scan obsolete registry references, back them up, then remove invalid entries.",
+    icon: <Database className="w-5 h-5" />,
+    script: REGISTRY_CLEANER_SCRIPT,
+    resultKind: "registry",
+  },
 ]
 
 function Clean() {
@@ -177,7 +206,7 @@ function Clean() {
     localStorage.getItem("last-clean") || "Not cleaned yet.",
   )
   const [isCleaning, setIsCleaning] = useState(false)
-  const [cleanupResults, setCleanupResults] = useState({})
+  const [cleanupResults, setCleanupResults] = useState<Record<string, CleanupResult>>({})
   const [currentSizes, setCurrentSizes] = useState<Record<string, number>>({})
   const [loadingSizes, setLoadingSizes] = useState(false)
 
@@ -185,11 +214,52 @@ function Clean() {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
-  const formatBytes = (bytes) => {
+  const formatBytes = (bytes: number) => {
     if (bytes === 0 || !bytes) return "0 B"
     const sizes = ["B", "KB", "MB", "GB", "TB"]
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`
+  }
+
+  const parseRegistryResult = (output: string): CleanupResult => {
+    const trimmed = output.trim()
+    const jsonStart = trimmed.indexOf("{")
+    const jsonEnd = trimmed.lastIndexOf("}")
+
+    if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+      throw new Error("Registry cleaner did not return a result.")
+    }
+
+    const parsed = JSON.parse(trimmed.slice(jsonStart, jsonEnd + 1))
+
+    return {
+      found: Number(parsed.found) || 0,
+      removed: Number(parsed.removed) || 0,
+      skipped: Number(parsed.skipped) || 0,
+      backupPath: typeof parsed.backupPath === "string" ? parsed.backupPath : "",
+    }
+  }
+
+  const parseCleanupResult = (cleanup: Cleanup, output: string): CleanupResult => {
+    if (cleanup.resultKind === "registry") {
+      return parseRegistryResult(output)
+    }
+
+    return { bytes: parseInt(output.trim(), 10) || 0 }
+  }
+
+  const getCompletionMessage = (cleanup: Cleanup, result: CleanupResult) => {
+    if (cleanup.resultKind === "registry") {
+      const found = result.found ?? 0
+      const removed = result.removed ?? 0
+      const skipped = result.skipped ?? 0
+      const skippedText = skipped > 0 ? ` ${skipped} skipped.` : ""
+      const backupText = result.backupPath ? " Backup saved." : ""
+
+      return `${cleanup.label} completed! ${removed}/${found} issues removed.${skippedText}${backupText}`
+    }
+
+    return `${cleanup.label} completed! ${formatBytes(result.bytes ?? 0)} cleared.`
   }
 
   async function fetchSizes(silent = false) {
@@ -218,18 +288,26 @@ function Clean() {
   }, [])
 
   const totalSize = Object.values(currentSizes).reduce((sum, size) => sum + (size || 0), 0)
-  const totalFreed = Object.values(cleanupResults as Record<string, number>).reduce(
-    (sum: number, size) => sum + (size || 0),
+  const totalFreed = Object.values(cleanupResults).reduce(
+    (sum, result) => sum + (result.bytes || 0),
     0,
   )
 
   async function runSelectedCleanups() {
+    if (selected.includes("registry")) {
+      const confirmed = window.confirm(
+        "Registry cleaning will remove invalid registry entries after saving a .reg backup. Continue?",
+      )
+
+      if (!confirmed) return
+    }
+
     toast.dismiss()
     setIsCleaning(true)
     setLoadingQueue([])
     setCleanupResults({})
     let anySuccess = false
-    let newResults = {}
+    const newResults: Record<string, CleanupResult> = {}
 
     for (const cleanup of cleanups) {
       if (!selected.includes(cleanup.id)) continue
@@ -241,12 +319,15 @@ function Clean() {
           payload: { script: cleanup.script, name: `cleanup-${cleanup.id}` },
         })
 
-        const resultStr = result?.output || "0"
-        const freedSpace = parseInt(resultStr.trim(), 10) || 0
-        newResults[cleanup.id] = freedSpace
+        if (!result?.success) {
+          throw new Error(result?.error || `${cleanup.label} failed.`)
+        }
+
+        const cleanupResult = parseCleanupResult(cleanup, result?.output || "0")
+        newResults[cleanup.id] = cleanupResult
 
         toast.update(toastId, {
-          render: `${cleanup.label} completed! ${formatBytes(freedSpace)} cleared.`,
+          render: getCompletionMessage(cleanup, cleanupResult),
           type: "success",
           isLoading: false,
           autoClose: 3000,
@@ -341,10 +422,10 @@ function Clean() {
           </div>
         </Card>
         <Card className="flex flex-col divide-y divide-sparkle-border p-0 mb-10">
-          {cleanups.map(({ id, label, description, path, icon }, idx) => {
+          {cleanups.map(({ id, label, description, path, icon, resultKind }, idx) => {
             const isSelected = selected.includes(id)
             const currentSize = currentSizes[id]
-            const freedSpace = cleanupResults[id]
+            const cleanupResult = cleanupResults[id]
             return (
               <div
                 key={id}
@@ -359,17 +440,29 @@ function Clean() {
                       <span className="text-base font-semibold text-sparkle-text truncate">
                         {label}
                       </span>
-                      {freedSpace ? (
+                      {cleanupResult ? (
                         <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-500/20 text-green-500">
-                          {formatBytes(freedSpace)} freed
+                          {resultKind === "registry"
+                            ? `${cleanupResult.removed ?? 0} removed`
+                            : `${formatBytes(cleanupResult.bytes ?? 0)} freed`}
                         </span>
                       ) : null}
                     </div>
                     <span className="text-sm text-sparkle-text-secondary mt-1">{description}</span>
                     <div className="flex items-center gap-4 mt-2">
                       <span className="text-xs text-sparkle-text-muted flex items-center gap-1">
-                        <span className="font-medium">Size:</span>
-                        {loadingSizes ? (
+                        <span className="font-medium">
+                          {resultKind === "registry" ? "Registry:" : "Size:"}
+                        </span>
+                        {resultKind === "registry" ? (
+                          cleanupResult?.found !== undefined ? (
+                            <span className="text-teal-500 font-medium">
+                              {cleanupResult.found} issues found
+                            </span>
+                          ) : (
+                            <span className="text-sparkle-text-secondary">Scans on demand</span>
+                          )
+                        ) : loadingSizes ? (
                           <span className="text-sparkle-text-secondary">Calculating...</span>
                         ) : currentSize !== undefined ? (
                           <span className="text-teal-500 font-medium">
