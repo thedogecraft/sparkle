@@ -9,6 +9,7 @@ import { setupDNSHandlers } from "@main/dnsHandler"
 import { setupBackupHandlers } from "@main/backup"
 import { initAutoUpdater } from "@main/updates"
 import { setMainWindow } from "@main/windowState"
+import { getSidecar } from "@main/sidecar"
 import Store from "electron-store"
 import { is } from "@main/utils"
 
@@ -72,8 +73,6 @@ function createWindow(): void {
       width: 1380,
       backgroundColor: "#0c121f",
       height: 760,
-      // minWidth: 1380,
-      // minHeight: 760,
       minWidth: 790,
       center: true,
       frame: false,
@@ -122,8 +121,17 @@ function createWindow(): void {
 app.commandLine.appendSwitch("no-sandbox")
 app
   .whenReady()
-  .then(() => {
-    console.log("[Sparkle]: App ready, creating window...")
+  .then(async () => {
+    console.log("[Sparkle]: App ready, starting sidecar...")
+
+    const sidecar = getSidecar()
+    await sidecar.start()
+    console.log("[Sparkle]: Sidecar started")
+
+    app.on("will-quit", () => {
+      sidecar.stop()
+    })
+
     try {
       createWindow()
       console.log("[Sparkle]: Window created successfully")

@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import fs from "fs"
 
 vi.mock("electron-log", () => ({
   default: { log: vi.fn(), error: vi.fn(), warn: vi.fn() },
@@ -7,31 +6,34 @@ vi.mock("electron-log", () => ({
 }))
 
 vi.mock("electron", () => ({
-  app: { getPath: vi.fn() },
+  app: { getPath: vi.fn(), isPackaged: false },
   ipcMain: { handle: vi.fn(), removeHandler: vi.fn() },
 }))
 
-vi.mock("@main/index", () => ({
-  mainWindow: {},
+const mockRequest = vi.fn()
+vi.mock("@main/sidecar", () => ({
+  getSidecar: () => ({ request: mockRequest }),
 }))
 
 const { checkChocolatey } = await import("@main/powershell")
 
 beforeEach(() => {
   vi.restoreAllMocks()
+  mockRequest.mockReset()
 })
 
 describe("checkChocolatey", () => {
   it("returns installed=true when choco.exe exists", async () => {
-    vi.spyOn(fs, "existsSync").mockReturnValue(true)
+    mockRequest.mockResolvedValue({ success: true, installed: true })
 
     const result = await checkChocolatey()
 
     expect(result).toEqual({ success: true, installed: true })
+    expect(mockRequest).toHaveBeenCalledWith("choco.check")
   })
 
   it("returns installed=false when choco.exe does not exist", async () => {
-    vi.spyOn(fs, "existsSync").mockReturnValue(false)
+    mockRequest.mockResolvedValue({ success: true, installed: false })
 
     const result = await checkChocolatey()
 
@@ -39,12 +41,8 @@ describe("checkChocolatey", () => {
   })
 
   it("handles errors gracefully", async () => {
-    vi.spyOn(fs, "existsSync").mockImplementation(() => {
-      throw new Error("access denied")
-    })
+    mockRequest.mockRejectedValue(new Error("access denied"))
 
-    const result = await checkChocolatey()
-
-    expect(result).toEqual({ success: false, installed: false })
+    await expect(checkChocolatey()).rejects.toThrow("access denied")
   })
 })

@@ -72,7 +72,7 @@ Tweaks can be grouped into these categories:
 
 ## Example Tweak
 
-Here’s an example of a `meta.json` for a tweak:
+Here's an example of a `meta.json` for a tweak:
 
 !!! note
 

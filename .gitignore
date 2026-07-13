@@ -25,3 +25,8 @@ wheels/
 # docs
 site
 docs/tweaks
+
+# C# sidecar build artifacts
+sidecar/bin/
+sidecar/obj/
+sidecar/publish/

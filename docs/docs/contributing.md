@@ -45,7 +45,11 @@ See the full guide: [Creating Tweaks](/creating-tweaks/)
 
 ## Development Setup
 
-To run Sparkle locally:
+To run Sparkle locally you need:
+
+- **Node.js** v22+ and **pnpm**
+- **.NET 10 SDK** or higher ([download](https://dotnet.microsoft.com/download))
+- **Windows 10/11**
 
 ```bash
 # Clone the repository
@@ -58,6 +62,40 @@ pnpm install
 # Start development mode (Admin Recomended. Some things only work with admin)
 pnpm dev
 ```
+
+### Building the Sidecar
+
+Sparkle uses a C# sidecar (`SparkleSidecar.exe`) for all system-level operations. To build it:
+
+```bash
+# Build the sidecar only
+pnpm build:sidecar
+
+# Build everything (sidecar + registry + electron)
+pnpm build:all
+```
+
+The sidecar is a self-contained .NET 10 executable that runs as a child process of the Electron main process. Communication happens over stdin/stdout using newline-delimited JSON.
+
+### Build Commands
+
+| Command | Description |
+| ------- | ----------- |
+| `pnpm dev` | Start in development mode with hot reload |
+| `pnpm build` | Full build (sidecar + registry + electron) |
+| `pnpm build:sidecar` | Build only the C# sidecar |
+| `pnpm build:registry` | Regenerate tweak registry JSON files |
+| `pnpm build:electron` | Build only the Electron app |
+| `pnpm build:all` | Build sidecar, registry, and Electron |
+
+## Architecture
+
+Sparkle uses a **two-process architecture**:
+
+- **Electron (Node.js)** - Handles the UI (React), window management, auto-updates, and reads tweak definitions from the asar archive.
+- **C# Sidecar** - A self-contained .NET 10 executable (`SparkleSidecar.exe`) that handles all system- operations such as executing tweak scripts, DNS management, backup/restore points, app installation, and system information.
+
+The Electron main process communicates with the C# sidecar over **stdin/stdout**
 
 ## Community
 

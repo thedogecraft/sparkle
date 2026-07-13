@@ -1,10 +1,8 @@
-import { ipcMain, app, IpcMainInvokeEvent } from "electron"
+import { ipcMain, IpcMainInvokeEvent } from "electron"
 import fs from "fs/promises"
-import fsSync from "fs"
 import path from "path"
-import { exec } from "child_process"
-import { logo } from "@main/windowState"
-import { executePowerShell } from "@main/powershell"
+import { app } from "electron"
+import { getSidecar } from "@main/sidecar"
 import { detectGPU } from "@main/gpu"
 import log from "electron-log"
 
@@ -12,8 +10,6 @@ console.log = log.log
 console.error = log.error
 console.warn = log.warn
 
-const userDataPath = app.getPath("userData")
-const tweaksStatePath = path.join(userDataPath, "tweakStates.json")
 const isDev = !app.isPackaged
 const tweaksDir = isDev ? path.join(process.cwd(), "tweaks") : path.join(app.getAppPath(), "tweaks")
 
@@ -21,16 +17,9 @@ interface Tweak {
   name: string
   psapply: string
   psunapply: string
-  category?: string
+  category?: string | string[]
   description?: string
   [key: string]: any
-}
-
-const getExePath = (exeName: string): string => {
-  if (isDev) {
-    return path.resolve(process.cwd(), "resources", exeName)
-  }
-  return path.join(process.resourcesPath, exeName)
 }
 
 async function loadTweaks(): Promise<Tweak[]> {
@@ -92,65 +81,33 @@ async function loadTweaks(): Promise<Tweak[]> {
   return tweaks
 }
 
-const getNipPath = (): string => {
-  if (isDev) {
-    return path.resolve(process.cwd(), "resources", "sparklenvidia.nip")
-  }
-  return path.join(process.resourcesPath, "sparklenvidia.nip")
+function getCategories(tweak: Tweak): string[] {
+  if (!tweak.category) return []
+  if (Array.isArray(tweak.category)) return tweak.category
+  return [tweak.category]
 }
 
 function isGPUTweak(tweak: Tweak): boolean {
-  return !!(tweak.category && tweak.category.includes("GPU"))
+  return getCategories(tweak).includes("GPU")
 }
 
 function isNvidiaTweak(tweak: Tweak): boolean {
   return tweak.name === "optimize-nvidia-settings"
 }
 
-function NvidiaProfileInspector(): Promise<string> {
-  const exePath = getExePath("nvidiaProfileInspector.exe")
-  const nipPath = getNipPath()
-
-  return new Promise((resolve, reject) => {
-    exec(`"${exePath}" -silentImport "${nipPath}"`, (error, stdout, stderr) => {
-      console.log("stdout:", stdout)
-      console.log("stderr:", stderr)
-      if (error) {
-        console.error("Error:", error)
-        reject(error)
-      } else {
-        resolve(stdout || "Completed with no output.")
-      }
-    })
-  })
-}
-
 export const setupTweaksHandlers = (): void => {
   ipcMain.handle("tweak-states:load", async (): Promise<string> => {
-    try {
-      await fs.access(tweaksStatePath)
-      const data = await fs.readFile(tweaksStatePath, "utf8")
-      return data
-    } catch (error: any) {
-      if (error.code === "ENOENT") {
-        return JSON.stringify({})
-      }
-      console.error("Error loading tweak states:", error)
-      throw error
-    }
+    const sidecar = getSidecar()
+    const result = await sidecar.request("tweak.states.load")
+    return typeof result === "string" ? result : JSON.stringify(result)
   })
 
   ipcMain.handle(
     "tweak-states:save",
     async (_event: IpcMainInvokeEvent, payload: string): Promise<boolean> => {
-      try {
-        await fs.mkdir(path.dirname(tweaksStatePath), { recursive: true })
-        await fs.writeFile(tweaksStatePath, payload, "utf8")
-        return true
-      } catch (error) {
-        console.error("Error saving tweak states:", error)
-        throw error
-      }
+      const sidecar = getSidecar()
+      await sidecar.request("tweak.states.save", { data: payload })
+      return true
     },
   )
 
@@ -176,11 +133,12 @@ export const setupTweaksHandlers = (): void => {
     }
 
     if (name === "optimize-nvidia-settings") {
-      console.log(logo, "Running Nvidia settings optimization...")
-      await NvidiaProfileInspector()
-    } else {
-      return executePowerShell(null, { script: tweak.psapply, name })
+      const sidecar = getSidecar()
+      return await sidecar.request("nvidia.inspector")
     }
+
+    const sidecar = getSidecar()
+    return await sidecar.request("tweak.apply", { name, script: tweak.psapply })
   })
 
   ipcMain.handle("tweak:unapply", async (_: any, name: string): Promise<any> => {
@@ -189,28 +147,23 @@ export const setupTweaksHandlers = (): void => {
     if (!tweak || !tweak.psunapply) {
       throw new Error(`No unapply script found for tweak: ${name}`)
     }
-    return executePowerShell(null, { script: tweak.psunapply, name })
+
+    const sidecar = getSidecar()
+    return await sidecar.request("tweak.unapply", { name, script: tweak.psunapply })
   })
 
-  ipcMain.handle("nvidia-inspector", (_: any, _args: any): Promise<string> => {
-    return NvidiaProfileInspector()
+  ipcMain.handle("nvidia-inspector", (_: any, _args: any): Promise<any> => {
+    const sidecar = getSidecar()
+    return sidecar.request("nvidia.inspector")
   })
 
-  ipcMain.handle("tweak:active", (): string[] => {
-    return getActiveTweaks()
+  ipcMain.handle("tweak:active", async (): Promise<string[]> => {
+    const sidecar = getSidecar()
+    const result = await sidecar.request("tweak.active")
+    return result.active ?? []
   })
+
   console.log("[Sparkle main/tweakHandler.ts]: Tweak handlers setup complete")
-}
-
-const getActiveTweaks = (): string[] => {
-  try {
-    const data = fsSync.readFileSync(tweaksStatePath, "utf8")
-    const parsed = JSON.parse(data)
-    return Object.keys(parsed).filter((key) => parsed[key])
-  } catch (error) {
-    console.error("Error loading tweak states:", error)
-    return []
-  }
 }
 
 export const cleanupTweaksHandlers = (): void => {
@@ -220,6 +173,7 @@ export const cleanupTweaksHandlers = (): void => {
   ipcMain.removeHandler("tweak:apply")
   ipcMain.removeHandler("tweak:unapply")
   ipcMain.removeHandler("nvidia-inspector")
+  ipcMain.removeHandler("tweak:active")
 }
 
 export default {

@@ -10,9 +10,11 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev -w",
     "build": "node build.js",
+    "build:sidecar": "dotnet publish sidecar/SparkleSidecar.csproj -c Release -r win-x64 --self-contained -o sidecar/publish/",
     "build:registry": "pnpm run build -- --registry",
     "build:electron": "pnpm run build:vite && electron-builder",
     "build:vite": "electron-vite build",
+    "build:all": "pnpm run build:sidecar && pnpm run build:registry && pnpm run build:electron",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "pnpm run build && electron-builder --dir",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
@@ -81,6 +83,13 @@
           "*.exe",
           "*.nip",
           "*.pow"
+        ]
+      },
+      {
+        "from": "sidecar/publish",
+        "to": ".",
+        "filter": [
+          "SparkleSidecar.exe"
         ]
       }
     ],

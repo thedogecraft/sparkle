@@ -11,47 +11,41 @@ vi.mock("electron", () => ({
   ipcMain: { handle: vi.fn(), removeHandler: vi.fn() },
 }))
 
-const mockExecFile = vi.fn()
-vi.mock("child_process", () => ({
-  execFile: mockExecFile,
-  exec: vi.fn(),
+const mockRequest = vi.fn()
+vi.mock("@main/sidecar", () => ({
+  getSidecar: () => ({ request: mockRequest }),
 }))
 
 const { checkWinget } = await import("@main/system")
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockRequest.mockReset()
 })
 
 describe("checkWinget", () => {
   it("returns installed=true when winget command succeeds", async () => {
-    mockExecFile.mockImplementation((_cmd, _args, callback) => {
-      callback(null, "v1.2.3", "")
-    })
+    mockRequest.mockResolvedValue({ success: true, installed: true })
 
     const result = await checkWinget()
 
     expect(result).toEqual({ success: true, installed: true })
-    expect(mockExecFile).toHaveBeenCalledWith("winget", ["--version"], expect.any(Function))
+    expect(mockRequest).toHaveBeenCalledWith("system.checkWinget")
   })
 
   it("returns installed=false when winget command fails", async () => {
-    mockExecFile.mockImplementation((_cmd, _args, callback) => {
-      callback(new Error("not found"))
-    })
+    mockRequest.mockResolvedValue({ success: true, installed: false })
 
     const result = await checkWinget()
 
     expect(result).toEqual({ success: true, installed: false })
   })
 
-  it("calls execFile with correct arguments", async () => {
-    mockExecFile.mockImplementation((_cmd, _args, callback) => {
-      callback(null, "v1.2.3", "")
-    })
+  it("calls sidecar with correct method", async () => {
+    mockRequest.mockResolvedValue({ success: true, installed: true })
 
     await checkWinget()
 
-    expect(mockExecFile).toHaveBeenCalledWith("winget", ["--version"], expect.any(Function))
+    expect(mockRequest).toHaveBeenCalledWith("system.checkWinget")
   })
 })
