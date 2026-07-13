@@ -18,13 +18,14 @@ import { broom } from "@lucide/lab"
 import { toast } from "react-toastify"
 import log from "electron-log/renderer"
 import Card from "@/components/ui/Card"
+import { useTranslation } from "react-i18next"
 
 const cleanups = [
   {
     id: "temp",
-    label: "Clean Temporary Files",
+    label: "clean.cleanTemp",
     path: "C:\\Windows\\Temp",
-    description: "Remove system and user temporary files.",
+    description: "clean.cleanTempDesc",
     icon: <FileX className="w-5 h-5" />,
     script: `
       $systemTemp = "$env:SystemRoot\\Temp"
@@ -58,9 +59,9 @@ const cleanups = [
   },
   {
     id: "prefetch",
-    label: "Clean Prefetch Files",
+    label: "clean.cleanPrefetch",
     path: "C:\\Windows\\Prefetch",
-    description: "Delete files from the Windows Prefetch folder.",
+    description: "clean.cleanPrefetchDesc",
     icon: <Gauge className="w-5 h-5" />,
     script: `
       $prefetch = "$env:SystemRoot\\Prefetch"
@@ -82,9 +83,9 @@ const cleanups = [
   },
   {
     id: "recyclebin",
-    label: "Empty Recycle Bin",
+    label: "clean.emptyRecycle",
     path: "Recycle Bin",
-    description: "Permanently remove files from the Recycle Bin.",
+    description: "clean.emptyRecycleDesc",
     icon: <Trash2 className="w-5 h-5" />,
     script: `
       $recycleBinSize = 0
@@ -106,9 +107,9 @@ const cleanups = [
   },
   {
     id: "windows-update",
-    label: "Clean Windows Update Cache",
+    label: "clean.cleanWindowsUpdate",
     path: "C:\\Windows\\SoftwareDistribution\\Download",
-    description: "Remove Windows Update downloaded installation files.",
+    description: "clean.cleanWindowsUpdateDesc",
     icon: <Download className="w-5 h-5" />,
     script: `
       $windowsUpdateDownload = "$env:SystemRoot\\SoftwareDistribution\\Download"
@@ -130,9 +131,9 @@ const cleanups = [
   },
   {
     id: "thumbnails",
-    label: "Clear Thumbnail Cache",
+    label: "clean.clearThumbnails",
     path: "C:\\Users\\<User>\\AppData\\Local\\Microsoft\\Windows\\Explorer",
-    description: "Remove cached thumbnail images used by File Explorer.",
+    description: "clean.clearThumbnailsDesc",
     icon: <Image className="w-5 h-5" />,
     script: `
       $thumbCache = "$env:LOCALAPPDATA\\Microsoft\\Windows\\Explorer"
@@ -156,9 +157,9 @@ const cleanups = [
   },
   {
     id: "errorreports",
-    label: "Clear Error Reports",
+    label: "clean.clearErrorReports",
     path: "C:\\Users\\<User>\\AppData\\Local\\CrashDumps",
-    description: "Remove error report and crash dump files.",
+    description: "clean.clearErrorReportsDesc",
     icon: <Bug className="w-5 h-5" />,
     script: `
       $crashDumps = "$env:LOCALAPPDATA\\CrashDumps"
@@ -181,10 +182,11 @@ const cleanups = [
 ]
 
 function Clean() {
+  const { t } = useTranslation()
   const [selected, setSelected] = useState<string[]>([])
   const [loadingQueue, setLoadingQueue] = useState<string[]>([])
   const [lastClean, setLastClean] = useState(
-    localStorage.getItem("last-clean") || "Not cleaned yet.",
+    localStorage.getItem("last-clean") || t("clean.notCleanedYet"),
   )
   const [isCleaning, setIsCleaning] = useState(false)
   const [cleanupResults, setCleanupResults] = useState({})
@@ -244,7 +246,7 @@ function Clean() {
     for (const cleanup of cleanups) {
       if (!selected.includes(cleanup.id)) continue
       setLoadingQueue((q) => [...q, cleanup.id])
-      const toastId = toast.loading(`Running ${cleanup.label}...`)
+      const toastId = toast.loading(t("clean.runningCleanup", { label: t(cleanup.label) }))
       try {
         const result = await invoke({
           channel: "run-powershell",
@@ -256,7 +258,7 @@ function Clean() {
         newResults[cleanup.id] = freedSpace
 
         toast.update(toastId, {
-          render: `${cleanup.label} completed! ${formatBytes(freedSpace)} cleared.`,
+          render: t("clean.cleanupCompleted", { label: t(cleanup.label), size: formatBytes(freedSpace) }),
           type: "success",
           isLoading: false,
           autoClose: 3000,
@@ -264,7 +266,7 @@ function Clean() {
         anySuccess = true
       } catch (err: any) {
         toast.update(toastId, {
-          render: `Failed: ${err.message || err}`,
+          render: t("clean.cleanupFailed", { error: err.message || err }),
           type: "error",
           isLoading: false,
           autoClose: 4000,
@@ -293,24 +295,24 @@ function Clean() {
             <Icon iconNode={broom} className="text-teal-500" size={28} />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-sparkle-text mb-1">System Cleaner</h2>
+            <h2 className="text-2xl font-bold text-sparkle-text mb-1">{t("clean.title")}</h2>
             <p className="text-sm text-sparkle-text-secondary">
-              Last cleaned: <span className="font-medium">{lastClean}</span>
+              {t("clean.lastCleaned", { time: lastClean })}
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
               <p className="text-sm text-sparkle-text-secondary">
                 {loadingSizes ? (
-                  "Calculating total size..."
+                  t("clean.calculatingSize")
                 ) : (
                   <>
-                    Total size:{" "}
+                    {t("clean.totalSize", { size: "" })}
                     <span className="font-medium text-teal-500">{formatBytes(totalSize)}</span>
                   </>
                 )}
               </p>
               {totalFreed > 0 && (
                 <p className="text-sm text-green-500">
-                  Total freed: <span className="font-medium">{formatBytes(totalFreed)}</span>
+                  {t("clean.totalFreed", { size: "" })} <span className="font-medium">{formatBytes(totalFreed)}</span>
                 </p>
               )}
             </div>
@@ -318,7 +320,7 @@ function Clean() {
           <div className="flex items-center">
             {selected.length > 0 ? (
               <Button onClick={() => setSelected([])} variant="secondary" className="mr-2">
-                Unselect All
+                {t("clean.unselectAll")}
               </Button>
             ) : (
               <Button
@@ -326,7 +328,7 @@ function Clean() {
                 variant="secondary"
                 className="mr-2"
               >
-                Select All
+                {t("clean.selectUnselect")}
               </Button>
             )}
             <Button
@@ -339,12 +341,12 @@ function Clean() {
               {isCleaning ? (
                 <>
                   <LoaderCircle className="animate-spin" size={18} />
-                  <span>Cleaning...</span>
+                  <span>{t("clean.cleaning")}</span>
                 </>
               ) : (
                 <>
                   <Icon iconNode={broom} size={18} />
-                  <span>Clean Selected</span>
+                  <span>{t("clean.cleanSelected")}</span>
                 </>
               )}
             </Button>
@@ -367,26 +369,26 @@ function Clean() {
                   <div className="flex flex-col flex-1 min-w-0">
                     <div className="flex items-center gap-3">
                       <span className="text-base font-semibold text-sparkle-text truncate">
-                        {label}
+                        {t(label)}
                       </span>
                       {freedSpace ? (
                         <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-500/20 text-green-500">
-                          {formatBytes(freedSpace)} freed
+                          {t("clean.freed", { size: formatBytes(freedSpace) })}
                         </span>
                       ) : null}
                     </div>
-                    <span className="text-sm text-sparkle-text-secondary mt-1">{description}</span>
+                    <span className="text-sm text-sparkle-text-secondary mt-1">{t(description)}</span>
                     <div className="flex items-center gap-4 mt-2">
                       <span className="text-xs text-sparkle-text-muted flex items-center gap-1">
-                        <span className="font-medium">Size:</span>
+                        <span className="font-medium">{t("clean.size")}</span>
                         {loadingSizes ? (
-                          <span className="text-sparkle-text-secondary">Calculating...</span>
+                          <span className="text-sparkle-text-secondary">{t("clean.calculating")}</span>
                         ) : currentSize !== undefined ? (
                           <span className="text-teal-500 font-medium">
                             {formatBytes(currentSize)}
                           </span>
                         ) : (
-                          <span className="text-sparkle-text-secondary">Unknown</span>
+                          <span className="text-sparkle-text-secondary">{t("common.unknown")}</span>
                         )}
                       </span>
                       {path && path !== "Recycle Bin" && (
@@ -408,7 +410,7 @@ function Clean() {
                   <div className="absolute inset-0 flex items-center justify-center z-10 rounded-xl">
                     <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-sparkle-border border border-sparkle-border-secondary">
                       <LoaderCircle className="animate-spin text-teal-500" size={18} />
-                      <span className="text-sm font-medium text-teal-600">Cleaning...</span>
+                      <span className="text-sm font-medium text-teal-600">{t("clean.cleaning")}</span>
                     </div>
                   </div>
                 )}

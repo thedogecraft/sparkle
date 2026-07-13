@@ -8,6 +8,7 @@ import Toggle from "@/components/ui/Toggle"
 import { toast } from "react-toastify"
 import Card from "@/components/ui/Card"
 import { Dropdown } from "@/components/ui/dropdown"
+import { useTranslation } from "react-i18next"
 
 const themes = [
   { label: "System", value: "system" },
@@ -18,7 +19,13 @@ const themes = [
   { label: "Classic", value: "classic" },
 ]
 
+const languages = [
+  { label: "English", value: "en" },
+  { label: "Español", value: "es" },
+]
+
 function Settings() {
+  const { t, i18n } = useTranslation()
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
   const [animationDirection, setAnimationDirection] = useState<"up" | "left" | "off">(
     (localStorage.getItem("pageAnimation") as "up" | "left" | "off") || "up",
@@ -30,6 +37,7 @@ function Settings() {
     return localStorage.getItem("posthogDisabled") === "true"
   })
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [languageModalOpen, setLanguageModalOpen] = useState(false)
   const [forceLocalApps, setForceLocalApps] = useState(() => {
     return localStorage.getItem("forceLocalApps") === "true"
   })
@@ -39,6 +47,7 @@ function Settings() {
   const [hideAppIcons, setHideAppIcons] = useState<boolean>(
     localStorage.getItem("hideAppsPageAppIcons") === "true",
   )
+  const [language, setLanguage] = useState(localStorage.getItem("language") || "en")
   const checkForUpdates = async () => {
     try {
       setChecking(true)
@@ -107,6 +116,15 @@ function Settings() {
     }
   }
 
+  const handleLanguageChange = (value: string) => {
+    setLanguage(value)
+    i18n.changeLanguage(value)
+    localStorage.setItem("language", value)
+    if (value !== "en") {
+      setLanguageModalOpen(true)
+    }
+  }
+
   return (
     <>
       <Modal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
@@ -149,6 +167,41 @@ function Settings() {
               }}
             >
               Delete
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <Modal open={languageModalOpen} onClose={() => setLanguageModalOpen(false)}>
+        <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-2xl max-w-md w-full mx-4">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-amber-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-white mb-3">Warning</h2>
+            <p className="text-gray-300 text-sm leading-relaxed prose prose-invert prose-strong:text-sparkle-secondary prose-em:text-sparkle-primary">
+              <strong>
+                English is the only fully supported language. Other languages may be incomplete
+              </strong>{" "}
+              or contain inaccurate translations and some pages may still appear in English. <br />
+              Also, some languages that have long words may cause UI issues. If you experience any
+              issues, please switch back to <strong>English</strong>.
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <Button variant="secondary" onClick={() => setLanguageModalOpen(false)}>
+              Understood
             </Button>
           </div>
         </div>
@@ -198,6 +251,24 @@ function Settings() {
                     onChange={(value) => {
                       setAnimationDirection(value as "up" | "left" | "off")
                       localStorage.setItem("pageAnimation", value)
+                    }}
+                  />
+                </div>
+              </SettingCard>
+              <SettingCard>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-base font-medium text-sparkle-text mb-1">Language</h3>
+                    <p className="text-sm text-sparkle-text-secondary">
+                      Choose your preferred language
+                    </p>
+                  </div>
+                  <Dropdown
+                    value={language}
+                    options={languages.map((l) => l.label)}
+                    onChange={(value) => {
+                      const lang = languages.find((l) => l.label === value)
+                      if (lang) handleLanguageChange(lang.value)
                     }}
                   />
                 </div>

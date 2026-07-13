@@ -11,7 +11,9 @@ import Greeting from "@/components/greeting"
 import { MonitorCog } from "lucide-react"
 import { Wrench } from "lucide-react"
 import Card from "@/components/ui/Card"
+import { useTranslation } from "react-i18next"
 function Home() {
+  const { t } = useTranslation()
   const systemInfo = useSystemStore((state) => state.systemInfo)
   const setSystemInfo = useSystemStore((state) => state.setSystemInfo)
   const [tweakInfo, setTweakInfo] = useState(() => {
@@ -148,13 +150,13 @@ function Home() {
             ></div>
           </div>
           <div className="flex flex-col items-center gap-1.5 text-center">
-            <p className="text-sparkle-text-dark font-medium">Loading system information</p>
+            <p className="text-sparkle-text-dark font-medium">{t("home.loadingSystem")}</p>
             <p className="text-sparkle-text-muted text-sm">
-              This may take a while depending on your system
+              {t("home.loadingSystemDesc")}
             </p>
           </div>
           <p className="text-xs text-sparkle-secondary bg-sparkle-accent px-3 py-1.5 rounded-full mt-1">
-            You can use other parts of Sparkle while this loads
+            {t("home.loadingSystemHint")}
           </p>
         </div>
       </RootDiv>
@@ -170,11 +172,11 @@ function Home() {
             icon={Cpu}
             iconBgColor="bg-blue-500/10"
             iconColor="text-blue-500"
-            title="CPU"
-            subtitle="Processor Information"
+            title={t("home.cpu")}
+            subtitle={t("home.cpuSubtitle")}
             items={[
-              { label: "Model", value: systemInfo?.cpu_model || "Unknown" },
-              { label: "Cores", value: `${systemInfo?.cpu_cores || "0"} Cores` },
+              { label: t("home.model"), value: systemInfo?.cpu_model || t("common.unknown") },
+              { label: t("home.cores"), value: `${systemInfo?.cpu_cores || "0"} ${t("home.coresUnit")}` },
             ]}
           />
 
@@ -182,17 +184,17 @@ function Home() {
             icon={Gpu}
             iconBgColor="bg-teal-500/10"
             iconColor="text-teal-500"
-            title="GPU"
-            subtitle="Graphics Information"
+            title={t("home.gpu")}
+            subtitle={t("home.gpuSubtitle")}
             items={
               systemInfo?.hasGPU
                 ? [
-                    { label: "Model", value: systemInfo?.gpu_model || "Loading..." },
-                    { label: "VRAM", value: systemInfo?.vram || "Loading..." },
+                    { label: t("home.model"), value: systemInfo?.gpu_model || t("common.loadingDots") },
+                    { label: t("home.vram"), value: systemInfo?.vram || t("common.loadingDots") },
                   ]
                 : [
-                    { label: "Model", value: systemInfo?.integrated_gpu || "Loading..." },
-                    { label: "Type", value: "Integrated" },
+                    { label: t("home.model"), value: systemInfo?.integrated_gpu || t("common.loadingDots") },
+                    { label: t("home.type"), value: t("home.integrated") },
                   ]
             }
           />
@@ -201,11 +203,11 @@ function Home() {
             icon={MemoryStick}
             iconBgColor="bg-purple-500/10"
             iconColor="text-purple-500"
-            title="Memory"
-            subtitle="RAM Information"
+            title={t("home.memory")}
+            subtitle={t("home.memorySubtitle")}
             items={[
-              { label: "Total Memory", value: formatBytes(systemInfo?.memory_total) },
-              { label: "Type", value: systemInfo?.memory_type || "Unknown" },
+              { label: t("home.totalMemory"), value: formatBytes(systemInfo?.memory_total) },
+              { label: t("home.type"), value: systemInfo?.memory_type || t("common.unknown") },
             ]}
           />
 
@@ -213,11 +215,11 @@ function Home() {
             icon={MonitorCog}
             iconBgColor="bg-red-500/10"
             iconColor="text-red-500"
-            title="System"
-            subtitle="OS Information"
+            title={t("home.system")}
+            subtitle={t("home.systemSubtitle")}
             items={[
-              { label: "Operating System", value: systemInfo?.os || "Unknown" },
-              { label: "Version", value: systemInfo?.os_version || "Unknown" },
+              { label: t("home.operatingSystem"), value: systemInfo?.os || t("common.unknown") },
+              { label: t("home.version"), value: systemInfo?.os_version || t("common.unknown") },
             ]}
           />
 
@@ -225,11 +227,11 @@ function Home() {
             icon={HardDrive}
             iconBgColor="bg-orange-500/10"
             iconColor="text-orange-500"
-            title="Storage"
-            subtitle="Disk Information"
+            title={t("home.storage")}
+            subtitle={t("home.storageSubtitle")}
             items={[
-              { label: "Primary Disk", value: systemInfo?.disk_model || "Loading..." },
-              { label: "Total Space", value: systemInfo?.disk_size || "Loading..." },
+              { label: t("home.primaryDisk"), value: systemInfo?.disk_model || t("common.loadingDots") },
+              { label: t("home.totalSpace"), value: systemInfo?.disk_size || t("common.loadingDots") },
             ]}
           />
 
@@ -237,11 +239,11 @@ function Home() {
             icon={Wrench}
             iconBgColor="bg-green-500/10"
             iconColor="text-green-500"
-            title="Tweaks"
-            subtitle="Applied Tweaks"
+            title={t("home.tweaks")}
+            subtitle={t("home.tweaksSubtitle")}
             items={[
-              { label: "Available Tweaks", value: `${tweakInfo?.length || 0} Tweaks` },
-              { label: "Active Tweaks", value: `${activeTweaks.length || 0} Active` },
+              { label: t("home.availableTweaks"), value: `${tweakInfo?.length || 0} ${t("home.tweaksUnit")}` },
+              { label: t("home.activeTweaks"), value: `${activeTweaks.length || 0} ${t("home.activeUnit")}` },
             ]}
           />
         </div>
@@ -250,19 +252,19 @@ function Home() {
             <Wrench className="text-green-500" size={24} />
           </div>
           <div>
-            <h1 className="font-medium text-sparkle-text">PC Running slow?</h1>
+            <h1 className="font-medium text-sparkle-text">{t("home.pcRunningSlow")}</h1>
             <p className="text-sparkle-text-secondary">
-              Try Using Tweaks to improve system performance and privacy.
+              {t("home.tryTweaks")}
             </p>
           </div>
           <div className="ml-auto">
             <Button variant="outline" className="flex items-center gap-2" onClick={goToTweaks}>
-              <Zap size={18} /> Visit Tweaks
+              <Zap size={18} /> {t("home.visitTweaks")}
             </Button>
           </div>
         </Card>
         <p className="text-xs text-sparkle-text-secondary text-center mt-4">
-          {usingCache ? "Loading latest system data..." : ""}
+          {usingCache ? t("home.loadingLatest") : ""}
         </p>
       </div>
     </RootDiv>

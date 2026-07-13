@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react"
 import Modal from "@/components/ui/modal"
 import Button from "@/components/ui/button"
 import { toast } from "react-toastify"
+import { useTranslation } from "react-i18next"
 
 interface UpdatePayload {
   version?: string
@@ -10,6 +11,7 @@ interface UpdatePayload {
 }
 
 export default function UpdateManager(): React.ReactElement {
+  const { t } = useTranslation()
   const [updateOpen, setUpdateOpen] = useState(false)
   const [updateVersion, setUpdateVersion] = useState<string | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
@@ -24,10 +26,10 @@ export default function UpdateManager(): React.ReactElement {
       setDownloadPercent(0)
     }
     const onNotAvailable = () => {
-      toast.success("You're up to date")
+      toast.success(t("updateManager.upToDate"))
     }
     const onError = (_e: any, payload: UpdatePayload) => {
-      toast.error(payload?.message ?? "Update error")
+      toast.error(payload?.message ?? t("updateManager.updateError"))
       setIsDownloading(false)
     }
     const onProgress = (_e: any, payload: UpdatePayload) => {
@@ -68,18 +70,18 @@ export default function UpdateManager(): React.ReactElement {
     <Modal open={updateOpen} onClose={() => {}}>
       <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4">
         <h2 className="text-xl font-semibold mb-2 text-sparkle-primary">
-          Update available{updateVersion ? ` (${updateVersion})` : ""}
+          {t("updateManager.updateAvailable", { version: updateVersion ? ` (${updateVersion})` : "" })}
         </h2>
         <p className="mb-6 text-sparkle-text">
           {isDownloaded
-            ? "The update has been downloaded. Restart to install now."
+            ? t("updateManager.downloadedMessage")
             : isDownloading
-              ? `Downloading update… ${Math.floor(downloadPercent)}%`
-              : "A new version is available. Please update to ensure sparkle keeps working properly."}
+              ? t("updateManager.downloadingMessage", { percent: Math.floor(downloadPercent) })
+              : t("updateManager.availableMessage")}
         </p>
         <div className="flex justify-end gap-3">
           <Button onClick={handleUpdateNow} disabled={isDownloading}>
-            {isDownloaded ? "Restart and install" : isDownloading ? "Downloading…" : "Update now"}
+            {isDownloaded ? t("updateManager.restartInstall") : isDownloading ? t("updateManager.downloading") : t("updateManager.updateNow")}
           </Button>
         </div>
       </div>

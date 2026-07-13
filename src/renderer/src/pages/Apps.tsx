@@ -19,6 +19,7 @@ import { LargeInput } from "@/components/ui/input"
 import { Dropdown } from "@/components/ui/dropdown"
 import useAppInstallStore from "@/store/appInstallStore"
 import logo from "../../../../resources/sparklelogo.png"
+import { useTranslation } from "react-i18next"
 
 interface AppData {
   name: string
@@ -42,6 +43,7 @@ interface InvokeResult {
 }
 
 function Apps() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState("")
   const [selectedApps, setSelectedApps] = useState<string[]>([])
   const [importModalOpen, setImportModalOpen] = useState(false)
@@ -113,10 +115,10 @@ function Apps() {
           setSelectedImportedApps(parsed)
           setImportModalOpen(true)
         } else {
-          toast.error("Invalid import file format")
+          toast.error(t("apps.invalidFormat"))
         }
       } catch {
-        toast.error("Failed to parse JSON file")
+        toast.error(t("apps.failedParseJSON"))
       } finally {
         event.target.value = ""
       }
@@ -161,11 +163,11 @@ function Apps() {
     setWingetInstalling(true)
     try {
       await invoke({ channel: "install-winget" })
-      toast.success("Winget installation completed!")
+      toast.success(t("apps.wingetInstalledSuccess"))
       await checkWinget()
     } catch (error) {
       console.error("Error installing Winget:", error)
-      toast.error("Failed to install Winget. Please try again.")
+      toast.error(t("apps.failedInstallWinget"))
     } finally {
       setWingetInstalling(false)
     }
@@ -193,13 +195,13 @@ function Apps() {
     setChocolateyInstalling(true)
     try {
       await invoke({ channel: "install-chocolatey" })
-      toast.success("Chocolatey installed! Please restart Sparkle to continue.", {
+      toast.success(t("apps.chocoInstalledSuccess"), {
         autoClose: false,
       })
       await checkChocolatey()
     } catch (error) {
       console.error("Error installing Chocolatey:", error)
-      toast.error("Failed to install Chocolatey. Please try again.")
+      toast.error(t("apps.failedInstallChoco"))
     } finally {
       setChocolateyInstalling(false)
     }
@@ -226,7 +228,7 @@ function Apps() {
         setAppsList(appsData.apps || [])
       } catch (error) {
         console.error("Failed to load apps list", error)
-        toast.error("Failed to fetch apps list (Using local apps.json)")
+        toast.error(t("apps.failedFetchApps"))
         setAppsList((data as { apps: AppData[] }).apps || [])
       }
     }
@@ -274,16 +276,14 @@ function Apps() {
       <Modal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4">
           <h3 className="text-xl font-semibold text-sparkle-text mb-3">
-            Welcome to The Apps Page!
+            {t("apps.welcome")}
           </h3>
 
           <div className="text-sparkle-text-secondary text-sm leading-6 mb-6">
             <p className="mb-4">
-              Sparkle can install apps using either{" "}
-              <strong className="text-sparkle-primary">Winget</strong> or{" "}
-              <strong className="text-sparkle-primary">Chocolatey</strong>.{" "}
+              {t("apps.welcomeDesc")}
               <p className="text-sparkle-secondary">
-                Please select your preferred package manager:
+                {t("apps.selectPackageManager")}
               </p>
             </p>
 
@@ -294,16 +294,16 @@ function Apps() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-sparkle-text">Winget</h4>
+                    <h4 className="font-medium text-sparkle-text">{t("apps.wingetName")}</h4>
                     <p className="text-sm text-sparkle-text-secondary">
-                      Microsoft's official package manager
+                      {t("apps.wingetDesc")}
                     </p>
                   </div>
                   {wingetInstalled && (
-                    <span className="text-green-500 text-sm font-medium">Installed</span>
+                    <span className="text-green-500 text-sm font-medium">{t("apps.installed")}</span>
                   )}
                   {!wingetInstalled && !wingetChecking && (
-                    <span className="text-amber-500 text-sm font-medium">Not installed</span>
+                    <span className="text-amber-500 text-sm font-medium">{t("apps.notInstalled")}</span>
                   )}
                 </div>
               </button>
@@ -314,16 +314,16 @@ function Apps() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-sparkle-text">Chocolatey</h4>
+                    <h4 className="font-medium text-sparkle-text">{t("apps.chocoName")}</h4>
                     <p className="text-sm text-sparkle-text-secondary">
-                      Community package manager for Windows
+                      {t("apps.chocoDesc")}
                     </p>
                   </div>
                   {chocolateyInstalled && (
-                    <span className="text-green-500 text-sm font-medium">Installed</span>
+                    <span className="text-green-500 text-sm font-medium">{t("apps.installed")}</span>
                   )}
                   {!chocolateyInstalled && !chocolateyChecking && (
-                    <span className="text-amber-500 text-sm font-medium">Not installed</span>
+                    <span className="text-amber-500 text-sm font-medium">{t("apps.notInstalled")}</span>
                   )}
                 </div>
               </button>
@@ -331,14 +331,14 @@ function Apps() {
 
             {(wingetChecking || chocolateyChecking) && (
               <p className="text-sm text-sparkle-text-secondary mt-4 text-center">
-                Checking package manager status...
+                {t("apps.checkingStatus")}
               </p>
             )}
           </div>
 
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={() => setShowWelcomeModal(false)}>
-              Skip for now
+              {t("apps.skipForNow")}
             </Button>
           </div>
         </div>
@@ -346,7 +346,7 @@ function Apps() {
       <Modal open={showSelectedAppsModal} onClose={() => setShowSelectedAppsModal(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4">
           <h3 className="text-xl font-semibold text-sparkle-text mb-3">
-            Selected Apps ({selectedApps.length})
+            {t("apps.selectedApps", { count: selectedApps.length })}
           </h3>
 
           <div className="text-sparkle-text-secondary text-sm leading-6 whitespace-pre-wrap max-h-64 overflow-y-auto custom-scrollbar mb-6">
@@ -359,7 +359,7 @@ function Apps() {
                       <li key={appId} className="flex items-center gap-2 text-sparkle-text">
                         {app?.name || appId}
                       </li>
-                      <p title="Remove App from Selection">
+                      <p title={t("apps.removeFromSelection")}>
                         <X onClick={() => toggleApp(appId)} className="w-4 h-4 cursor-pointer" />
                       </p>
                     </div>
@@ -367,13 +367,13 @@ function Apps() {
                 })}
               </ul>
             ) : (
-              <p className="text-sparkle-text-secondary italic">No apps selected</p>
+              <p className="text-sparkle-text-secondary italic">{t("apps.noAppsSelected")}</p>
             )}
           </div>
 
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={() => setShowSelectedAppsModal(false)}>
-              Close
+              {t("common.close")}
             </Button>
           </div>
         </div>
@@ -381,7 +381,7 @@ function Apps() {
       <Modal open={importModalOpen} onClose={() => setImportModalOpen(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4">
           <h3 className="text-xl font-semibold text-sparkle-text mb-3">
-            Import Apps ({importedApps.length})
+            {t("apps.importApps", { count: importedApps.length })}
           </h3>
 
           <div className="text-sparkle-text-secondary text-sm leading-6 whitespace-pre-wrap max-h-64 overflow-y-auto custom-scrollbar mb-6">
@@ -404,19 +404,19 @@ function Apps() {
                         }}
                       />
 
-                      {app ? app.name : `Unknown App (${id})`}
+                      {app ? app.name : `${t("common.unknown")} App (${id})`}
                     </li>
                   )
                 })}
               </ul>
             ) : (
-              <p className="text-sparkle-text-secondary italic">No apps found in file</p>
+              <p className="text-sparkle-text-secondary italic">{t("apps.noAppsInFile")}</p>
             )}
           </div>
 
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={() => setImportModalOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               disabled={selectedImportedApps.length === 0}
@@ -426,7 +426,7 @@ function Apps() {
                 handleAppAction("install", selectedImportedApps)
               }}
             >
-              Install Selected
+              {t("apps.installSelected")}
             </Button>
           </div>
         </div>
@@ -434,7 +434,7 @@ function Apps() {
       <RootDiv>
         <LargeInput
           icon={Search}
-          placeholder={`Search for ${filteredApps.length} apps...`}
+          placeholder={t("apps.searchApps", { count: filteredApps.length })}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -445,9 +445,9 @@ function Apps() {
               <Download className="text-amber-500" size={24} />
             </div>
             <div className="flex-1">
-              <h1 className="font-medium text-sparkle-text">Winget Not Installed</h1>
+              <h1 className="font-medium text-sparkle-text">{t("apps.wingetNotInstalled")}</h1>
               <p className="text-sparkle-text-secondary">
-                Winget is required to install and manage apps. Click the button to install it.
+                {t("apps.wingetRequired")}
               </p>
             </div>
             <div className="ml-auto">
@@ -460,13 +460,13 @@ function Apps() {
                 {wingetInstalling ? (
                   <>
                     <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-                    Installing...
+                    {t("apps.installing")}
                   </>
                 ) : wingetChecking ? (
-                  <>Checking...</>
+                  <>{t("apps.checking")}</>
                 ) : (
                   <>
-                    <Download size={18} /> Install Winget
+                    <Download size={18} /> {t("apps.installWinget")}
                   </>
                 )}
               </Button>
@@ -480,10 +480,9 @@ function Apps() {
               <Download className="text-amber-500" size={24} />
             </div>
             <div className="flex-1">
-              <h1 className="font-medium text-sparkle-text">Chocolatey Not Installed</h1>
+              <h1 className="font-medium text-sparkle-text">{t("apps.chocoNotInstalled")}</h1>
               <p className="text-sparkle-text-secondary">
-                Chocolatey is required to install and manage apps with this source. Click the button
-                to install it.
+                {t("apps.chocoRequired")}
               </p>
             </div>
             <div className="ml-auto">
@@ -496,13 +495,13 @@ function Apps() {
                 {chocolateyInstalling ? (
                   <>
                     <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-                    Installing...
+                    {t("apps.installing")}
                   </>
                 ) : chocolateyChecking ? (
-                  <>Checking...</>
+                  <>{t("apps.checking")}</>
                 ) : (
                   <>
-                    <Download size={18} /> Install Chocolatey
+                    <Download size={18} /> {t("apps.installChoco")}
                   </>
                 )}
               </Button>
@@ -517,7 +516,7 @@ function Apps() {
               className="flex gap-2 text-sm h-auto py-1 px-2"
               onClick={() => setShowSelectedAppsModal(true)}
             >
-              {selectedApps.length} app{selectedApps.length !== 1 ? "s" : ""} selected
+              {t("apps.appsSelected", { count: selectedApps.length, plural: selectedApps.length !== 1 ? "s" : "" })}
             </Button>
           )}
           <Button
@@ -526,7 +525,7 @@ function Apps() {
             onClick={() => handleAppAction("install")}
           >
             <Download className="w-5" />
-            Install Selected
+            {t("apps.installSelected")}
           </Button>
           <Button
             className="flex gap-2"
@@ -535,7 +534,7 @@ function Apps() {
             onClick={() => handleAppAction("uninstall")}
           >
             <Trash className="w-5" />
-            Uninstall Selected
+            {t("apps.uninstallSelected")}
           </Button>
           <Button
             className="flex gap-2"
@@ -543,12 +542,12 @@ function Apps() {
             disabled={selectedApps.length === 0}
           >
             <Download className="w-5" />
-            Export List
+            {t("apps.exportList")}
           </Button>
 
           <label className="flex gap-2 cursor-pointer bg-sparkle-border text-sparkle-text rounded-lg font-medium px-3 py-1.5 text-sm text-center items-center active:scale-90 hover:bg-sparkle-secondary transition-all duration-200">
             <Upload className="w-5" />
-            Import List
+            {t("apps.importList")}
             <input
               type="file"
               accept="application/json"
@@ -563,25 +562,25 @@ function Apps() {
               variant="secondary"
               onClick={() => setSelectedApps([])}
             >
-              Uncheck All
+              {t("apps.uncheckAll")}
             </Button>
           )}
         </div>
         <p className="mb-2 mt-2 text-sparkle-text-muted font-medium">
-          Looking to debloat windows? its located in {""}
+          {t("apps.debloatLink")}{""}
           <a className="text-sparkle-primary cursor-pointer" onClick={() => router("/tweaks")}>
-            Tweaks
+            {t("apps.tweaksLink")}
           </a>
         </p>
 
         <div className="flex flex-row gap-2 items-center">
           {import.meta.env.DEV && (
             <p className=" text-red-500 text-xs">
-              You are in development mode, using local apps.json
+              {t("apps.devMode")}
             </p>
           )}
           <div className="ml-auto flex gap-2 items-center">
-            <p className="text-sparkle-text-muted">Select Source:</p>
+            <p className="text-sparkle-text-muted">{t("apps.selectSource")}</p>
             <Dropdown
               options={["Winget", "Chocolatey"]}
               value={source || "Winget"}
@@ -591,7 +590,7 @@ function Apps() {
         </div>
         <div className="space-y-10 mb-10">
           <Suspense
-            fallback={<div className="text-center text-sparkle-text-secondary">Loading...</div>}
+            fallback={<div className="text-center text-sparkle-text-secondary">{t("common.loading")}</div>}
           >
             {Object.entries(appsByCategory).map(([category, apps]) => (
               <div key={category} className="space-y-4">
@@ -663,14 +662,14 @@ function Apps() {
             ))}
           </Suspense>
           <p className="text-center text-sparkle-text-muted">
-            Request more apps or make a pull request on{" "}
+            {t("apps.requestApps")}{" "}
             <a
               href="https://github.com/parcoil/sparkle"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sparkle-primary"
             >
-              github
+              {t("apps.github")}
             </a>
           </p>
         </div>
