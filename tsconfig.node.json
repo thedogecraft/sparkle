@@ -7,7 +7,6 @@
     "src/types/**/*"
   ],
   "compilerOptions": {
-        "ignoreDeprecations": "6.0",
     "composite": true,
     "types": ["electron-vite/node"],
     "baseUrl": ".",

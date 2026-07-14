@@ -7,6 +7,7 @@ import { setupSystemHandlers } from "@main/system"
 import { setupTweaksHandlers } from "@main/tweakHandler"
 import { setupDNSHandlers } from "@main/dnsHandler"
 import { setupBackupHandlers } from "@main/backup"
+import { setupDebloatHandlers } from "@main/debloat"
 import { initAutoUpdater } from "@main/updates"
 import { setMainWindow } from "@main/windowState"
 import Store from "electron-store"
@@ -146,6 +147,7 @@ app
     setupTweaksHandlers()
     setupDNSHandlers()
     setupBackupHandlers()
+    setupDebloatHandlers()
     console.log("[Sparkle]: Handlers setup complete")
 
     ipcMain.on("window-minimize", () => {

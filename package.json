@@ -19,6 +19,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "test": "vitest run  --reporter=verbose",
     "test:watch": "vitest",
+    "test:smoke": "node scripts/smoke-test.mjs",
     "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web"
   },
   "dependencies": {

@@ -19,6 +19,7 @@ import useOnlineStore from "./store/online"
 
 import { toast } from "react-toastify"
 import { useTranslation } from "react-i18next"
+import Debloat from "./pages/Debloat"
 
 function App() {
   const { t } = useTranslation()
@@ -124,6 +125,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/tweaks" element={<Tweaks />} />
+            <Route path="/debloat" element={<Debloat />} />
             <Route path="/clean" element={<Clean />} />
             <Route path="/backup" element={<Backup />} />
             <Route path="/utilities" element={<Utilities />} />

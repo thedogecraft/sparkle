@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { invoke } from "@/lib/electron"
 import RootDiv from "@/components/rootdiv"
 import {
-  RotateCw,
   Icon,
   FileX,
   Gauge,

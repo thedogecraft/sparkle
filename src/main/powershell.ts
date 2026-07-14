@@ -1,7 +1,7 @@
 import { promises as fsp } from "fs"
 import path from "path"
 import util from "util"
-import { exec } from "child_process"
+import { exec, spawn } from "child_process"
 import { app, ipcMain } from "electron"
 import { mainWindow } from "@main/windowState"
 import fs from "fs"
@@ -45,6 +45,74 @@ export async function executePowerShell(_, props) {
     console.error(`PowerShell execution error [${name}]:`, error)
     return { success: false, error: error.message }
   }
+}
+
+function sendToRenderer(channel: string, ...args: any[]) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, ...args)
+  }
+}
+
+function sendOutput(appId: string, text: string) {
+  const lines = text.split(/\r?\n/)
+  for (const line of lines) {
+    if (line.trim()) {
+      sendToRenderer("install-output", { appId, line })
+    }
+  }
+}
+
+export function executePowerShellStreaming(
+  _,
+  { script, name = "script", appId }: { script: string; name: string; appId: string }
+): Promise<{ success: boolean; output?: string; error?: string }> {
+  return new Promise(async (resolve) => {
+    const tempDir = path.join(app.getPath("userData"), "scripts")
+    ensureDirectoryExists(tempDir)
+    const tempFile = path.join(tempDir, `${name}-${Date.now()}.ps1`)
+
+    await fsp.writeFile(tempFile, script)
+
+    let fullOutput = ""
+
+    const child = spawn("powershell.exe", [
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      tempFile,
+    ])
+
+    child.stdout?.on("data", (data: Buffer) => {
+      const text = data.toString()
+      fullOutput += text
+      sendOutput(appId, text)
+    })
+
+    child.stderr?.on("data", (data: Buffer) => {
+      const text = data.toString()
+      fullOutput += text
+      sendOutput(appId, text)
+    })
+
+    child.on("close", async (code) => {
+      await fsp.unlink(tempFile).catch(console.error)
+
+      if (code === 0) {
+        console.log(`PowerShell stdout [${name}]:`, fullOutput)
+        resolve({ success: true, output: fullOutput })
+      } else {
+        console.error(`PowerShell execution error [${name}]: Exit code ${code}`)
+        resolve({ success: false, error: `Process exited with code ${code}`, output: fullOutput })
+      }
+    })
+
+    child.on("error", async (error) => {
+      await fsp.unlink(tempFile).catch(console.error)
+      console.error(`PowerShell spawn error [${name}]:`, error)
+      resolve({ success: false, error: error.message })
+    })
+  })
 }
 
 async function runPowerShellInWindow(_, { script, name = "script", noExit = true }) {
@@ -109,18 +177,20 @@ export const setupPowerShellHandlers = (): void => {
   ipcMain.handle("handle-apps", async (event, { action, apps, source }) => {
     switch (action) {
       case "install":
-        for (const app of apps) {
+        for (const appId of apps) {
           let command
           if (source === "Chocolatey") {
-            command = `choco install ${app} -y --no-progress`
+            command = `choco install ${appId} -y`
           } else {
-            command = `winget install ${app} --silent --accept-package-agreements --accept-source-agreements`
+            command = `winget install ${appId} --silent --accept-package-agreements --accept-source-agreements`
           }
 
-          if (!mainWindow) throw new Error("Main window is not available")
-
-          mainWindow.webContents.send("install-progress", `${app}`)
-          const result = await executePowerShell(event, { script: command, name: `Install-${app}` })
+          sendToRenderer("install-start", { appId })
+          const result = await executePowerShellStreaming(event, {
+            script: command,
+            name: `Install-${appId}`,
+            appId,
+          })
           const isChocoFailure =
             source === "Chocolatey" &&
             !result.success &&
@@ -128,61 +198,61 @@ export const setupPowerShellHandlers = (): void => {
             !result.output.includes("already installed")
 
           if (result.success || (result.output && result.output.includes("already installed"))) {
-            console.log(`Successfully installed ${app}`)
+            console.log(`Successfully installed ${appId}`)
+            sendToRenderer("install-app-complete", { appId })
           } else if (isChocoFailure) {
-            console.log(`Initial install failed for ${app}, retrying with --pre flag`)
-            const retryCommand = `choco install ${app} -y --no-progress --pre`
-            const retryResult = await executePowerShell(event, {
+            console.log(`Initial install failed for ${appId}, retrying with --pre flag`)
+            sendToRenderer("install-output", { appId, line: "\nRetrying with --pre flag...\n" })
+            const retryCommand = `choco install ${appId} -y --pre`
+            const retryResult = await executePowerShellStreaming(event, {
               script: retryCommand,
-              name: `Install-${app}-pre`,
+              name: `Install-${appId}-pre`,
+              appId,
             })
 
             if (
               retryResult.success ||
               (retryResult.output && retryResult.output.includes("already installed"))
             ) {
-              console.log(`Successfully installed ${app} with --pre flag`)
+              console.log(`Successfully installed ${appId} with --pre flag`)
+              sendToRenderer("install-app-complete", { appId })
             } else {
-              console.error(`Failed to install ${app} even with --pre flag:`, retryResult.error)
-              mainWindow.webContents.send("install-error")
+              console.error(`Failed to install ${appId} even with --pre flag:`, retryResult.error)
+              sendToRenderer("install-app-error", { appId })
             }
           } else {
-            console.error(`Failed to install ${app}:`, result.error)
-            mainWindow.webContents.send("install-error")
+            console.error(`Failed to install ${appId}:`, result.error)
+            sendToRenderer("install-app-error", { appId })
           }
         }
-        if (mainWindow) {
-          mainWindow.webContents.send("install-complete")
-        }
+        sendToRenderer("install-complete")
         break
 
       case "uninstall":
-        for (const app of apps) {
+        for (const appId of apps) {
           let command
           if (source === "Chocolatey") {
-            command = `choco uninstall ${app} -y --no-progress`
+            command = `choco uninstall ${appId} -y`
           } else {
-            command = `winget uninstall ${app} --silent`
+            command = `winget uninstall ${appId} --silent`
           }
 
-          if (!mainWindow) throw new Error("Main window is not available")
-
-          mainWindow.webContents.send("install-progress", `${app}`)
-          const result = await executePowerShell(event, {
+          sendToRenderer("install-start", { appId })
+          const result = await executePowerShellStreaming(event, {
             script: command,
-            name: `Uninstall-${app}`,
+            name: `Uninstall-${appId}`,
+            appId,
           })
 
           if (result.success) {
-            console.log(`Successfully uninstalled ${app}`)
+            console.log(`Successfully uninstalled ${appId}`)
+            sendToRenderer("install-app-complete", { appId })
           } else {
-            console.error(`Failed to uninstall ${app}:`, result.error)
-            mainWindow.webContents.send("install-error")
+            console.error(`Failed to uninstall ${appId}:`, result.error)
+            sendToRenderer("install-app-error", { appId })
           }
         }
-        if (mainWindow) {
-          mainWindow.webContents.send("install-complete")
-        }
+        sendToRenderer("install-complete")
         break
 
       case "check-installed":
