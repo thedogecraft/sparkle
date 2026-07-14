@@ -24,7 +24,7 @@ function Greeting() {
     }
   }, [])
 
-  const generalGreetings: string[] = t("greeting.greetings", { returnObjects: true })
+  const generalGreetings: string[] = t("greeting.greetings", { returnObjects: true }) as string[]
 
   const timeGreetings = () => {
     const hour = new Date().getHours()

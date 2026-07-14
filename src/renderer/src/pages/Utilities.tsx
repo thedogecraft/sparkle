@@ -641,7 +641,7 @@ function Utilities() {
                         />
                       ))}
                     {util.type === "button" && (
-                      <Button onClick={() => handleButtonClick(util)}>{utilBtnMap[util.buttonText] || util.buttonText}</Button>
+                      <Button onClick={() => handleButtonClick(util)}>{util.buttonText ? utilBtnMap[util.buttonText] || util.buttonText : ""}</Button>
                     )}
                     {util.type === "dropdown" &&
                       (loadingStates[util.name] ? (
