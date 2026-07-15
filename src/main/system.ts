@@ -507,6 +507,24 @@ export const setupSystemHandlers = (): void => {
   ipcMain.handle("check-winget", async () => checkWinget())
   ipcMain.handle("get-admin-status", async () => getAdminStatus())
   ipcMain.handle("install-winget", ensureWinget)
+  ipcMain.handle("clear-standby-memory", async (): Promise<{ success: boolean; output?: string; error?: string }> => {
+    try {
+      const script = `
+        $before = (Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory
+        [System.GC]::Collect()
+        [System.GC]::WaitForPendingFinalizers()
+        Start-Sleep -Seconds 1
+        $after = (Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory
+        $freed = ($after - $before) * 1024
+        if ($freed -lt 0) { $freed = 0 }
+        Write-Output $freed
+      `
+      return await executePowerShell(null, { script, name: "clear-standby-memory" })
+    } catch (error: any) {
+      console.error("Failed to clear standby memory:", error)
+      return { success: false, error: error.message }
+    }
+  })
   console.log("[Sparkle main/system.ts]: System handlers setup complete")
 }
 
@@ -519,4 +537,5 @@ export const cleanupSystemHandlers = (): void => {
   ipcMain.removeHandler("restart-explorer")
   ipcMain.removeHandler("check-winget")
   ipcMain.removeHandler("install-winget")
+  ipcMain.removeHandler("clear-standby-memory")
 }

@@ -1,0 +1,10 @@
+{
+  "title": "Disable Win+X Power Shortcuts",
+  "name": "disable-winx-power-shortcuts",
+  "risk": "safe",
+  "category": ["Safety", "Shortcuts"],
+  "description": "Disable the Windows Win+X power menu shortcuts to prevent accidental shutdown and sign-out actions.",
+  "deepDescription": "This tweak disables the Win+X power menu keyboard shortcuts (Shutdown, Restart, Sign out) while keeping the standard Win+X menu available. It is a reversible, safe registry change that helps avoid accidental power commands.",
+  "modal": "This tweak disables the power shortcut keys on the Win+X menu to reduce accidental shutdowns or restarts. It can be reverted safely.",
+  "restart": false
+}

@@ -185,6 +185,11 @@ function Clean() {
   const [lastClean, setLastClean] = useState(
     localStorage.getItem("last-clean") || "Not cleaned yet.",
   )
+  const [totalSaved, setTotalSaved] = useState(() => {
+    const saved =
+      localStorage.getItem("flare:totalSpaceSaved") || localStorage.getItem("total-space-saved")
+    return saved ? parseInt(saved, 10) || 0 : 0
+  })
   const [isCleaning, setIsCleaning] = useState(false)
   const [cleanupResults, setCleanupResults] = useState({})
   const [currentSizes, setCurrentSizes] = useState<Record<string, number>>({})
@@ -283,6 +288,18 @@ function Clean() {
       setLastClean(now)
       localStorage.setItem("last-clean", now)
       setCleanupResults(newResults)
+      const cleanedTotal = Object.values(newResults as Record<string, number>).reduce(
+        (sum, size) => sum + (size || 0),
+        0,
+      )
+      setTotalSaved((previous) => {
+        const updated = previous + cleanedTotal
+        localStorage.setItem("flare:totalSpaceSaved", updated.toString())
+        window.dispatchEvent(
+          new CustomEvent("flare-maintenance-update", { detail: { totalSpaceSaved: updated } }),
+        )
+        return updated
+      })
       fetchSizes(true)
     }
 
@@ -316,6 +333,11 @@ function Clean() {
               {totalFreed > 0 && (
                 <p className="text-sm text-green-500">
                   Total freed: <span className="font-medium">{formatBytes(totalFreed)}</span>
+                </p>
+              )}
+              {totalSaved > 0 && (
+                <p className="text-sm text-rose-500">
+                  Total saved: <span className="font-medium">{formatBytes(totalSaved)}</span>
                 </p>
               )}
             </div>

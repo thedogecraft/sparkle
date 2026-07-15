@@ -16,7 +16,8 @@ function Home() {
   const setSystemInfo = useSystemStore((state) => state.setSystemInfo)
   const [tweakInfo, setTweakInfo] = useState(() => {
     try {
-      const cached = localStorage.getItem("sparkle:tweakInfo")
+      const cached =
+        localStorage.getItem("flare:tweakInfo") || localStorage.getItem("sparkle:tweakInfo")
       return cached ? JSON.parse(cached) : null
     } catch (err) {
       console.error("Failed to parse tweakInfo cache", err)
@@ -28,11 +29,22 @@ function Home() {
   const [usingCache, setUsingCache] = useState(false)
   const [activeTweaks, setActiveTweaks] = useState(() => {
     try {
-      const cached = localStorage.getItem("sparkle:activeTweaks")
+      const cached =
+        localStorage.getItem("flare:activeTweaks") || localStorage.getItem("sparkle:activeTweaks")
       return cached ? JSON.parse(cached) : []
     } catch {
       return []
     }
+  })
+  const [totalSpaceSaved, setTotalSpaceSaved] = useState(() => {
+    const saved =
+      localStorage.getItem("flare:totalSpaceSaved") || localStorage.getItem("total-space-saved")
+    return saved ? parseInt(saved, 10) || 0 : 0
+  })
+  const [totalRamFreed, setTotalRamFreed] = useState(() => {
+    const saved =
+      localStorage.getItem("flare:totalRamFreed") || localStorage.getItem("total-ram-freed")
+    return saved ? parseInt(saved, 10) || 0 : 0
   })
 
   const goToTweaks = () => {
@@ -43,7 +55,7 @@ function Home() {
     try {
       const active = await invoke({ channel: "tweak:active" })
       setActiveTweaks(active)
-      localStorage.setItem("sparkle:activeTweaks", JSON.stringify(active))
+      localStorage.setItem("flare:activeTweaks", JSON.stringify(active))
     } catch (err) {
       console.error("Failed to fetch active tweaks:", err)
     }
@@ -51,7 +63,8 @@ function Home() {
 
   useEffect(() => {
     const idleHandle = requestIdleCallback(() => {
-      const cached = localStorage.getItem("sparkle:systemInfo")
+      const cached =
+        localStorage.getItem("flare:systemInfo") || localStorage.getItem("sparkle:systemInfo")
       if (cached) {
         try {
           const parsed = JSON.parse(cached)
@@ -67,7 +80,7 @@ function Home() {
         .then((info) => {
           useSystemStore.setState((state) => {
             const merged = { ...state.systemInfo, ...info }
-            localStorage.setItem("sparkle:systemInfo", JSON.stringify(merged))
+            localStorage.setItem("flare:systemInfo", JSON.stringify(merged))
             return { systemInfo: merged }
           })
           setUsingCache(false)
@@ -85,7 +98,8 @@ function Home() {
 
   useEffect(() => {
     const idleHandle = requestIdleCallback(() => {
-      const cached = localStorage.getItem("sparkle:tweakInfo")
+      const cached =
+        localStorage.getItem("flare:tweakInfo") || localStorage.getItem("sparkle:tweakInfo")
       if (cached) {
         try {
           setTweakInfo(JSON.parse(cached))
@@ -97,7 +111,7 @@ function Home() {
       invoke({ channel: "tweaks:fetch" })
         .then((tweaks) => {
           setTweakInfo(tweaks)
-          localStorage.setItem("sparkle:tweakInfo", JSON.stringify(tweaks))
+          localStorage.setItem("flare:tweakInfo", JSON.stringify(tweaks))
         })
         .catch((err) => {
           console.error("Error fetching tweak info:", err)
@@ -119,14 +133,26 @@ function Home() {
     const handleExtraInfo = (_event: any, extra: Record<string, any>) => {
       useSystemStore.setState((state) => {
         const merged = { ...state.systemInfo, ...extra }
-        localStorage.setItem("sparkle:systemInfo", JSON.stringify(merged))
+        localStorage.setItem("flare:systemInfo", JSON.stringify(merged))
         return { systemInfo: merged }
       })
     }
 
+    const handleMaintenanceUpdates = (event: any) => {
+      const detail = event.detail || {}
+      if (typeof detail.totalSpaceSaved === "number") {
+        setTotalSpaceSaved(detail.totalSpaceSaved)
+      }
+      if (typeof detail.totalRamFreed === "number") {
+        setTotalRamFreed(detail.totalRamFreed)
+      }
+    }
+
     window.electron.ipcRenderer.on("system-info-extra", handleExtraInfo)
+    window.addEventListener("flare-maintenance-update", handleMaintenanceUpdates)
     return () => {
       window.electron.ipcRenderer.removeListener("system-info-extra", handleExtraInfo)
+      window.removeEventListener("flare-maintenance-update", handleMaintenanceUpdates)
     }
   }, [])
 
@@ -242,6 +268,18 @@ function Home() {
             items={[
               { label: "Available Tweaks", value: `${tweakInfo?.length || 0} Tweaks` },
               { label: "Active Tweaks", value: `${activeTweaks.length || 0} Active` },
+            ]}
+          />
+
+          <InfoCard
+            icon={Zap}
+            iconBgColor="bg-rose-500/10"
+            iconColor="text-rose-500"
+            title="Maintenance"
+            subtitle="Recovery Metrics"
+            items={[
+              { label: "Disk Space Saved", value: `${(totalSpaceSaved / 1024 / 1024 / 1024).toFixed(2)} GB` },
+              { label: "RAM Freed", value: `${(totalRamFreed / 1024 / 1024 / 1024).toFixed(2)} GB` },
             ]}
           />
         </div>

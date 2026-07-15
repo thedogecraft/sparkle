@@ -86,78 +86,78 @@ layer(base);
     background: var(--color-sparkle-secondary);
   } */
   .light {
-    --color-sparkle-bg: #f0f0f0;
-    --color-sparkle-text: #1e293b;
-    --color-sparkle-text-dark: #334155;
-    --color-sparkle-text-darker: #475569;
-    --color-sparkle-text-secondary: #64748b;
-    --color-sparkle-text-muted: #94a3b8;
-    --color-sparkle-card: #ffffff;
-    --color-sparkle-border: #d5dae2;
-    --color-sparkle-border-secondary: #cbd5e1;
-    --color-sparkle-primary: #3b82f6;
-    --color-sparkle-secondary: #2dac7d;
-    --color-sparkle-accent: #f1f5f9;
+    --color-sparkle-bg: #fff5f5;
+    --color-sparkle-text: #1f1a18;
+    --color-sparkle-text-dark: #3b2923;
+    --color-sparkle-text-darker: #5f403b;
+    --color-sparkle-text-secondary: #7f5a5a;
+    --color-sparkle-text-muted: #9f7575;
+    --color-sparkle-card: #fff7f7;
+    --color-sparkle-border: #ebd6d6;
+    --color-sparkle-border-secondary: #e4c6c6;
+    --color-sparkle-primary: #e02424;
+    --color-sparkle-secondary: #d03d3d;
+    --color-sparkle-accent: #ffe2e2;
   }
 
   :root {
-    --color-sparkle-bg: #0c121f;
-    --color-sparkle-text: #f0f4f8;
-    --color-sparkle-text-dark: #d3dbe4;
-    --color-sparkle-text-darker: #aab4c3;
-    --color-sparkle-text-secondary: #7e92a9;
-    --color-sparkle-text-muted: #4b5970;
-    --color-sparkle-card: #131c2c;
-    --color-sparkle-border: #1f2a3d;
-    --color-sparkle-border-secondary: #212f44;
-    --color-sparkle-primary: #4f90e6;
-    --color-sparkle-secondary: #3db58a;
-    --color-sparkle-accent: #243144;
+    --color-sparkle-bg: #110606;
+    --color-sparkle-text: #f9ecec;
+    --color-sparkle-text-dark: #dac1c1;
+    --color-sparkle-text-darker: #b79d9d;
+    --color-sparkle-text-secondary: #c18787;
+    --color-sparkle-text-muted: #8f6a6a;
+    --color-sparkle-card: #1f0d0d;
+    --color-sparkle-border: #3b1717;
+    --color-sparkle-border-secondary: #5c2525;
+    --color-sparkle-primary: #ff3b3b;
+    --color-sparkle-secondary: #ff9a9a;
+    --color-sparkle-accent: #2a1212;
   }
 
   .purple {
-    --color-sparkle-bg: #120f1c;
-    --color-sparkle-text: #e3d8ff;
-    --color-sparkle-text-dark: #cbb8ff;
-    --color-sparkle-text-darker: #b199ff;
-    --color-sparkle-text-secondary: #9a85e8;
-    --color-sparkle-text-muted: #4a3a6b;
-    --color-sparkle-card: #1a1430;
-    --color-sparkle-border: #2f1b60;
-    --color-sparkle-border-secondary: #3a2178;
-    --color-sparkle-primary: #8e44ff;
-    --color-sparkle-secondary: #3463ff;
-    --color-sparkle-accent: #3b1673;
+    --color-sparkle-bg: #190b12;
+    --color-sparkle-text: #f5d9dc;
+    --color-sparkle-text-dark: #d4b0b6;
+    --color-sparkle-text-darker: #b8878f;
+    --color-sparkle-text-secondary: #c07a82;
+    --color-sparkle-text-muted: #8c6269;
+    --color-sparkle-card: #270f16;
+    --color-sparkle-border: #4a1f2a;
+    --color-sparkle-border-secondary: #6e2b34;
+    --color-sparkle-primary: #ff3a3a;
+    --color-sparkle-secondary: #ff6f6f;
+    --color-sparkle-accent: #3f141c;
   }
 
   .gray {
-    --color-sparkle-bg: #111214;
-    --color-sparkle-text: #f5f6fa;
-    --color-sparkle-text-dark: #e0e2e6;
-    --color-sparkle-text-darker: #c8ccd2;
-    --color-sparkle-text-secondary: #aeb3bb;
-    --color-sparkle-text-muted: #7a7f87;
-    --color-sparkle-card: #18191b;
-    --color-sparkle-border: #26272b;
-    --color-sparkle-border-secondary: #232426;
-    --color-sparkle-primary: #6366f1;
-    --color-sparkle-secondary: #b981f8;
-    --color-sparkle-accent: #232324;
+    --color-sparkle-bg: #120f0f;
+    --color-sparkle-text: #f4e7e7;
+    --color-sparkle-text-dark: #d8bebe;
+    --color-sparkle-text-darker: #b89d9d;
+    --color-sparkle-text-secondary: #a77b7b;
+    --color-sparkle-text-muted: #856565;
+    --color-sparkle-card: #1e1414;
+    --color-sparkle-border: #322020;
+    --color-sparkle-border-secondary: #4a2d2d;
+    --color-sparkle-primary: #f74f4f;
+    --color-sparkle-secondary: #e89b9b;
+    --color-sparkle-accent: #291414;
   }
 
   .classic {
-    --color-sparkle-bg: #0f172a;
-    --color-sparkle-text: #ffffff;
-    --color-sparkle-text-dark: #e6e6e6;
-    --color-sparkle-text-darker: #cccccc;
-    --color-sparkle-text-secondary: #94a3b8;
-    --color-sparkle-text-muted: #475569;
-    --color-sparkle-card: #162033;
-    --color-sparkle-border: #253144;
-    --color-sparkle-border-secondary: #1e293b;
-    --color-sparkle-primary: #3b82f6;
-    --color-sparkle-secondary: #2dac7d;
-    --color-sparkle-accent: #2e394b;
+    --color-sparkle-bg: #130b10;
+    --color-sparkle-text: #fde8e8;
+    --color-sparkle-text-dark: #d8b8b8;
+    --color-sparkle-text-darker: #b89a9a;
+    --color-sparkle-text-secondary: #b68f8f;
+    --color-sparkle-text-muted: #8d6a6a;
+    --color-sparkle-card: #23131a;
+    --color-sparkle-border: #3a1f24;
+    --color-sparkle-border-secondary: #582d33;
+    --color-sparkle-primary: #ff4848;
+    --color-sparkle-secondary: #ff7b7b;
+    --color-sparkle-accent: #33171c;
   }
   .Toastify__toast {
     background-color: var(--color-sparkle-card) !important;

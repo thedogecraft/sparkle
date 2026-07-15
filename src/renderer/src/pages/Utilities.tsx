@@ -34,6 +34,7 @@ type Utility = {
   type: "button" | "toggle" | "dropdown"
   buttonText?: string
   options?: string[]
+  action?: string
   checkScript?: string
   applyScript?: string | Record<string, string>
   unapplyScript?: string
@@ -41,6 +42,15 @@ type Utility = {
 }
 
 const utilities: Utility[] = [
+  {
+    name: "Free RAM",
+    description: "Release unused memory from Windows standby and working sets.",
+    state: false,
+    icon: <Zap className="w-5 h-5" />,
+    type: "button",
+    buttonText: "Free RAM",
+    action: "clear-standby-memory",
+  },
   {
     name: "Disk Cleaner",
     command: "cleanmgr",
@@ -323,6 +333,17 @@ function Utilities() {
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [search, setSearch] = useState("")
+  const [totalRamFreed, setTotalRamFreed] = useState(() => {
+    const raw = localStorage.getItem("flare:totalRamFreed") || localStorage.getItem("total-ram-freed")
+    return raw ? parseInt(raw, 10) || 0 : 0
+  })
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0 || !bytes) return "0 B"
+    const sizes = ["B", "KB", "MB", "GB", "TB"]
+    const i = Math.floor(Math.log(bytes) / Math.log(1024))
+    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`
+  }
 
   const filteredUtilities = utilities.filter(
     (util) =>
@@ -473,6 +494,43 @@ function Utilities() {
 
   const handleButtonClick = async (util: Utility) => {
     toast.dismiss()
+    if (util.action === "clear-standby-memory") {
+      const loadingToastId = toast.loading(`Clearing RAM...`)
+      try {
+        const result = await invoke({
+          channel: "clear-standby-memory",
+        })
+        if (!result.success) {
+          throw new Error(result.error || "Failed to execute RAM clear")
+        }
+
+        const freedBytes = parseInt((result.output || "0").trim(), 10) || 0
+        const updatedTotal = totalRamFreed + freedBytes
+        setTotalRamFreed(updatedTotal)
+        localStorage.setItem("flare:totalRamFreed", updatedTotal.toString())
+        window.dispatchEvent(
+          new CustomEvent("flare-maintenance-update", { detail: { totalRamFreed: updatedTotal } }),
+        )
+
+        toast.update(loadingToastId, {
+          render: `Freed ${formatBytes(freedBytes)} of RAM`,
+          type: "success",
+          isLoading: false,
+          autoClose: 4000,
+        })
+      } catch (error) {
+        console.error(`Error running ${util.name}:`, error)
+        log.error(`Error running ${util.name}:`, error)
+        toast.update(loadingToastId, {
+          render: `Failed to free RAM`,
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        })
+      }
+      return
+    }
+
     if (util.runScript) {
       const loadingToastId = toast.loading(`Running ${util.name}...`)
       try {
@@ -558,6 +616,9 @@ function Utilities() {
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
+          <div className="text-sm text-sparkle-text-secondary">
+            Total RAM freed so far: <span className="font-medium text-rose-500">{formatBytes(totalRamFreed)}</span>
+          </div>
           {filteredUtilities.length === 0 && (
             <p className="text-sparkle-text-secondary flex text-center items-center justify-center gap-2">
               No utilities match your search.

@@ -1,10 +1,10 @@
 {
-  "name": "sparkle",
+  "name": "flare",
   "version": "2.21.0",
-  "description": "Sparkle",
+  "description": "Flare",
   "main": "./out/main/index.js",
   "author": "Parcoil",
-  "homepage": "https://getsparkle.net",
+  "homepage": "https://flare.local",
   "scripts": {
     "format": "prettier --write .",
     "start": "electron-vite preview",
@@ -70,7 +70,7 @@
       {
         "provider": "github",
         "owner": "Parcoil",
-        "repo": "Sparkle",
+        "repo": "Flare",
         "releaseType": "release"
       }
     ],
@@ -85,8 +85,8 @@
         ]
       }
     ],
-    "appId": "com.parcoil.sparkle",
-    "productName": "sparkle",
+    "appId": "com.parcoil.flare",
+    "productName": "Flare",
     "directories": {
       "buildResources": "build"
     },
