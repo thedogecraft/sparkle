@@ -144,6 +144,136 @@ function shutdownSystem(): { success: boolean } {
   }
 }
 
+function sleepSystem(): { success: boolean } {
+  try {
+    // Application.SetSuspendState(Suspend, ...) genuinely sleeps. The common
+    // "rundll32 powrprof.dll,SetSuspendState" trick hibernates instead when
+    // hibernation is enabled, so it is deliberately not used here.
+    exec(
+      'powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Application]::SetSuspendState(\'Suspend\', $false, $false)"',
+      { windowsHide: true },
+    )
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to sleep system:", error)
+    throw error
+  }
+}
+
+function lockWorkstation(): { success: boolean } {
+  try {
+    exec("rundll32.exe user32.dll,LockWorkStation", { windowsHide: true })
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to lock workstation:", error)
+    throw error
+  }
+}
+
+// True only when Windows actually has a servicing/update reboot staged.
+// PendingFileRenameOperations is deliberately NOT checked: ordinary installers
+// leave entries there, so it would report "update pending" when none exists.
+const REBOOT_PENDING_KEYS = [
+  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\RebootRequired",
+  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending",
+]
+
+async function getPendingUpdate(): Promise<{ pending: boolean }> {
+  try {
+    const checks = REBOOT_PENDING_KEYS.map((k) => `(Test-Path '${k}')`).join(" -or ")
+    const result = await executePowerShell(null, {
+      script: `if (${checks}) { Write-Output 'true' } else { Write-Output 'false' }`,
+      name: "check-pending-update",
+    })
+    if (!result.success) return { pending: false }
+    return { pending: (result.output || "").trim().toLowerCase() === "true" }
+  } catch (error) {
+    console.error("Failed to check pending updates:", error)
+    return { pending: false }
+  }
+}
+
+// shutdown.exe cannot install updates. Windows 11 now treats "Shut down" and
+// "Update and shut down" as distinct actions, so the update variants must go
+// through InitiateShutdownW with SHUTDOWN_INSTALL_UPDATES (0x40).
+const SHUTDOWN_RESTART = 0x00000004
+const SHUTDOWN_POWEROFF = 0x00000008
+const SHUTDOWN_INSTALL_UPDATES = 0x00000040
+
+function initiateShutdownScript(flags: number): string {
+  return `
+$src = @'
+using System;
+using System.Runtime.InteropServices;
+
+public class SparkleShutdown {
+    [StructLayout(LayoutKind.Sequential)]
+    struct LUID { public uint LowPart; public int HighPart; }
+    [StructLayout(LayoutKind.Sequential)]
+    struct LUID_AND_ATTRIBUTES { public LUID Luid; public uint Attributes; }
+    [StructLayout(LayoutKind.Sequential)]
+    struct TOKEN_PRIVILEGES { public uint PrivilegeCount; public LUID_AND_ATTRIBUTES Privileges; }
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    static extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    static extern bool LookupPrivilegeValueW(string lpSystemName, string lpName, out LUID lpLuid);
+    [DllImport("advapi32.dll", SetLastError = true)]
+    static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges, ref TOKEN_PRIVILEGES NewState, uint BufferLength, IntPtr PreviousState, IntPtr ReturnLength);
+    [DllImport("kernel32.dll")]
+    static extern IntPtr GetCurrentProcess();
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    static extern uint InitiateShutdownW(string lpMachineName, string lpMessage, uint dwGracePeriod, uint dwShutdownFlags, uint dwReason);
+
+    const uint TOKEN_ADJUST_PRIVILEGES = 0x0020;
+    const uint TOKEN_QUERY = 0x0008;
+    const uint SE_PRIVILEGE_ENABLED = 0x0002;
+
+    static void EnableShutdownPrivilege() {
+        IntPtr token;
+        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out token))
+            throw new Exception("OpenProcessToken failed: " + Marshal.GetLastWin32Error());
+        LUID luid;
+        if (!LookupPrivilegeValueW(null, "SeShutdownPrivilege", out luid))
+            throw new Exception("LookupPrivilegeValue failed: " + Marshal.GetLastWin32Error());
+        TOKEN_PRIVILEGES tp = new TOKEN_PRIVILEGES();
+        tp.PrivilegeCount = 1;
+        tp.Privileges.Luid = luid;
+        tp.Privileges.Attributes = SE_PRIVILEGE_ENABLED;
+        if (!AdjustTokenPrivileges(token, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero))
+            throw new Exception("AdjustTokenPrivileges failed: " + Marshal.GetLastWin32Error());
+        int err = Marshal.GetLastWin32Error();
+        if (err != 0) throw new Exception("AdjustTokenPrivileges could not enable SeShutdownPrivilege: " + err);
+    }
+
+    public static uint Run(uint flags) {
+        EnableShutdownPrivilege();
+        // SHTDN_REASON_MAJOR_OTHER | SHTDN_REASON_MINOR_OTHER | SHTDN_REASON_FLAG_PLANNED
+        return InitiateShutdownW(null, null, 0, flags, 0x80000000);
+    }
+}
+'@
+Add-Type -TypeDefinition $src -Language CSharp
+$code = [SparkleShutdown]::Run(${flags})
+if ($code -ne 0) { Write-Error "InitiateShutdown failed with code $code"; exit 1 }
+Write-Output "ok"
+`
+}
+
+async function updateAndRestart(): Promise<PowerShellResult> {
+  return executePowerShell(null, {
+    script: initiateShutdownScript(SHUTDOWN_INSTALL_UPDATES | SHUTDOWN_RESTART),
+    name: "update-and-restart",
+  })
+}
+
+async function updateAndShutdown(): Promise<PowerShellResult> {
+  return executePowerShell(null, {
+    script: initiateShutdownScript(SHUTDOWN_INSTALL_UPDATES | SHUTDOWN_POWEROFF),
+    name: "update-and-shutdown",
+  })
+}
+
 function restartExplorer(): { success: boolean; error?: string } {
   try {
     exec("taskkill /f /im explorer.exe & start explorer.exe")
@@ -510,6 +640,11 @@ export async function checkWinget(): Promise<{ success: boolean; installed: bool
 export const setupSystemHandlers = (): void => {
   ipcMain.handle("restart", restartSystem)
   ipcMain.handle("shutdown", shutdownSystem)
+  ipcMain.handle("sleep", sleepSystem)
+  ipcMain.handle("lock", lockWorkstation)
+  ipcMain.handle("get-pending-update", async () => getPendingUpdate())
+  ipcMain.handle("update-and-restart", updateAndRestart)
+  ipcMain.handle("update-and-shutdown", updateAndShutdown)
   ipcMain.handle("open-log-folder", openLogFolder)
   ipcMain.handle("clear-sparkle-cache", clearSparkleCache)
   ipcMain.handle("get-system-info", getSystemInfo)
@@ -524,6 +659,11 @@ export const setupSystemHandlers = (): void => {
 export const cleanupSystemHandlers = (): void => {
   ipcMain.removeHandler("restart")
   ipcMain.removeHandler("shutdown")
+  ipcMain.removeHandler("sleep")
+  ipcMain.removeHandler("lock")
+  ipcMain.removeHandler("get-pending-update")
+  ipcMain.removeHandler("update-and-restart")
+  ipcMain.removeHandler("update-and-shutdown")
   ipcMain.removeHandler("open-log-folder")
   ipcMain.removeHandler("clear-sparkle-cache")
   ipcMain.removeHandler("get-system-info")

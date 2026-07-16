@@ -14,6 +14,8 @@ import {
   WifiOff,
   Bubbles,
   Power,
+  Moon,
+  Lock,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -49,6 +51,14 @@ const tabs = {
   settings: { label: "Settings", path: "/settings" },
 }
 
+type PowerAction = {
+  id: string
+  label: string
+  channel: string
+  icon: React.ReactNode
+  confirm?: string
+}
+
 function Nav({ collapsed }) {
   const location = useLocation()
   const navigate = useNavigate()
@@ -58,8 +68,11 @@ function Nav({ collapsed }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 0 })
   const [showRestartModal, setShowRestartModal] = useState(false)
-  const [showShutdownModal, setShowShutdownModal] = useState(false)
   const [showOfflineModal, setShowOfflineModal] = useState(false)
+  const [powerMenuOpen, setPowerMenuOpen] = useState(false)
+  const [pendingUpdate, setPendingUpdate] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<PowerAction | null>(null)
+  const powerMenuRef = useRef<HTMLDivElement | null>(null)
   const [hasShownOfflineModal, setHasShownOfflineModal] = useState(false)
   const { online, checkOnline } = useOnlineStore()
 
@@ -106,6 +119,61 @@ function Nav({ collapsed }) {
     window.addEventListener("resize", updateIndicator)
     return () => window.removeEventListener("resize", updateIndicator)
   }, [activeTab])
+
+  // Re-check on every open so the update options can't go stale.
+  useEffect(() => {
+    if (!powerMenuOpen) return
+    invoke({ channel: "get-pending-update" })
+      .then((result) => setPendingUpdate(!!result?.pending))
+      .catch(() => setPendingUpdate(false))
+  }, [powerMenuOpen])
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (powerMenuRef.current && !powerMenuRef.current.contains(event.target as Node)) {
+        setPowerMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const powerActions: PowerAction[] = [
+    { id: "sleep", label: "Sleep", channel: "sleep", icon: <Moon size={16} /> },
+    { id: "lock", label: "Lock", channel: "lock", icon: <Lock size={16} /> },
+    ...(pendingUpdate
+      ? [
+          {
+            id: "update-restart",
+            label: "Update and restart",
+            channel: "update-and-restart",
+            icon: <RotateCw size={16} />,
+            confirm: "Windows will install pending updates and then restart. Continue?",
+          },
+          {
+            id: "update-shutdown",
+            label: "Update and shut down",
+            channel: "update-and-shutdown",
+            icon: <Power size={16} />,
+            confirm: "Windows will install pending updates and then shut down. Continue?",
+          },
+        ]
+      : []),
+    {
+      id: "restart",
+      label: "Restart",
+      channel: "restart",
+      icon: <RotateCw size={16} />,
+      confirm: "Are you sure you want to restart your computer now?",
+    },
+    {
+      id: "shutdown",
+      label: "Shut Down",
+      channel: "shutdown",
+      icon: <Power size={16} />,
+      confirm: "Are you sure you want to shut down your computer now?",
+    },
+  ]
 
   return (
     <nav
@@ -235,38 +303,68 @@ function Nav({ collapsed }) {
           </div>
         </div>
       </Modal>
-      <Modal open={showShutdownModal} onOpenChange={setShowShutdownModal}>
+      <Modal open={confirmAction !== null} onOpenChange={() => setConfirmAction(null)}>
         <div className="bg-sparkle-card p-4 rounded-2xl border border-sparkle-border text-sparkle-text w-[90vw] max-w-md">
-          <h2 className="text-lg font-semibold">Confirm Shut Down</h2>
-          <p>Are you sure you want to shut down your computer now?</p>
+          <h2 className="text-lg font-semibold">Confirm {confirmAction?.label}</h2>
+          <p>{confirmAction?.confirm}</p>
           <div className="flex gap-2 justify-end">
-            <Button onClick={() => setShowShutdownModal(false)} variant="secondary">
+            <Button onClick={() => setConfirmAction(null)} variant="secondary">
               Cancel
             </Button>
             <Button
               onClick={() => {
-                setShowShutdownModal(false)
-                invoke({ channel: "shutdown" })
+                const channel = confirmAction?.channel
+                setConfirmAction(null)
+                if (channel) invoke({ channel })
               }}
               variant="danger"
             >
-              Shut Down
+              {confirmAction?.label}
             </Button>
           </div>
         </div>
       </Modal>
-      <button
-        className={clsx(
-          "flex items-center rounded-lg transition-all duration-200 border mx-3 py-2",
-          collapsed ? "justify-center px-2" : "gap-3 px-3",
-          "bg-sparkle-card text-sparkle-text-secondary border-sparkle-border-secondary hover:bg-sparkle-border-secondary hover:text-sparkle-text",
-        )}
-        onClick={() => setShowShutdownModal(true)}
-        title="Shut down your PC"
-      >
-        <Power size={16} />
-        {!collapsed && <span className="text-sm">Shut Down</span>}
-      </button>
+      <div className="relative mx-3" ref={powerMenuRef}>
+        <div
+          className={clsx(
+            "absolute bottom-full mb-2 bg-sparkle-card border border-sparkle-border rounded-lg shadow-lg z-50 overflow-hidden transition-all duration-200 origin-bottom",
+            collapsed ? "left-0 w-40" : "left-0 right-0",
+            powerMenuOpen
+              ? "opacity-100 scale-y-100"
+              : "opacity-0 scale-y-0 pointer-events-none",
+          )}
+        >
+          {powerActions.map((action) => (
+            <button
+              key={action.id}
+              onClick={() => {
+                setPowerMenuOpen(false)
+                if (action.confirm) {
+                  setConfirmAction(action)
+                } else {
+                  invoke({ channel: action.channel })
+                }
+              }}
+              className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 text-sparkle-text hover:bg-sparkle-border-secondary transition-colors"
+            >
+              {action.icon}
+              <span>{action.label}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          className={clsx(
+            "w-full flex items-center rounded-lg transition-all duration-200 border py-2",
+            collapsed ? "justify-center px-2" : "gap-3 px-3",
+            "bg-sparkle-card text-sparkle-text-secondary border-sparkle-border-secondary hover:bg-sparkle-border-secondary hover:text-sparkle-text",
+          )}
+          onClick={() => setPowerMenuOpen((open) => !open)}
+          title="Power options"
+        >
+          <Power size={16} />
+          {!collapsed && <span className="text-sm">Power</span>}
+        </button>
+      </div>
       <div
         className={`flex items-center justify-center gap-2 mt-4 mb-2 ${collapsed ? "flex-col" : ""}`}
       >

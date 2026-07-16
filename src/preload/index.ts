@@ -34,6 +34,11 @@ const INVOKABLE_CHANNELS = new Set([
   // system.ts
   "restart",
   "shutdown",
+  "sleep",
+  "lock",
+  "get-pending-update",
+  "update-and-restart",
+  "update-and-shutdown",
   "open-log-folder",
   "clear-sparkle-cache",
   "get-system-info",
