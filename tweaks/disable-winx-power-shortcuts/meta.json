@@ -1,10 +1,11 @@
 {
   "title": "Disable Win+X Power Shortcuts",
   "name": "disable-winx-power-shortcuts",
-  "risk": "safe",
+  "risk": "caution",
   "category": ["Safety", "Shortcuts"],
-  "description": "Remove the Shut down, Restart, Sleep, Hibernate, and Sign out commands from the Win+X menu to prevent accidental or prank power actions.",
-  "deepDescription": "This tweak removes the entire \"Shut down or sign out\" submenu (Shutdown/Restart/Sleep/Hibernate/Sign out) from the Win+X power user menu, Start menu power button, and Ctrl+Alt+Del screen, so pressing Win+X, U, then U/R/S/H/I does nothing. It restarts Explorer to apply immediately and is a reversible, safe registry change.",
-  "modal": "This tweak removes the power and sign-out options from the Win+X menu to stop accidental or prank shutdowns/restarts/sign-outs. Explorer will restart to apply it. It can be reverted safely.",
+  "warning": "Windows has no setting that hides this only from the Win+X menu — it also removes Shut down/Restart/Sleep/Sign out from your normal Start menu power button. To shut down normally after applying, toggle this tweak off first, use the physical power button, or run \"shutdown /s\" from a terminal.",
+  "description": "Remove the Shut down, Restart, Sleep, Hibernate, and Sign out commands from the Win+X menu to prevent accidental or prank power actions. Also removes them from the normal Start menu power button — Windows does not allow hiding this from Win+X alone.",
+  "deepDescription": "This tweak removes the entire \"Shut down or sign out\" submenu (Shutdown/Restart/Sleep/Hibernate/Sign out) from the Win+X power user menu, the Start menu's power button, and the Ctrl+Alt+Del screen, so pressing Win+X, U, then U/R/S/H/I does nothing. There is no Windows registry or policy setting that scopes this to Win+X only — it was verified empirically that hiding it from Win+X requires the same setting that hides it from the normal Start menu shutdown button too. If you need to shut down normally after applying this, toggle the tweak off first (or use the physical power button, or \"shutdown /s\" from a terminal). It restarts Explorer to apply immediately and is a reversible registry change.",
+  "modal": "This tweak removes the power and sign-out options from the Win+X menu to stop accidental or prank shutdowns/restarts/sign-outs. It also removes them from your normal Start menu power button, since Windows can't scope this to Win+X alone — toggle it off (or hold the physical power button) when you actually want to shut down. Explorer will restart to apply it. It can be reverted safely.",
   "restart": false
 }

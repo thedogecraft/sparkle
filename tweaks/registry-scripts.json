@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-16T06:21:46.496Z",
+  "version": "2026-07-16T07:21:08.237Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -360,7 +360,7 @@
     {
       "id": "disable-winx-power-shortcuts",
       "title": "Disable Win+X Power Shortcuts",
-      "description": "Remove the Shut down, Restart, Sleep, Hibernate, and Sign out commands from the Win+X menu to prevent accidental or prank power actions.",
+      "description": "Remove the Shut down, Restart, Sleep, Hibernate, and Sign out commands from the Win+X menu to prevent accidental or prank power actions. Also removes them from the normal Start menu power button — Windows does not allow hiding this from Win+X alone.",
       "category": [
         "Safety",
         "Shortcuts"
