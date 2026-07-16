@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-16T07:21:08.237Z",
+  "version": "2026-07-16T23:17:04.461Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -179,6 +179,19 @@
       "reversible": true,
       "docsurl": "https://docs.getsparkle.net/tweaks/disable-location-tracking",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-location-tracking/meta.json"
+    },
+    {
+      "id": "disable-lock-workstation",
+      "title": "Disable Lock (Win+L)",
+      "description": "Stop the PC from being locked, including the Win+L shortcut, to prevent prank or accidental lockouts.",
+      "category": [
+        "Safety",
+        "Shortcuts"
+      ],
+      "recommended": false,
+      "reversible": true,
+      "docsurl": "https://docs.getsparkle.net/tweaks/disable-lock-workstation",
+      "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-lock-workstation/meta.json"
     },
     {
       "id": "disable-lockscreen-tips",

@@ -134,6 +134,16 @@ function restartSystem(): { success: boolean } {
   }
 }
 
+function shutdownSystem(): { success: boolean } {
+  try {
+    exec("shutdown /s /t 0")
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to shut down system:", error)
+    throw error
+  }
+}
+
 function restartExplorer(): { success: boolean; error?: string } {
   try {
     exec("taskkill /f /im explorer.exe & start explorer.exe")
@@ -499,6 +509,7 @@ export async function checkWinget(): Promise<{ success: boolean; installed: bool
 
 export const setupSystemHandlers = (): void => {
   ipcMain.handle("restart", restartSystem)
+  ipcMain.handle("shutdown", shutdownSystem)
   ipcMain.handle("open-log-folder", openLogFolder)
   ipcMain.handle("clear-sparkle-cache", clearSparkleCache)
   ipcMain.handle("get-system-info", getSystemInfo)
@@ -512,6 +523,7 @@ export const setupSystemHandlers = (): void => {
 
 export const cleanupSystemHandlers = (): void => {
   ipcMain.removeHandler("restart")
+  ipcMain.removeHandler("shutdown")
   ipcMain.removeHandler("open-log-folder")
   ipcMain.removeHandler("clear-sparkle-cache")
   ipcMain.removeHandler("get-system-info")

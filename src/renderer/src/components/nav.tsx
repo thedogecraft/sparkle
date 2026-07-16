@@ -13,6 +13,7 @@ import {
   Wrench,
   WifiOff,
   Bubbles,
+  Power,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -57,6 +58,7 @@ function Nav({ collapsed }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 0 })
   const [showRestartModal, setShowRestartModal] = useState(false)
+  const [showShutdownModal, setShowShutdownModal] = useState(false)
   const [showOfflineModal, setShowOfflineModal] = useState(false)
   const [hasShownOfflineModal, setHasShownOfflineModal] = useState(false)
   const { online, checkOnline } = useOnlineStore()
@@ -233,6 +235,38 @@ function Nav({ collapsed }) {
           </div>
         </div>
       </Modal>
+      <Modal open={showShutdownModal} onOpenChange={setShowShutdownModal}>
+        <div className="bg-sparkle-card p-4 rounded-2xl border border-sparkle-border text-sparkle-text w-[90vw] max-w-md">
+          <h2 className="text-lg font-semibold">Confirm Shut Down</h2>
+          <p>Are you sure you want to shut down your computer now?</p>
+          <div className="flex gap-2 justify-end">
+            <Button onClick={() => setShowShutdownModal(false)} variant="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setShowShutdownModal(false)
+                invoke({ channel: "shutdown" })
+              }}
+              variant="danger"
+            >
+              Shut Down
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <button
+        className={clsx(
+          "flex items-center rounded-lg transition-all duration-200 border mx-3 py-2",
+          collapsed ? "justify-center px-2" : "gap-3 px-3",
+          "bg-sparkle-card text-sparkle-text-secondary border-sparkle-border-secondary hover:bg-sparkle-border-secondary hover:text-sparkle-text",
+        )}
+        onClick={() => setShowShutdownModal(true)}
+        title="Shut down your PC"
+      >
+        <Power size={16} />
+        {!collapsed && <span className="text-sm">Shut Down</span>}
+      </button>
       <div
         className={`flex items-center justify-center gap-2 mt-4 mb-2 ${collapsed ? "flex-col" : ""}`}
       >

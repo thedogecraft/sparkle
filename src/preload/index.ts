@@ -33,6 +33,7 @@ const INVOKABLE_CHANNELS = new Set([
   "handle-apps",
   // system.ts
   "restart",
+  "shutdown",
   "open-log-folder",
   "clear-sparkle-cache",
   "get-system-info",

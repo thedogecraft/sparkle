@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-16T07:21:08.237Z",
+  "version": "2026-07-16T23:17:04.461Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -234,6 +234,23 @@
       "scripts": {
         "apply": "$locationPath = \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location\"\nif (-not (Test-Path $locationPath)) { New-Item -Path $locationPath -Force | Out-Null }\nSet-ItemProperty -Path $locationPath -Name \"Value\" -Value \"Deny\" -Type String -Force\n\n$telemetryPath = \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection\"\nif (-not (Test-Path $telemetryPath)) { New-Item -Path $telemetryPath -Force | Out-Null }\nSet-ItemProperty -Path $telemetryPath -Name \"AllowTelemetry\" -Value 0 -Type DWord -Force\n\nSet-Service -Name DiagTrack -StartupType Disabled -ErrorAction SilentlyContinue\n\n$auPath = \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU\"\nif (-not (Test-Path $auPath)) { New-Item -Path $auPath -Force | Out-Null }\nSet-ItemProperty -Path $auPath -Name \"NoAutoUpdate\" -Value 1 -Type DWord -Force\n\nWrite-Output \"Location tracking, telemetry, diagnostics tracking, and automatic updates disabled.\"\n",
         "unapply": "$locationPath = \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location\"\nif (Test-Path $locationPath) {\n    Set-ItemProperty -Path $locationPath -Name \"Value\" -Value \"Allow\" -Type String -Force\n}\n\nRemove-ItemProperty -Path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection\" -Name \"AllowTelemetry\" -ErrorAction SilentlyContinue\n\nSet-Service -Name DiagTrack -StartupType Automatic -ErrorAction SilentlyContinue\n\nRemove-ItemProperty -Path \"HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU\" -Name \"NoAutoUpdate\" -ErrorAction SilentlyContinue\n\nWrite-Output \"Location tracking, telemetry, diagnostics tracking, and automatic updates restored to defaults.\"\n"
+      }
+    },
+    {
+      "id": "disable-lock-workstation",
+      "title": "Disable Lock (Win+L)",
+      "description": "Stop the PC from being locked, including the Win+L shortcut, to prevent prank or accidental lockouts.",
+      "category": [
+        "Safety",
+        "Shortcuts"
+      ],
+      "recommended": false,
+      "reversible": true,
+      "docsurl": "https://docs.getsparkle.net/tweaks/disable-lock-workstation",
+      "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-lock-workstation/meta.json",
+      "scripts": {
+        "apply": "$regPath = \"HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\"\nif (-not (Test-Path $regPath)) {\n    New-Item -Path $regPath -Force | Out-Null\n}\nSet-ItemProperty -Path $regPath -Name \"DisableLockWorkstation\" -Type DWord -Value 1 -Force\nWrite-Output \"Lock disabled. Win+L, the Start menu Lock option, and Ctrl+Alt+Del Lock are now blocked.\"\n",
+        "unapply": "$regPath = \"HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\"\nif (Test-Path $regPath) {\n    Remove-ItemProperty -Path $regPath -Name \"DisableLockWorkstation\" -Force -ErrorAction SilentlyContinue\n}\nWrite-Output \"Lock restored. Win+L and the Lock options work again.\"\n"
       }
     },
     {

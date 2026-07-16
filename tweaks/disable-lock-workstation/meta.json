@@ -1,0 +1,11 @@
+{
+  "title": "Disable Lock (Win+L)",
+  "name": "disable-lock-workstation",
+  "risk": "caution",
+  "category": ["Safety", "Shortcuts"],
+  "warning": "You will not be able to lock your PC at all while this is on.",
+  "description": "Stop the PC from being locked, including the Win+L shortcut, to prevent prank or accidental lockouts.",
+  "deepDescription": "This tweak enables the \"Remove Lock Computer\" policy (DisableLockWorkstation), which blocks the Win+L keyboard shortcut and removes the Lock option from the Start menu user tile and the Ctrl+Alt+Del screen. Because it disables locking everywhere, you will not be able to lock your own PC while it is applied, so only use it if you would rather not be able to lock than have someone lock you out. It does not affect signing out, shutting down, or restarting, and applies instantly without restarting Explorer.",
+  "modal": "This tweak blocks Win+L and removes the Lock option from the Start menu and Ctrl+Alt+Del, so nobody can lock your PC as a prank. Note that this also means you can't lock it yourself until you turn this off. It can be reverted safely.",
+  "restart": false
+}
