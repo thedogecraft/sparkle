@@ -1,5 +1,5 @@
-$services = @(
-      @{ Name = "AJRouter"; StartupType = "Manual" },
+      $services = @(
+      @{ Name = "AJRouter"; StartupType = "Disabled" },
       @{ Name = "ALG"; StartupType = "Manual" },
       @{ Name = "AppIDSvc"; StartupType = "Manual" },
       @{ Name = "AppMgmt"; StartupType = "Manual" },
@@ -7,14 +7,14 @@ $services = @(
       @{ Name = "AppVClient"; StartupType = "Disabled" },
       @{ Name = "AppXSvc"; StartupType = "Manual" },
       @{ Name = "Appinfo"; StartupType = "Manual" },
-      @{ Name = "AssignedAccessManagerSvc"; StartupType = "Manual" },
+      @{ Name = "AssignedAccessManagerSvc"; StartupType = "Disabled" },
       @{ Name = "AudioEndpointBuilder"; StartupType = "Automatic" },
       @{ Name = "AudioSrv"; StartupType = "Automatic" },
       @{ Name = "Audiosrv"; StartupType = "Automatic" },
       @{ Name = "AxInstSV"; StartupType = "Manual" },
       @{ Name = "BDESVC"; StartupType = "Manual" },
       @{ Name = "BFE"; StartupType = "Automatic" },
-      @{ Name = "BITS"; StartupType = "Automatic" },
+      @{ Name = "BITS"; StartupType = "AutomaticDelayedStart" },
       @{ Name = "BTAGService"; StartupType = "Manual" },
       @{ Name = "BcastDVRUserService_*"; StartupType = "Manual" },
       @{ Name = "BluetoothUserService_*"; StartupType = "Manual" },
@@ -22,7 +22,7 @@ $services = @(
       @{ Name = "Browser"; StartupType = "Manual" },
       @{ Name = "BthAvctpSvc"; StartupType = "Automatic" },
       @{ Name = "BthHFSrv"; StartupType = "Automatic" },
-      @{ Name = "CDPSvc"; StartupType = "Automatic" },
+      @{ Name = "CDPSvc"; StartupType = "Manual" },
       @{ Name = "CDPUserSvc_*"; StartupType = "Automatic" },
       @{ Name = "COMSysApp"; StartupType = "Manual" },
       @{ Name = "CaptureService_*"; StartupType = "Manual" },
@@ -43,13 +43,13 @@ $services = @(
       @{ Name = "DevicePickerUserSvc_*"; StartupType = "Manual" },
       @{ Name = "DevicesFlowUserSvc_*"; StartupType = "Manual" },
       @{ Name = "Dhcp"; StartupType = "Automatic" },
-      @{ Name = "DiagTrack"; StartupType = "Automatic" },
+      @{ Name = "DiagTrack"; StartupType = "Disabled" },
       @{ Name = "DialogBlockingService"; StartupType = "Disabled" },
       @{ Name = "DispBrokerDesktopSvc"; StartupType = "Automatic" },
       @{ Name = "DisplayEnhancementService"; StartupType = "Manual" },
       @{ Name = "DmEnrollmentSvc"; StartupType = "Manual" },
       @{ Name = "Dnscache"; StartupType = "Automatic" },
-      @{ Name = "DoSvc"; StartupType = "Automatic" },
+      @{ Name = "DoSvc"; StartupType = "AutomaticDelayedStart" },
       @{ Name = "DsSvc"; StartupType = "Manual" },
       @{ Name = "DsmSvc"; StartupType = "Manual" },
       @{ Name = "DusmSvc"; StartupType = "Automatic" },
@@ -81,13 +81,13 @@ $services = @(
       @{ Name = "LxpSvc"; StartupType = "Manual" },
       @{ Name = "MSDTC"; StartupType = "Manual" },
       @{ Name = "MSiSCSI"; StartupType = "Manual" },
-      @{ Name = "MapsBroker"; StartupType = "Automatic" },
+      @{ Name = "MapsBroker"; StartupType = "AutomaticDelayedStart" },
       @{ Name = "McpManagementService"; StartupType = "Manual" },
       @{ Name = "MessagingService_*"; StartupType = "Manual" },
       @{ Name = "MicrosoftEdgeElevationService"; StartupType = "Manual" },
       @{ Name = "MixedRealityOpenXRSvc"; StartupType = "Manual" },
       @{ Name = "MpsSvc"; StartupType = "Automatic" },
-      @{ Name = "MsKeyboardFilter"; StartupType = "Disabled" },
+      @{ Name = "MsKeyboardFilter"; StartupType = "Manual" },
       @{ Name = "NPSMSvc_*"; StartupType = "Manual" },
       @{ Name = "NaturalAuthentication"; StartupType = "Manual" },
       @{ Name = "NcaSvc"; StartupType = "Manual" },
@@ -104,7 +104,7 @@ $services = @(
       @{ Name = "P9RdrService_*"; StartupType = "Manual" },
       @{ Name = "PNRPAutoReg"; StartupType = "Manual" },
       @{ Name = "PNRPsvc"; StartupType = "Manual" },
-      @{ Name = "PcaSvc"; StartupType = "Automatic" },
+      @{ Name = "PcaSvc"; StartupType = "Manual" },
       @{ Name = "PeerDistSvc"; StartupType = "Manual" },
       @{ Name = "PenService_*"; StartupType = "Manual" },
       @{ Name = "PerfHost"; StartupType = "Manual" },
@@ -151,15 +151,15 @@ $services = @(
       @{ Name = "SmsRouter"; StartupType = "Manual" },
       @{ Name = "Spooler"; StartupType = "Automatic" },
       @{ Name = "SstpSvc"; StartupType = "Manual" },
-      @{ Name = "StateRepository"; StartupType = "Automatic" },
+      @{ Name = "StateRepository"; StartupType = "Manual" },
       @{ Name = "StiSvc"; StartupType = "Manual" },
-      @{ Name = "StorSvc"; StartupType = "Automatic" },
+      @{ Name = "StorSvc"; StartupType = "Manual" },
       @{ Name = "SysMain"; StartupType = "Automatic" },
       @{ Name = "SystemEventsBroker"; StartupType = "Automatic" },
       @{ Name = "TabletInputService"; StartupType = "Manual" },
       @{ Name = "TapiSrv"; StartupType = "Manual" },
       @{ Name = "TermService"; StartupType = "Automatic" },
-      @{ Name = "TextInputManagementService"; StartupType = "Automatic" },
+      @{ Name = "TextInputManagementService"; StartupType = "Manual" },
       @{ Name = "Themes"; StartupType = "Automatic" },
       @{ Name = "TieringEngineService"; StartupType = "Manual" },
       @{ Name = "TimeBroker"; StartupType = "Manual" },
@@ -175,7 +175,7 @@ $services = @(
       @{ Name = "UnistoreSvc_*"; StartupType = "Manual" },
       @{ Name = "UserDataSvc_*"; StartupType = "Manual" },
       @{ Name = "UserManager"; StartupType = "Automatic" },
-      @{ Name = "UsoSvc"; StartupType = "Automatic" },
+      @{ Name = "UsoSvc"; StartupType = "Manual" },
       @{ Name = "VGAuthService"; StartupType = "Automatic" },
       @{ Name = "VMTools"; StartupType = "Automatic" },
       @{ Name = "VSS"; StartupType = "Manual" },
@@ -188,7 +188,7 @@ $services = @(
       @{ Name = "WManSvc"; StartupType = "Manual" },
       @{ Name = "WPDBusEnum"; StartupType = "Manual" },
       @{ Name = "WSService"; StartupType = "Manual" },
-      @{ Name = "WSearch"; StartupType = "Automatic" },
+      @{ Name = "WSearch"; StartupType = "AutomaticDelayedStart" },
       @{ Name = "WaaSMedicSvc"; StartupType = "Manual" },
       @{ Name = "WalletService"; StartupType = "Manual" },
       @{ Name = "WarpJITSvc"; StartupType = "Manual" },
@@ -208,7 +208,7 @@ $services = @(
       @{ Name = "Winmgmt"; StartupType = "Automatic" },
       @{ Name = "WlanSvc"; StartupType = "Automatic" },
       @{ Name = "WpcMonSvc"; StartupType = "Manual" },
-      @{ Name = "WpnService"; StartupType = "Automatic" },
+      @{ Name = "WpnService"; StartupType = "Manual" },
       @{ Name = "WpnUserService_*"; StartupType = "Automatic" },
       @{ Name = "XblAuthManager"; StartupType = "Manual" },
       @{ Name = "XblGameSave"; StartupType = "Manual" },
@@ -217,7 +217,7 @@ $services = @(
       @{ Name = "autotimesvc"; StartupType = "Manual" },
       @{ Name = "bthserv"; StartupType = "Manual" },
       @{ Name = "camsvc"; StartupType = "Manual" },
-      @{ Name = "cbdhsvc_*"; StartupType = "Automatic" },
+      @{ Name = "cbdhsvc_*"; StartupType = "Manual" },
       @{ Name = "cloudidsvc"; StartupType = "Manual" },
       @{ Name = "dcsvc"; StartupType = "Manual" },
       @{ Name = "defragsvc"; StartupType = "Manual" },
@@ -225,7 +225,7 @@ $services = @(
       @{ Name = "diagsvc"; StartupType = "Manual" },
       @{ Name = "dmwappushservice"; StartupType = "Manual" },
       @{ Name = "dot3svc"; StartupType = "Manual" },
-      @{ Name = "edgeupdate"; StartupType = "Automatic" },
+      @{ Name = "edgeupdate"; StartupType = "Manual" },
       @{ Name = "edgeupdatem"; StartupType = "Manual" },
       @{ Name = "embeddedmode"; StartupType = "Manual" },
       @{ Name = "fdPHost"; StartupType = "Manual" },
@@ -249,7 +249,7 @@ $services = @(
       @{ Name = "shpamsvc"; StartupType = "Disabled" },
       @{ Name = "smphost"; StartupType = "Manual" },
       @{ Name = "spectrum"; StartupType = "Manual" },
-      @{ Name = "sppsvc"; StartupType = "Automatic" },
+      @{ Name = "sppsvc"; StartupType = "AutomaticDelayedStart" },
       @{ Name = "ssh-agent"; StartupType = "Disabled" },
       @{ Name = "svsvc"; StartupType = "Manual" },
       @{ Name = "swprv"; StartupType = "Manual" },
@@ -258,7 +258,7 @@ $services = @(
       @{ Name = "uhssvc"; StartupType = "Disabled" },
       @{ Name = "upnphost"; StartupType = "Manual" },
       @{ Name = "vds"; StartupType = "Manual" },
-      @{ Name = "vm3dservice"; StartupType = "Automatic" },
+      @{ Name = "vm3dservice"; StartupType = "Manual" },
       @{ Name = "vmicguestinterface"; StartupType = "Manual" },
       @{ Name = "vmicheartbeat"; StartupType = "Manual" },
       @{ Name = "vmickvpexchange"; StartupType = "Manual" },
@@ -278,17 +278,16 @@ $services = @(
       @{ Name = "wlpasvc"; StartupType = "Manual" },
       @{ Name = "wmiApSrv"; StartupType = "Manual" },
       @{ Name = "workfolderssvc"; StartupType = "Manual" },
-      @{ Name = "wscsvc"; StartupType = "Automatic" },
+      @{ Name = "wscsvc"; StartupType = "AutomaticDelayedStart" },
       @{ Name = "wuauserv"; StartupType = "Manual" },
       @{ Name = "wudfsvc"; StartupType = "Manual" }
   )
-  
+
   foreach ($svc in $services) {
-      try {
-          Set-Service -Name $svc.Name -StartupType $svc.StartupType -ErrorAction Stop
-          Write-Output "Set $($svc.Name) to $($svc.StartupType)"
-      } catch {
-          Write-Warning "Failed to set $($svc.Name): $_"
-      }
-  }
-     
+    try {
+        Set-Service -Name $svc.Name -StartupType $svc.StartupType -ErrorAction Stop
+        Write-Output "Set $($svc.Name) to $($svc.StartupType)"
+    } catch {
+        Write-Warning "Failed to set $($svc.Name): $_"
+    }
+}

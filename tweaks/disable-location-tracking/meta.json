@@ -1,9 +1,10 @@
 {
   "title": "Disable Location Tracking",
   "name": "disable-location-tracking",
-  "risk": "safe",
+  "risk": "caution",
   "category": ["Privacy"],
   "recommended": true,
-  "description": "Disables Windows location tracking.",
+  "warning": "Also disables automatic Windows Update, not just location tracking.",
+  "description": "Disables Windows location tracking, telemetry, and automatic Windows updates.",
   "deepDescription": "Disables telemetry, location access, diagnostic tracking, and automatic Windows updates by setting related registry values, reducing background data collection and improving system privacy and performance."
 }

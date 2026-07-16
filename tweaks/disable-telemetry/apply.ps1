@@ -30,7 +30,7 @@ Set-Service -Name wermgr -StartupType Disabled
 
 # Set SvcHostSplitThresholdInKB to total RAM in KB (this can help with performance)
 $MemoryKB = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Value [int]$MemoryKB
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Type DWord -Value ([int]$MemoryKB)
 
 # Remove PeriodInNanoSeconds key if exists
 Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Siuf\Rules" -Name "PeriodInNanoSeconds" -ErrorAction SilentlyContinue

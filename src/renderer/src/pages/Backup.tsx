@@ -315,6 +315,7 @@ function RestorePointsTab() {
               onChange={(e) => setCustomName(e.target.value)}
               placeholder="Enter restore point name"
               disabled={processing}
+              maxLength={80}
             />
             <div className="flex justify-end gap-3">
               <Button

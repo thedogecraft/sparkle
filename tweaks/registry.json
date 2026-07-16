@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-15T01:11:58.565Z",
+  "version": "2026-07-16T06:21:46.496Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -171,7 +171,7 @@
     {
       "id": "disable-location-tracking",
       "title": "Disable Location Tracking",
-      "description": "Disables Windows location tracking.",
+      "description": "Disables Windows location tracking, telemetry, and automatic Windows updates.",
       "category": [
         "Privacy"
       ],
@@ -204,6 +204,19 @@
       "reversible": true,
       "docsurl": "https://docs.getsparkle.net/tweaks/disable-mouse-acceleration",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-mouse-acceleration/meta.json"
+    },
+    {
+      "id": "disable-physical-power-button",
+      "title": "Disable Physical Power Button",
+      "description": "Make the laptop's physical power button do nothing on a normal press, to prevent accidental or prank shutdowns.",
+      "category": [
+        "Safety",
+        "Power"
+      ],
+      "recommended": false,
+      "reversible": true,
+      "docsurl": "https://docs.getsparkle.net/tweaks/disable-physical-power-button",
+      "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-physical-power-button/meta.json"
     },
     {
       "id": "disable-rdp-warnings",
@@ -259,6 +272,19 @@
       "reversible": true,
       "docsurl": "https://docs.getsparkle.net/tweaks/disable-wifi-sense",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-wifi-sense/meta.json"
+    },
+    {
+      "id": "disable-winx-power-shortcuts",
+      "title": "Disable Win+X Power Shortcuts",
+      "description": "Remove the Shut down, Restart, Sleep, Hibernate, and Sign out commands from the Win+X menu to prevent accidental or prank power actions.",
+      "category": [
+        "Safety",
+        "Shortcuts"
+      ],
+      "recommended": false,
+      "reversible": true,
+      "docsurl": "https://docs.getsparkle.net/tweaks/disable-winx-power-shortcuts",
+      "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-winx-power-shortcuts/meta.json"
     },
     {
       "id": "enable-dark-mode",

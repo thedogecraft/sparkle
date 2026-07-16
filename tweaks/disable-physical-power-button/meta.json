@@ -1,0 +1,10 @@
+{
+  "title": "Disable Physical Power Button",
+  "name": "disable-physical-power-button",
+  "risk": "safe",
+  "category": ["Safety", "Power"],
+  "description": "Make the laptop's physical power button do nothing on a normal press, to prevent accidental or prank shutdowns.",
+  "deepDescription": "This tweak sets the physical power button action to \"Do nothing\" for both plugged-in and on-battery power plans, on all power schemes. A quick press of the button will no longer sleep or shut down the PC. Holding the button down for several seconds still force-powers-off the machine as a hardware failsafe, so it can't get you stuck. It is reversible and safe.",
+  "modal": "This tweak disables the normal action of your laptop's physical power button so a quick press does nothing. Holding it down still hard-powers-off the PC if needed. It can be reverted safely.",
+  "restart": false
+}

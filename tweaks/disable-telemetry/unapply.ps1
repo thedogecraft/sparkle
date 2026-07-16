@@ -12,7 +12,8 @@ $registrySettings = @(
     "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection\AllowTelemetry",
     "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\Start_TrackProgs",
     "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System\PublishUserActivities",
-    "HKCU:\Software\Microsoft\Siuf\Rules\NumberOfSIUFInPeriod"
+    "HKCU:\Software\Microsoft\Siuf\Rules\NumberOfSIUFInPeriod",
+    "HKLM:\SYSTEM\CurrentControlSet\Control\SvcHostSplitThresholdInKB"
 )
 
 foreach ($reg in $registrySettings) {

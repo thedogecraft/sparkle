@@ -26,6 +26,13 @@ function changeRestorePointCooldown(): Promise<string> {
   )
 }
 
+function sanitizeRestorePointName(name: string): string {
+  return name
+    .replace(/[^A-Za-z0-9 _.-]/g, "")
+    .trim()
+    .slice(0, 80)
+}
+
 function getTimestamp(): string {
   const date = new Date()
   const yyyy = date.getFullYear()
@@ -62,7 +69,8 @@ export const setupBackupHandlers = (): void => {
     "create-restore-point",
     async (_event: IpcMainInvokeEvent, name?: string): Promise<BackupResult> => {
       try {
-        const label = name ? `${name}-${getTimestamp()}` : `ManualRestore-${getTimestamp()}`
+        const safeName = name ? sanitizeRestorePointName(name) : ""
+        const label = safeName ? `${safeName}-${getTimestamp()}` : `ManualRestore-${getTimestamp()}`
 
         await runPowerShell(`Checkpoint-Computer -Description '${label}'`)
         await changeRestorePointCooldown()

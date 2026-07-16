@@ -1,0 +1,10 @@
+{
+  "title": "Disable Win+X Power Shortcuts",
+  "name": "disable-winx-power-shortcuts",
+  "risk": "safe",
+  "category": ["Safety", "Shortcuts"],
+  "description": "Remove the Shut down, Restart, Sleep, Hibernate, and Sign out commands from the Win+X menu to prevent accidental or prank power actions.",
+  "deepDescription": "This tweak removes the entire \"Shut down or sign out\" submenu (Shutdown/Restart/Sleep/Hibernate/Sign out) from the Win+X power user menu, Start menu power button, and Ctrl+Alt+Del screen, so pressing Win+X, U, then U/R/S/H/I does nothing. It restarts Explorer to apply immediately and is a reversible, safe registry change.",
+  "modal": "This tweak removes the power and sign-out options from the Win+X menu to stop accidental or prank shutdowns/restarts/sign-outs. Explorer will restart to apply it. It can be reverted safely.",
+  "restart": false
+}

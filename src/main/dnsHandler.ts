@@ -13,6 +13,18 @@ interface DNSConfig {
   name: string
 }
 
+const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/
+const HOSTNAME_REGEX =
+  /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+
+function isValidIPv4(ip: string): boolean {
+  return IPV4_REGEX.test(ip)
+}
+
+function isValidHostname(hostname: string): boolean {
+  return hostname.length <= 253 && HOSTNAME_REGEX.test(hostname)
+}
+
 const DNS_CONFIGS: Record<string, DNSConfig> = {
   cloudflare: { primary: "1.1.1.1", secondary: "1.0.0.1", name: "Cloudflare" },
   google: { primary: "8.8.8.8", secondary: "8.8.4.4", name: "Google" },
@@ -152,6 +164,9 @@ export const setupDNSHandlers = (): void => {
           if (!primaryDNS) {
             return { success: false, error: "Primary DNS is required for custom DNS" }
           }
+          if (!isValidIPv4(primaryDNS) || (secondaryDNS && !isValidIPv4(secondaryDNS))) {
+            return { success: false, error: "Invalid DNS server address" }
+          }
           config = { primary: primaryDNS, secondary: secondaryDNS, name: "Custom" }
         } else {
           config = DNS_CONFIGS[normalizedType]
@@ -229,6 +244,9 @@ export const setupDNSHandlers = (): void => {
     async (_event: IpcMainInvokeEvent, props: TestDNSProps): Promise<any> => {
       try {
         const { hostname = "google.com" } = props
+        if (!isValidHostname(hostname)) {
+          return { success: false, error: "Invalid hostname" }
+        }
         const script = `
         try {
           $result = nslookup ${hostname} 2>&1

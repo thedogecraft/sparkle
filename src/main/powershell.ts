@@ -66,50 +66,56 @@ export function executePowerShellStreaming(
   _,
   { script, name = "script", appId }: { script: string; name: string; appId: string }
 ): Promise<{ success: boolean; output?: string; error?: string }> {
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     const tempDir = path.join(app.getPath("userData"), "scripts")
-    ensureDirectoryExists(tempDir)
     const tempFile = path.join(tempDir, `${name}-${Date.now()}.ps1`)
 
-    await fsp.writeFile(tempFile, script)
+    ;(async () => {
+      ensureDirectoryExists(tempDir)
+      await fsp.writeFile(tempFile, script)
 
-    let fullOutput = ""
+      let fullOutput = ""
 
-    const child = spawn("powershell.exe", [
-      "-NoProfile",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-File",
-      tempFile,
-    ])
+      const child = spawn("powershell.exe", [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        tempFile,
+      ])
 
-    child.stdout?.on("data", (data: Buffer) => {
-      const text = data.toString()
-      fullOutput += text
-      sendOutput(appId, text)
-    })
+      child.stdout?.on("data", (data: Buffer) => {
+        const text = data.toString()
+        fullOutput += text
+        sendOutput(appId, text)
+      })
 
-    child.stderr?.on("data", (data: Buffer) => {
-      const text = data.toString()
-      fullOutput += text
-      sendOutput(appId, text)
-    })
+      child.stderr?.on("data", (data: Buffer) => {
+        const text = data.toString()
+        fullOutput += text
+        sendOutput(appId, text)
+      })
 
-    child.on("close", async (code) => {
+      child.on("close", async (code) => {
+        await fsp.unlink(tempFile).catch(console.error)
+
+        if (code === 0) {
+          console.log(`PowerShell stdout [${name}]:`, fullOutput)
+          resolve({ success: true, output: fullOutput })
+        } else {
+          console.error(`PowerShell execution error [${name}]: Exit code ${code}`)
+          resolve({ success: false, error: `Process exited with code ${code}`, output: fullOutput })
+        }
+      })
+
+      child.on("error", async (error) => {
+        await fsp.unlink(tempFile).catch(console.error)
+        console.error(`PowerShell spawn error [${name}]:`, error)
+        resolve({ success: false, error: error.message })
+      })
+    })().catch(async (error) => {
       await fsp.unlink(tempFile).catch(console.error)
-
-      if (code === 0) {
-        console.log(`PowerShell stdout [${name}]:`, fullOutput)
-        resolve({ success: true, output: fullOutput })
-      } else {
-        console.error(`PowerShell execution error [${name}]: Exit code ${code}`)
-        resolve({ success: false, error: `Process exited with code ${code}`, output: fullOutput })
-      }
-    })
-
-    child.on("error", async (error) => {
-      await fsp.unlink(tempFile).catch(console.error)
-      console.error(`PowerShell spawn error [${name}]:`, error)
+      console.error(`PowerShell setup error [${name}]:`, error)
       resolve({ success: false, error: error.message })
     })
   })
