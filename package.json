@@ -1,6 +1,6 @@
 {
   "name": "sparkle",
-  "version": "2.21.0",
+  "version": "2.21.1",
   "description": "Sparkle",
   "main": "./out/main/index.js",
   "author": "Parcoil",
@@ -73,8 +73,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "Parcoil",
-        "repo": "Sparkle",
+        "owner": "Joystiick",
+        "repo": "sparkle",
         "releaseType": "release"
       }
     ],
