@@ -1,0 +1,6 @@
+Allow: /
+
+User-agent: *
+Disallow:
+
+Sitemap: https://docs.getsparkle.net/sitemap.xml

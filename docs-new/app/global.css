@@ -1,0 +1,104 @@
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "tailwindcss";
+@import "fumadocs-ui/css/shadcn.css";
+@import "fumadocs-ui/css/preset.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.9751 0.0127 244.2507);
+  --foreground: oklch(0.2705 0.0457 249.8541);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2705 0.0457 249.8541);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2705 0.0457 249.8541);
+  --primary: oklch(0.6602 0.1878 250.1786);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.9179 0.0403 254.0389);
+  --secondary-foreground: oklch(0.3503 0.0828 251.4412);
+  --muted: oklch(0.9506 0.0172 248.0089);
+  --muted-foreground: oklch(0.5639 0.039 248.5213);
+  --accent: oklch(0.9111 0.0467 243.3949);
+  --accent-foreground: oklch(0.2705 0.0457 249.8541);
+  --destructive: oklch(0.6861 0.2061 14.9941);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.903 0.0261 248.1176);
+  --input: oklch(0.903 0.0261 248.1176);
+  --ring: oklch(0.6602 0.1878 250.1786);
+  --radius: 0.675rem;
+}
+
+.dark {
+  --background: oklch(0.1801 0.0191 255.7673);
+  --foreground: oklch(0.9219 0.0231 258.3605);
+  --card: oklch(0.241 0.0306 256.8678);
+  --card-foreground: oklch(0.9219 0.0231 258.3605);
+  --popover: oklch(0.241 0.0306 256.8678);
+  --popover-foreground: oklch(0.9219 0.0231 258.3605);
+  --primary: oklch(0.6602 0.1878 250.1786);
+  --primary-foreground: oklch(0.1801 0.0191 255.7673);
+  --secondary: oklch(0.31 0.0445 249.4384);
+  --secondary-foreground: oklch(0.8516 0.0529 248.4481);
+  --muted: oklch(0.2759 0.0409 260.3189);
+  --muted-foreground: oklch(0.6643 0.0375 248.3916);
+  --accent: oklch(0.3509 0.0612 253.8448);
+  --accent-foreground: oklch(0.9219 0.0231 258.3605);
+  --destructive: oklch(0.6861 0.2061 14.9941);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.2836 0.0451 259.1754);
+  --input: oklch(0.354 0.0586 258.2773);
+  --ring: oklch(0.6602 0.1878 250.1786);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: Poppins, sans-serif;
+  --font-serif: Poppins, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: Fira Code, ui-monospace, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+* {
+  scrollbar-color: var(--color-primary) transparent;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}

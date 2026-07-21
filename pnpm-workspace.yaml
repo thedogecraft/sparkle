@@ -6,3 +6,7 @@ onlyBuiltDependencies:
   - electron
   - electron-winstaller
   - esbuild
+
+packages:
+  - "./*"
+  - "docs-new/*"
