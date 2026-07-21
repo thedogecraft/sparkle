@@ -19,7 +19,8 @@ function TitleBar({
 }: TitleBarProps): React.ReactElement {
   const { apps, action } = useAppInstallStore()
   const [consoleOpen, setConsoleOpen] = useState(false)
-  const actionText = action === "uninstall" ? "Uninstalling" : "Installing"
+  const actionText =
+    action === "uninstall" ? "Uninstalling" : action === "update" ? "Updating" : "Installing"
 
   const currentApp = apps.find((app) => app.status === "installing")
   const remainingCount = apps.filter((app) => app.status === "pending").length

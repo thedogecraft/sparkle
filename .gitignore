@@ -25,3 +25,6 @@ wheels/
 # docs
 site
 docs/tweaks
+
+# local Claude Code settings (personal, not shared)
+.claude/settings.local.json

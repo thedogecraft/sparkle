@@ -60,6 +60,64 @@ export interface TweakMeta {
   warning?: string
 }
 
+export interface AppUpdate {
+  id: string
+  name: string
+  currentVersion: string
+  availableVersion: string
+  source: string
+  /** Id column was cut off by winget's console truncation (ends in …);
+   *  upgrades must fall back to substring matching instead of --exact. */
+  truncated?: boolean
+}
+
+export interface WindowsUpdateItem {
+  updateId: string
+  title: string
+  kb: string
+  type: "Driver" | "Software"
+  sizeBytes: number
+  driverProvider?: string
+  driverClass?: string
+  driverVerDate?: string
+}
+
+export interface NvidiaDriverInfo {
+  supported: boolean
+  reason?: string
+  installedVersion?: string
+  latestVersion?: string
+  releaseDate?: string
+  downloadUrl?: string
+  downloadSizeText?: string
+}
+
+export interface InstalledDriverDevice {
+  deviceName: string
+  driverVersion: string
+  driverDate: string
+  deviceClass: string
+  updateId?: string
+}
+
+export interface DriverVendorGroup {
+  vendor: string
+  devices: InstalledDriverDevice[]
+}
+
+export interface GpuDriverStatus {
+  hasGPU: boolean
+  vendor: "nvidia" | "amd" | "intel" | "other" | null
+  model: string
+  installedVersion: string
+  nvidia?: NvidiaDriverInfo
+  vendorAppInstalled?: boolean
+  vendorAppInstallable?: boolean
+  vendorAppId?: string
+  vendorAppName?: string
+  manualUrl?: string
+}
+
 export interface AppInfo {
   id: string
   name: string

@@ -2,6 +2,18 @@ import { contextBridge, ipcRenderer } from "electron"
 import { electronAPI } from "@electron-toolkit/preload"
 
 const INVOKABLE_CHANNELS = new Set([
+  // appUpdates.ts
+  "app-updates:check",
+  "app-updates:upgrade",
+  // osUpdates.ts
+  "os-updates:check",
+  "os-updates:install",
+  // driverUpdates.ts
+  "driver-updates:check",
+  "driver-updates:install",
+  "gpu-driver:check",
+  "gpu-driver:download",
+  "gpu-driver:launch-app",
   // backup.ts
   "create-sparkle-restore-point",
   "create-restore-point",

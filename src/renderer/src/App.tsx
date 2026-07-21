@@ -19,6 +19,8 @@ import useOnlineStore from "./store/online"
 
 import { toast } from "react-toastify"
 import Debloat from "./pages/Debloat"
+import AppUpdates from "./pages/AppUpdates"
+import useAppUpdatesStore from "./store/appUpdatesStore"
 import NoAdmin from "./components/noAdmin"
 
 function App() {
@@ -119,6 +121,11 @@ function App() {
     })
   }, [])
 
+  // Populates the nav's update-count badge without needing the page opened.
+  useEffect(() => {
+    useAppUpdatesStore.getState().check()
+  }, [])
+
   return (
     <div className="flex flex-col h-screen bg-sparkle-bg text-sparkle-text overflow-hidden">
       <FirstTime />
@@ -142,6 +149,7 @@ function App() {
             <Route path="/utilities" element={<Utilities />} />
             <Route path="/dns" element={<DNS />} />
             <Route path="/apps" element={<Apps />} />
+            <Route path="/app-updates" element={<AppUpdates />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

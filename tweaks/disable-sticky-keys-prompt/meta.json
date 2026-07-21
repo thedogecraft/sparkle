@@ -1,0 +1,12 @@
+{
+  "title": "Disable Sticky Keys Prompt",
+  "name": "disable-sticky-keys-prompt",
+  "risk": "safe",
+  "category": ["Gaming", "General"],
+  "recommended": true,
+  "warning": "Removes the Shift-five-times accessibility shortcut. Leave this off if you or anyone using this PC relies on Sticky Keys.",
+  "description": "Stop the Sticky Keys popup from appearing when Shift is pressed five times, which often interrupts games.",
+  "deepDescription": "Pressing Shift five times triggers the Sticky Keys prompt, which steals focus and commonly minimises fullscreen games. This tweak clears the SKF_HOTKEYACTIVE and SKF_CONFIRMHOTKEY bits in the Sticky Keys Flags value so the shortcut no longer fires. Sticky Keys itself can still be turned on normally through Settings, and any other accessibility preferences already set are preserved. The original value is recorded and restored on undo. No restart is required.",
+  "modal": "This stops the Sticky Keys prompt from appearing when you press Shift five times. Sticky Keys can still be enabled from Windows Settings if you need it. Reversible at any time.",
+  "restart": false
+}

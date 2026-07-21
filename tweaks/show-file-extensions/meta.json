@@ -1,0 +1,11 @@
+{
+  "title": "Show File Extensions",
+  "name": "show-file-extensions",
+  "risk": "safe",
+  "category": ["Safety", "General"],
+  "recommended": true,
+  "description": "Always show file extensions in File Explorer, so a file named \"invoice.pdf.exe\" can't disguise itself as a PDF.",
+  "deepDescription": "By default Windows hides the extension of known file types, which means a program called \"invoice.pdf.exe\" appears in File Explorer as \"invoice.pdf\" with a PDF-looking icon. This is one of the oldest and most effective ways malware gets opened by mistake. This tweak sets HideFileExt to 0 so the real extension is always visible. File Explorer is restarted to apply the change.",
+  "modal": "This makes File Explorer always show file extensions, so disguised files like \"invoice.pdf.exe\" can't hide what they really are. File Explorer will restart briefly.",
+  "restart": false
+}

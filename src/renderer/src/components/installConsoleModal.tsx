@@ -28,7 +28,8 @@ function InstallConsoleModal({ open, onClose }: InstallConsoleModalProps) {
     }
   }, [apps, onClose])
 
-  const actionText = action === "uninstall" ? "Uninstalling" : "Installing"
+  const actionText =
+    action === "uninstall" ? "Uninstalling" : action === "update" ? "Updating" : "Installing"
 
   return (
     <Modal open={open} onClose={onClose}>

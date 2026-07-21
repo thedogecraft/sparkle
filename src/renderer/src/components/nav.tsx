@@ -16,6 +16,7 @@ import {
   Power,
   Moon,
   Lock,
+  ArrowUpCircle,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -26,6 +27,7 @@ import GithubIcon from "./githubicon"
 import Button from "./ui/button"
 import Modal from "./ui/modal"
 import useOnlineStore from "../store/online"
+import useAppUpdatesStore from "../store/appUpdatesStore"
 
 const tabIcons = {
   home: <Home size={20} />,
@@ -36,6 +38,7 @@ const tabIcons = {
   utilities: <Box size={20} />,
   dns: <EthernetPort size={20} />,
   apps: <LayoutGrid size={20} />,
+  appUpdates: <ArrowUpCircle size={20} />,
   settings: <Settings size={20} />,
 }
 
@@ -48,6 +51,7 @@ const tabs = {
   backup: { label: "Restore", path: "/backup" },
   dns: { label: "DNS Manager", path: "/dns" },
   apps: { label: "Apps", path: "/apps" },
+  appUpdates: { label: "App Updates", path: "/app-updates" },
   settings: { label: "Settings", path: "/settings" },
 }
 
@@ -75,8 +79,9 @@ function Nav({ collapsed }) {
   const powerMenuRef = useRef<HTMLDivElement | null>(null)
   const [hasShownOfflineModal, setHasShownOfflineModal] = useState(false)
   const { online, checkOnline } = useOnlineStore()
+  const updateCount = useAppUpdatesStore((s) => s.updates.length)
 
-  const disabledTabs = ["dns", "apps"]
+  const disabledTabs = ["dns", "apps", "appUpdates"]
 
   useEffect(() => {
     checkOnline()
@@ -219,6 +224,11 @@ function Nav({ collapsed }) {
                   {id === "debloat" && (
                     <span className="rounded-full bg-sparkle-primary/10 text-sparkle-primary text-[10px] uppercase tracking-[0.08em] px-2 py-0.5">
                       Beta
+                    </span>
+                  )}
+                  {id === "appUpdates" && updateCount > 0 && (
+                    <span className="rounded-full bg-sparkle-primary/10 text-sparkle-primary text-[10px] tracking-[0.08em] px-2 py-0.5">
+                      {updateCount}
                     </span>
                   )}
                 </div>

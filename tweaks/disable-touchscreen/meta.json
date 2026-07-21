@@ -1,0 +1,10 @@
+{
+  "title": "Disable Touchscreen",
+  "name": "disable-touchscreen",
+  "risk": "safe",
+  "category": ["Safety", "General"],
+  "description": "Disable touch input on laptops/tablets with a touchscreen, so accidental taps don't register.",
+  "deepDescription": "Disables the touchscreen's HID input collection at the device level, so finger touches stop registering entirely. On machines with a separate pen/stylus (e.g. Wacom-equipped ThinkPads), the stylus is a different device and is not affected. Only applies to machines that actually have a touchscreen; on any other machine this tweak does nothing. It is fully reversible.",
+  "modal": "This disables touchscreen (finger touch) input. If your device has a separate stylus/pen, it keeps working normally. Reversible at any time.",
+  "restart": false
+}

@@ -7,15 +7,17 @@ interface InstallingApp {
   logs: string[]
 }
 
+type InstallAction = "install" | "uninstall" | "update" | null
+
 interface AppInstallState {
   apps: InstallingApp[]
-  action: "install" | "uninstall" | null
+  action: InstallAction
   addApp: (id: string, name: string) => void
   setAppStatus: (id: string, status: InstallingApp["status"]) => void
   addAppLog: (id: string, line: string) => void
   removeApp: (id: string) => void
   clearApps: () => void
-  setAction: (action: "install" | "uninstall" | null) => void
+  setAction: (action: InstallAction) => void
 }
 
 const useAppInstallStore = create<AppInstallState>((set) => ({
