@@ -52,6 +52,12 @@ function openLogFolder() {
   }
 }
 
+async function getAdminStatus(): Promise<boolean> {
+  const sidecar = getSidecar()
+  const result = await sidecar.request("system.getAdminStatus")
+  return result.admin ?? false
+}
+
 function ensureWinget() {
   const sidecar = getSidecar()
   return sidecar.request("system.ensureWinget")
@@ -74,6 +80,7 @@ export const setupSystemHandlers = (): void => {
   ipcMain.handle("get-user-name", getUserName)
   ipcMain.handle("restart-explorer", restartExplorer)
   ipcMain.handle("check-winget", async () => checkWinget())
+  ipcMain.handle("get-admin-status", async () => getAdminStatus())
   ipcMain.handle("install-winget", ensureWinget)
   console.log("[Sparkle main/system.ts]: System handlers setup complete")
 }

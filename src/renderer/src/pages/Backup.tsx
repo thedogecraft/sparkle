@@ -18,6 +18,14 @@ import { toast } from "react-toastify"
 import { Trash } from "lucide-react"
 import log from "electron-log/renderer"
 import { Input, LargeInput } from "@/components/ui/input"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table"
 import { Tweak } from "@/types/index"
 
 type RestorePoint = {
@@ -146,7 +154,7 @@ function RestorePointsTab() {
   )
   return (
     <>
-      <div className="h-full max-w-full space-y-6">
+      <div className="h-full max-w-full space-y-6 ">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="relative w-full md:w-64 ml-1 mt-1">
             <LargeInput
@@ -224,37 +232,33 @@ function RestorePointsTab() {
             )}
           </div>
         ) : (
-          <div className="bg-sparkle-card border border-sparkle-border rounded-lg overflow-hidden">
-            <div className="max-h-96 overflow-y-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs text-sparkle-text-secondary uppercase bg-sparkle-card sticky top-0">
-                  <tr>
-                    <th className="px-6 py-4">Description</th>
-                    <th className="px-6 py-4 w-32 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRestorePoints.map((rp, index) => (
-                    <tr key={index} className="border-t border-sparkle-border">
-                      <td className="px-6 py-4 font-medium text-sparkle-text">{rp.Description}</td>
-                      <td className="px-14 py-4 text-center">
-                        <Button
-                          variant="outline"
-                          className="p-2! gap-2"
-                          onClick={() => handleRestore(rp)}
-                          disabled={processing}
-                          title="Restore System"
-                        >
-                          <RotateCcw size={16} />
-                          Restore
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <Table className="max-h-96">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead className="w-32 text-center">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRestorePoints.map((rp, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{rp.Description}</TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      variant="outline"
+                      className="p-2! gap-2"
+                      onClick={() => handleRestore(rp)}
+                      disabled={processing}
+                      title="Restore System"
+                    >
+                      <RotateCcw size={16} />
+                      Restore
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
         <p className="text-center text-sparkle-text-muted mt-4">
           Listing restore points is a beta feature and may be unreliable, but creating restore
@@ -547,54 +551,48 @@ function AppliedTweaksTab() {
             </p>
           </div>
         ) : (
-          <div className="bg-sparkle-card border border-sparkle-border rounded-lg overflow-hidden">
-            <div className="max-h-96 overflow-y-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs text-sparkle-text-secondary uppercase bg-sparkle-card sticky top-0">
-                  <tr>
-                    <th className="px-6 py-4">Tweak</th>
-                    <th className="px-6 py-4 w-32 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {appliedTweaks.map((tweak) => (
-                    <tr key={tweak.name} className="border-t border-sparkle-border">
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-sparkle-text">{tweak.title || tweak.name}</p>
-                        {tweak.description && (
-                          <p className="text-xs text-sparkle-text-secondary mt-0.5">
-                            {tweak.description}
-                          </p>
-                        )}
-                      </td>
-                      <td className="px-14 py-4 text-center">
-                        {tweak.reversible !== false ? (
-                          <Button
-                            variant="outline"
-                            className="p-2! gap-2"
-                            onClick={() => handleUndo(tweak)}
-                            disabled={processing}
-                            title="Undo Tweak"
-                          >
-                            {undoingTweak === tweak.name ? (
-                              <Loader2 size={16} className="animate-spin" />
-                            ) : (
-                              <Undo2 size={16} />
-                            )}
-                            Undo
-                          </Button>
+          <Table className="max-h-96">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tweak</TableHead>
+                <TableHead className="w-32 text-center">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {appliedTweaks.map((tweak) => (
+                <TableRow key={tweak.name}>
+                  <TableCell>
+                    <p className="font-medium">{tweak.title || tweak.name}</p>
+                    {tweak.description && (
+                      <p className="text-xs text-sparkle-text-secondary mt-0.5">
+                        {tweak.description}
+                      </p>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {tweak.reversible !== false ? (
+                      <Button
+                        variant="outline"
+                        className="p-2! gap-2"
+                        onClick={() => handleUndo(tweak)}
+                        disabled={processing}
+                        title="Undo Tweak"
+                      >
+                        {undoingTweak === tweak.name ? (
+                          <Loader2 size={16} className="animate-spin" />
                         ) : (
-                          <span className="text-sparkle-text-secondary text-xs">
-                            Not reversible
-                          </span>
+                          <Undo2 size={16} />
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                        Undo
+                      </Button>
+                    ) : (
+                      <span className="text-sparkle-text-secondary text-xs">Not reversible</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
         <div className="flex justify-center">
           <Button
@@ -688,7 +686,7 @@ export default function RestorePointManager() {
 
   return (
     <RootDiv>
-      <div className="h-full max-w-full space-y-4">
+      <div className="h-full max-w-full space-y-4 overflow-hidden">
         <div className="flex gap-1 bg-sparkle-card border border-sparkle-border rounded-lg p-1 w-fit">
           <button
             onClick={() => setActiveTab("restore")}

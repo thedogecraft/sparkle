@@ -12,6 +12,7 @@ import {
   Settings,
   Wrench,
   WifiOff,
+  Bubbles,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -26,6 +27,7 @@ import useOnlineStore from "../store/online"
 const tabIcons = {
   home: <Home size={20} />,
   tweaks: <Wrench size={20} />,
+  debloat: <Bubbles size={20} />,
   clean: <Icon iconNode={broom} size={20} />,
   backup: <Folder size={20} />,
   utilities: <Box size={20} />,
@@ -37,6 +39,7 @@ const tabIcons = {
 const tabs = {
   home: { label: "Dashboard", path: "/" },
   tweaks: { label: "Tweaks", path: "/tweaks" },
+  debloat: { label: "Debloat+", path: "/debloat" },
   utilities: { label: "Utilities", path: "/utilities" },
   clean: { label: "Cleaner", path: "/clean" },
   backup: { label: "Restore", path: "/backup" },
@@ -140,7 +143,16 @@ function Nav({ collapsed }) {
               )}
             >
               <div>{tabIcons[id]}</div>
-              {!collapsed && <span className="text-sm">{label}</span>}
+              {!collapsed && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{label}</span>
+                  {id === "debloat" && (
+                    <span className="rounded-full bg-sparkle-primary/10 text-sparkle-primary text-[10px] uppercase tracking-[0.08em] px-2 py-0.5">
+                      Beta
+                    </span>
+                  )}
+                </div>
+              )}
             </Button>
           )
         })}

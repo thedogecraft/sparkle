@@ -5,22 +5,25 @@
 
   <h3>Sparkle</h3>
   <p>A Windows app to debloat and optimize your PC</p>
+  
+<a href="https://trendshift.io/repositories/22090?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-22090" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/22090" alt="thedogecraft%2Fsparkle | Trendshift" width="250" height="55"/></a>
 
   <p>
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/React.svg?variant=secondary&amp;logo=react&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/React.svg?variant=secondary&amp;logo=react&amp;mode=light"></picture>
-   <a href="#-what-if-im-allergic-to-electron"> <picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/Electron.svg?variant=secondary&amp;logo=electron&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/Electron.svg?variant=secondary&amp;logo=electron&amp;mode=light"></picture></a>
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/Typescript.svg?variant=secondary&amp;logo=typescript&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/Typescript.svg?variant=secondary&amp;logo=typescript&amp;mode=light"></picture>
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/Powershell.svg?variant=secondary&amp;logo=ri%3ATbBrandPowershell&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/Powershell.svg?variant=secondary&amp;logo=ri%3ATbBrandPowershell&amp;mode=light"></picture>
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/C%23.svg?variant=secondary&amp;logo=dotnet&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/C%23.svg?variant=secondary&amp;logo=dotnet&amp;mode=light"></picture>
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://www.shieldcn.dev/github/stars/parcoil/sparkle.svg?variant=secondary&amp;size=sm&amp;mode=dark"><img alt="GitHub Stars" src="https://www.shieldcn.dev/github/stars/parcoil/sparkle.svg?variant=secondary&amp;size=sm&amp;mode=light"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/React.svg?variant=secondary&amp;logo=react&amp;size=xs&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/React.svg?variant=secondary&amp;logo=react&amp;size=xs&amp;mode=light"></picture>
+   <a href="#-what-if-im-allergic-to-electron"> <picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/Electron.svg?variant=secondary&amp;logo=electron&amp;size=xs&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/Electron.svg?variant=secondary&amp;logo=electron&amp;size=xs&amp;mode=light"></picture></a>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/Typescript.svg?variant=secondary&amp;logo=typescript&amp;size=xs&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/Typescript.svg?variant=secondary&amp;logo=typescript&amp;size=xs&amp;mode=light"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/Powershell.svg?variant=secondary&amp;logo=ri%3ATbBrandPowershell&amp;size=xs&amp;mode=dark"><img alt="badge" src="https://shieldcn.dev/badge/Powershell.svg?variant=secondary&amp;logo=ri%3ATbBrandPowershell&amp;size=xs&amp;mode=light"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://www.shieldcn.dev/github/stars/parcoil/sparkle.svg?variant=secondary&amp;size=xs&amp;mode=dark"><img alt="GitHub Stars" src="https://www.shieldcn.dev/github/stars/parcoil/sparkle.svg?variant=secondary&amp;size=xs&amp;mode=light"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://www.shieldcn.dev/github/ci/thedogecraft/sparkle.svg?variant=secondary&amp;size=xs&amp;mode=dark"><img alt="CI" src="https://www.shieldcn.dev/github/ci/thedogecraft/sparkle.svg?variant=secondary&amp;size=xs&amp;mode=light"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://www.shieldcn.dev/github/release/thedogecraft/sparkle.svg?size=xs&amp;mode=dark&amp;theme=zinc"><img alt="Release" src="https://www.shieldcn.dev/github/release/thedogecraft/sparkle.svg?size=xs&amp;mode=light&amp;theme=zinc"></picture>
   </p>
 
 ## Quick Start
 
-Install with Powershell:
+Install with Powershell (non admin) :
 
 ```powershell
-irm https://raw.githubusercontent.com/Parcoil/Sparkle/v2/get.ps1 | iex
+irm https://getsparkle.net/get | iex
 ```
 
 <a href="https://github.com/Parcoil/Sparkle/releases/latest">Download Installer/Portable</a>
@@ -124,9 +127,9 @@ Refer to the <a href="https://docs.getsparkle.net">docs</a> for more info on how
   </ul>
 
   <details>
-  <summary><h3>What if I'm allergic to Electron?</h3></summary>
+  <summary><h3>What if I’m allergic to Electron?</h3></summary>
 
-That's totally fine, this project probably isn't for you.  
+That’s totally fine, this project probably isn’t for you.  
  You might want to check out [CTT WinUtil](https://github.com/ChrisTitusTech/winutil),  
  A PowerShell based alternative that keeps things nice and lightweight.
 
@@ -134,22 +137,12 @@ this message is inspired by [this](https://github.com/nukeop/nuclear/blob/legacy
 
 </details>
 
-<h2>Architecture</h2>
+<h2>Building Sparkle</h4>
 
-Sparkle uses a **two-process architecture**:
-
-- **Electron (Node.js)** - Handles the UI (React), window management, auto-updates, and reads tweak definitions from the asar archive.
-- **C# Sidecar** - A self-contained .NET 10 executable (`SparkleSidecar.exe`) that handles all system- operations such as executing tweak scripts, DNS management, backup/restore points, app installation, and system information.
-
-The Electron main process communicates with the C# sidecar over **stdin/stdout**
-
-<h2>Building Sparkle</h2>
-
-<p>To build Sparkle you will need the following</p>
+<p>To build sparkle you will need the following</p>
 <ul>
   <li><b>Node.js</b> v22 or higher (v24 recommended)</li>
   <li><b>pnpm</b></li>
-  <li><b>.NET 10 SDK</b> or higher (<a href="https://dotnet.microsoft.com/download">download</a>)</li>
   <li><b>Windows 10/11</b></li>
 </ul>
 
@@ -179,21 +172,9 @@ cd Sparkle</code></pre>
   <li>
     <b>Build for production:</b>
     <pre><code>pnpm build</code></pre>
-    <i>This will build the C# sidecar, compile Sparkle, and package the app. Builds are located in <code>dist/</code> folder. You may be prompted to update the tweak registry.</i>
+    <i>This will compile Sparkle, Builds are located in <code>dist/</code> folder. you may be prompted if you want to update the tweak registry. This is only for production builds</i>
   </li>
 </ol>
-
-<h3>Build Commands</h3>
-
-| Command | Description |
-| ------- | ----------- |
-| `pnpm dev` | Start in development mode with hot reload |
-| `pnpm build` | Full build (sidecar + registry + electron) |
-| `pnpm build:sidecar` | Build only the C# sidecar |
-| `pnpm build:registry` | Regenerate tweak registry JSON files |
-| `pnpm build:electron` | Build only the Electron app |
-| `pnpm build:all` | Build sidecar, registry, and Electron |
-
  <br/>
   <p align="center">Made with ❤️ by Parcoil</p>
 

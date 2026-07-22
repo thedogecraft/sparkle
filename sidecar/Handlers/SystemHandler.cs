@@ -17,6 +17,7 @@ public static class SystemHandler
             "system.restartExplorer" => RestartExplorer(),
             "system.clearCache" => ClearCache(),
             "system.getUserName" => GetUserName(),
+            "system.getAdminStatus" => GetAdminStatus(),
             "system.checkWinget" => CheckWinget(),
             "system.ensureWinget" => await EnsureWinget(),
             "gpu.detect" => await DetectGpuAsync(),
@@ -127,6 +128,33 @@ public static class SystemHandler
     private static object GetUserName()
     {
         return new { username = Environment.UserName };
+    }
+
+    private static object GetAdminStatus()
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "net",
+                Arguments = "session",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(psi);
+            if (process is null)
+                return new { admin = false };
+
+            process.WaitForExit(5000);
+            return new { admin = process.ExitCode == 0 };
+        }
+        catch
+        {
+            return new { admin = false };
+        }
     }
 
     private static object CheckWinget()

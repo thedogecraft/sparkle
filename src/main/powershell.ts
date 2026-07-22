@@ -7,10 +7,29 @@ console.log = log.log
 console.error = log.error
 console.warn = log.warn
 
+function isSafeId(id: string): boolean {
+  return /^[a-zA-Z0-9._-]+$/.test(id)
+}
+
 export async function executePowerShell(_, props) {
   const sidecar = getSidecar()
   const { script, name = "script" } = props
   return await sidecar.request("powershell.run", { script, name })
+}
+
+function sendToRenderer(channel: string, ...args: any[]) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, ...args)
+  }
+}
+
+function sendOutput(appId: string, text: string) {
+  const lines = text.split(/\r?\n/)
+  for (const line of lines) {
+    if (line.trim()) {
+      sendToRenderer("install-output", { appId, line })
+    }
+  }
 }
 
 async function runPowerShellInWindow(_, { script, name = "script", noExit = true }) {

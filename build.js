@@ -60,15 +60,15 @@ async function buildRegistry() {
 
       try {
         applyScript = await fs.readFile(applyPath, "utf8")
-      } catch (e) {
-        console.warn(`No apply.ps1 found for ${folder}`)
+      } catch {
+        console.warn(`⚠️ No apply.ps1 found for ${folder}`)
       }
 
       if (baseTweak.reversible) {
         try {
           unapplyScript = await fs.readFile(unapplyPath, "utf8")
-        } catch (e) {
-          console.warn(`No unapply.ps1 found for ${folder}`)
+        } catch {
+          console.warn(`⚠️ No unapply.ps1 found for ${folder}`)
         }
       }
 
@@ -80,7 +80,7 @@ async function buildRegistry() {
         },
       })
     } catch (e) {
-      console.error(`Failed to read tweak in ${folder}: ${e.message}`)
+      console.error(`⚠️ Failed to read tweak in ${folder}: ${e.message}`)
     }
   }
 
@@ -88,11 +88,11 @@ async function buildRegistry() {
 
   const normalOutput = { version: timestamp, tweaks: registryNormal }
   await fs.writeFile(registryPath, JSON.stringify(normalOutput, null, 2))
-  console.log(`registry.json created at ${registryPath}`)
+  console.log(`✅ registry.json created at ${registryPath}`)
 
   const scriptsOutput = { version: timestamp, tweaks: registryScripts }
   await fs.writeFile(registryScriptsPath, JSON.stringify(scriptsOutput, null, 2))
-  console.log(`registry-scripts.json created at ${registryScriptsPath}`)
+  console.log(`✅ registry-scripts.json created at ${registryScriptsPath}`)
 }
 
 async function getSha256(filePath) {
@@ -103,7 +103,7 @@ async function getSha256(filePath) {
 }
 
 async function findAndPrintHashes() {
-  console.log("\nCalculating checksums...")
+  console.log("\n📦 Calculating checksums...")
   try {
     const files = await fs.readdir(distDir)
     for (const file of files) {
@@ -115,41 +115,26 @@ async function findAndPrintHashes() {
       }
     }
   } catch (e) {
-    console.warn(`Could not calculate hashes: ${e.message}`)
+    console.warn(`⚠️ Could not calculate hashes: ${e.message}`)
   }
 }
 
-function buildSidecar() {
-  console.log("Building C# sidecar...")
-  execSync("dotnet publish sidecar/SparkleSidecar.csproj -c Release -r win-x64 --self-contained -o sidecar/publish/", { stdio: "inherit" })
-  console.log("Sidecar build complete")
-}
-
 function buildElectron() {
-  console.log("Building Electron app...")
+  console.log("🚀 Building Electron app...")
   execSync("pnpm run build:vite && electron-builder", { stdio: "inherit" })
 }
 
 const args = process.argv.slice(2)
 const shouldBuildRegistry = args.includes("--registry") || args.length === 0
 const shouldBuildApp = args.includes("--build") || args.length === 0
-const shouldBuildSidecar = args.includes("--sidecar") || args.length === 0
 
 ;(async () => {
-  if (shouldBuildSidecar) {
-    const answer = await askQuestion("Do you want to build the sidecar? (y/N): ")
-    if (answer === "y" || answer === "yes") {
-      buildSidecar()
-    } else {
-      console.log("Skipping sidecar build")
-    }
-  }
   if (shouldBuildRegistry) {
     const answer = await askQuestion("Do you want to update the registry files? (y/N): ")
     if (answer === "y" || answer === "yes") {
       await buildRegistry()
     } else {
-      console.log("Skipping registry update")
+      console.log("⏭️  Skipping registry update")
     }
   }
   if (shouldBuildApp) {

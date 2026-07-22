@@ -7,11 +7,13 @@ import { setupSystemHandlers } from "@main/system"
 import { setupTweaksHandlers } from "@main/tweakHandler"
 import { setupDNSHandlers } from "@main/dnsHandler"
 import { setupBackupHandlers } from "@main/backup"
+import { setupDebloatHandlers } from "@main/debloat"
 import { initAutoUpdater } from "@main/updates"
 import { setMainWindow } from "@main/windowState"
 import { getSidecar } from "@main/sidecar"
 import Store from "electron-store"
 import { is } from "@main/utils"
+import { startDiscordRPC } from "@main/rpc"
 
 console.log = log.log
 console.error = log.error
@@ -154,6 +156,10 @@ app
     setupTweaksHandlers()
     setupDNSHandlers()
     setupBackupHandlers()
+    setupDebloatHandlers()
+    if (store.get("rpcEnabled") !== false) {
+      startDiscordRPC()
+    }
     console.log("[Sparkle]: Handlers setup complete")
 
     ipcMain.on("window-minimize", () => {

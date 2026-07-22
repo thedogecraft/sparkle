@@ -4,6 +4,7 @@
   "risk": "safe",
   "recommended": true,
   "addedversion": "2.14.0",
+  "updatedversion": "2.21.1",
   "top": true,
   "description": "Disables Windows telemetry and data collection for improved privacy and performance.",
   "deepDescription": "Disables Windows telemetry by modifying registry keys to prevent data collection and reporting to ~~Microsoft~~ Microslop. This tweak was previously in sparkle but was removed issues with the tweak not applying correctly. It has been re-added.",

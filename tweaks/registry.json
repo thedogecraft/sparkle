@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-13T00:59:31.771Z",
+  "version": "2026-07-18T02:58:43.082Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -50,6 +50,7 @@
       ],
       "recommended": false,
       "reversible": true,
+      "updatedversion": "2.21.1",
       "docsurl": "https://docs.getsparkle.net/tweaks/detailed-bsod",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/detailed-bsod/meta.json"
     },
@@ -177,6 +178,7 @@
       ],
       "recommended": true,
       "reversible": true,
+      "updatedversion": "2.21.1",
       "docsurl": "https://docs.getsparkle.net/tweaks/disable-location-tracking",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-location-tracking/meta.json"
     },
@@ -243,6 +245,7 @@
       "recommended": true,
       "reversible": true,
       "addedversion": "2.14.0",
+      "updatedversion": "2.21.1",
       "docsurl": "https://docs.getsparkle.net/tweaks/disable-telemetry",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-telemetry/meta.json"
     },
@@ -456,6 +459,7 @@
       ],
       "recommended": true,
       "reversible": true,
+      "updatedversion": "2.21.1",
       "docsurl": "https://docs.getsparkle.net/tweaks/set-services-to-manual",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/set-services-to-manual/meta.json"
     },

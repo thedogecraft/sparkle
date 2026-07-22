@@ -62,11 +62,11 @@ function Apps() {
   const [chocolateyInstalled, setChocolateyInstalled] = useState<boolean | null>(null)
   const [chocolateyChecking, setChocolateyChecking] = useState<boolean>(false)
   const [chocolateyInstalling, setChocolateyInstalling] = useState<boolean>(false)
-  const [hideAppIcons, setHideAppIcons] = useState<boolean>(
+  const [hideAppIcons, _setHideAppIcons] = useState<boolean>(
     localStorage.getItem("hideAppsPageAppIcons") === "true",
   )
 
-  const { addApp, apps: installingApps, setAction } = useAppInstallStore()
+  const { addApp, apps: installingApps, setAction, addAppLog, setAppStatus } = useAppInstallStore()
 
   const router = useNavigate()
 
@@ -234,6 +234,48 @@ function Apps() {
     loadApps()
     checkWinget()
     checkChocolatey()
+
+    const handleInstallStart = (_event: any, data: { appId: string }) => {
+      setAppStatus(data.appId, "installing")
+    }
+
+    const handleInstallOutput = (_event: any, data: { appId: string; line: string }) => {
+      addAppLog(data.appId, data.line)
+    }
+
+    const handleInstallAppComplete = (_event: any, data: { appId: string }) => {
+      setAppStatus(data.appId, "complete")
+    }
+
+    const handleInstallAppError = (_event: any, data: { appId: string }) => {
+      setAppStatus(data.appId, "error")
+    }
+
+    const handleInstallComplete = () => {
+      setTimeout(() => {
+        useAppInstallStore.getState().clearApps()
+      }, 3000)
+    }
+
+    const handleInstallError = () => {
+      toast.error("An error occurred during installation")
+    }
+
+    window.electron.ipcRenderer.on("install-start", handleInstallStart)
+    window.electron.ipcRenderer.on("install-output", handleInstallOutput)
+    window.electron.ipcRenderer.on("install-app-complete", handleInstallAppComplete)
+    window.electron.ipcRenderer.on("install-app-error", handleInstallAppError)
+    window.electron.ipcRenderer.on("install-complete", handleInstallComplete)
+    window.electron.ipcRenderer.on("install-error", handleInstallError)
+
+    return () => {
+      window.electron.ipcRenderer.removeListener("install-start", handleInstallStart)
+      window.electron.ipcRenderer.removeListener("install-output", handleInstallOutput)
+      window.electron.ipcRenderer.removeListener("install-app-complete", handleInstallAppComplete)
+      window.electron.ipcRenderer.removeListener("install-app-error", handleInstallAppError)
+      window.electron.ipcRenderer.removeListener("install-complete", handleInstallComplete)
+      window.electron.ipcRenderer.removeListener("install-error", handleInstallError)
+    }
   }, [])
 
   useEffect(() => {

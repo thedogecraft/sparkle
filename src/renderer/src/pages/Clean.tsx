@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { invoke } from "@/lib/electron"
 import RootDiv from "@/components/rootdiv"
 import {
-  RotateCw,
   Icon,
   FileX,
   Gauge,
@@ -204,22 +203,28 @@ function Clean() {
 
   async function fetchSizes(silent = false) {
     if (!silent) setLoadingSizes(true)
-    const newSizes: Record<string, number> = {}
-    for (const cleanup of cleanups) {
-      if (!cleanup.sizeScript) continue
-      try {
-        const result = await invoke({
-          channel: "run-powershell",
-          payload: { script: cleanup.sizeScript, name: `size-${cleanup.id}` },
-        })
-        const resultStr = result?.output || "0"
-        newSizes[cleanup.id] = parseInt(resultStr.trim(), 10) || 0
-      } catch (err) {
-        log.error(`Failed to fetch size for ${cleanup.id}: ${err}`)
-        newSizes[cleanup.id] = 0
-      }
-    }
-    setCurrentSizes(newSizes)
+
+    await Promise.all(
+      cleanups
+        .filter((cleanup) => cleanup.sizeScript)
+        .map(async (cleanup) => {
+          try {
+            const result = await invoke({
+              channel: "run-powershell",
+              payload: { script: cleanup.sizeScript, name: `size-${cleanup.id}` },
+            })
+            const resultStr = result?.output || "0"
+            setCurrentSizes((prev) => ({
+              ...prev,
+              [cleanup.id]: parseInt(resultStr.trim(), 10) || 0,
+            }))
+          } catch (err) {
+            log.error(`Failed to fetch size for ${cleanup.id}: ${err}`)
+            setCurrentSizes((prev) => ({ ...prev, [cleanup.id]: 0 }))
+          }
+        }),
+    )
+
     if (!silent) setLoadingSizes(false)
   }
 

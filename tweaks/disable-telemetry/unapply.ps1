@@ -28,4 +28,7 @@ Set-Service -Name diagtrack -StartupType Automatic
 # Enable Windows Error Reporting Manager service
 Set-Service -Name wermgr -StartupType Automatic
 
+# Reset SvcHostSplitThresholdInKB to default value
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Value 399360 -Type DWord
+
 Write-Output "Telemetry settings have been reverted to default."
