@@ -1,3 +1,6 @@
+packages:
+  - docs-fuma
+
 ignoredBuiltDependencies:
   - core-js
   - protobufjs
