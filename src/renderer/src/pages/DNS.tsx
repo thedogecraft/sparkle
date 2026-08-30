@@ -9,6 +9,7 @@ import { Cloud } from "lucide-react"
 import log from "electron-log/renderer"
 import { Check, X } from "lucide-react"
 import Card from "@/components/ui/Card"
+import { useTranslation } from "react-i18next"
 
 interface PingResult {
   name: string
@@ -94,6 +95,7 @@ const dnsProviders = [
 ]
 
 export default function DNSPage() {
+  const { t } = useTranslation()
   const [selectedProvider, setSelectedProvider] = useState<DNSProvider | null>(null)
   const [currentDNS, setCurrentDNS] = useState<Array<{ adapter: string; servers: string }> | null>(
     null,
@@ -127,7 +129,7 @@ export default function DNSPage() {
   const applyDNS = async (provider) => {
     toast.dismiss()
     setLoading(true)
-    const toastId = toast.loading(`Applying ${provider.name} DNS...`)
+    const toastId = toast.loading(t("dns.applyingDNS", { name: provider.name }))
 
     try {
       let payload
@@ -150,7 +152,7 @@ export default function DNSPage() {
 
       if (result.success) {
         toast.update(toastId, {
-          render: `${provider.name} DNS applied successfully!`,
+          render: t("dns.dnsApplied", { name: provider.name }),
           type: "success",
           isLoading: false,
           autoClose: 3000,
@@ -161,7 +163,7 @@ export default function DNSPage() {
       }
     } catch (error: any) {
       toast.update(toastId, {
-        render: `Failed to apply DNS: ${error.message}`,
+        render: t("dns.failedApplyDNS", { error: error.message }),
         type: "error",
         isLoading: false,
         autoClose: 5000,
@@ -211,10 +213,10 @@ export default function DNSPage() {
         })
         setPingResults(sorted)
       } else {
-        toast.error(`Ping test failed: ${result.error}`)
+        toast.error(t("dns.pingFailed", { error: result.error }))
       }
     } catch (error: any) {
-      toast.error(`Ping test failed: ${error.message}`)
+      toast.error(t("dns.pingFailed", { error: error.message }))
       log.error("Failed to ping DNS servers:", error)
     } finally {
       setPingLoading(false)
@@ -231,35 +233,33 @@ export default function DNSPage() {
     <>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <div className="bg-sparkle-card p-4 rounded-2xl border border-sparkle-border text-sparkle-text w-[90vw] max-w-md">
-          <h2 className="text-lg font-semibold mb-4">Confirm DNS Change</h2>
+          <h2 className="text-lg font-semibold mb-4">{t("dns.confirmChange")}</h2>
           {selectedProvider && (
             <>
               <p className="mb-4">
-                You are about to change your DNS servers to{" "}
-                <span className="text-sparkle-primary font-medium">{selectedProvider.name}</span>.
+                {t("dns.changeTo", { name: selectedProvider.name })}
               </p>
               <div className="bg-sparkle-border-secondary border border-sparkle-border p-3 rounded-md mb-4">
                 <div className="text-sm">
                   <div>
-                    <strong>Primary:</strong> {selectedProvider.primary}
+                    <strong>{t("dns.primary")}</strong> {selectedProvider.primary}
                   </div>
                   <div>
-                    <strong>Secondary:</strong> {selectedProvider.secondary}
+                    <strong>{t("dns.secondary")}</strong> {selectedProvider.secondary}
                   </div>
                 </div>
               </div>
               <p className="text-sm text-sparkle-text-secondary mb-4">
-                This will change DNS settings for all active network adapters and flush the DNS
-                cache.
+                {t("dns.changeWarning")}
               </p>
             </>
           )}
           <div className="flex justify-end gap-2">
             <Button onClick={() => setModalOpen(false)} variant="secondary">
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button onClick={() => applyDNS(selectedProvider)} disabled={loading}>
-              {loading ? "Applying..." : "Apply"}
+              {loading ? t("dns.applying") : t("common.apply")}
             </Button>
           </div>
         </div>
@@ -268,7 +268,7 @@ export default function DNSPage() {
         <div className="pb-10 mr-4">
           <Card className="p-4 mb-4">
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="font-semibold">Current DNS Settings</h2>
+              <h2 className="font-semibold">{t("dns.currentSettings")}</h2>
               <Button onClick={getCurrentDNS} variant="" size="sm" className="ml-auto">
                 <RotateCw className="w-5 h-5" />
               </Button>
@@ -287,14 +287,14 @@ export default function DNSPage() {
             ) : (
               <div className="flex items-center gap-2 text-sm text-sparkle-text-secondary">
                 <AlertCircle className="w-4 h-4" />
-                <span>Loading Network Info, this may take a while...</span>
+                <span>{t("dns.loadingNetwork")}</span>
               </div>
             )}
           </Card>
 
           <Card className="p-4 mb-4">
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="font-semibold">Find Fastest DNS</h2>
+              <h2 className="font-semibold">{t("dns.findFastest")}</h2>
               <Button
                 onClick={testAllPing}
                 disabled={pingLoading}
@@ -305,13 +305,13 @@ export default function DNSPage() {
                 {pingLoading ? (
                   <>
                     <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
-                    Testing Please Wait...
+                    {t("dns.testingWait")}
                   </>
                 ) : (
-                  <>Test All Servers</>
+                  <>{t("dns.testAll")}</>
                 )}
               </Button>
-              {pingResults && <Button onClick={() => setPingResults(null)}>Clear</Button>}
+              {pingResults && <Button onClick={() => setPingResults(null)}>{t("dns.clear")}</Button>}
             </div>
 
             {pingResults && (
@@ -320,8 +320,7 @@ export default function DNSPage() {
                   <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-green-500 font-medium">
-                        Fastest DNS: {getLowestPingServer()!.name} ({getLowestPingServer()!.server})
-                        - {getLowestPingServer()!.latency}ms
+                        {t("dns.fastestDNS", { name: getLowestPingServer()!.name, server: getLowestPingServer()!.server, latency: getLowestPingServer()!.latency })}
                       </span>
                     </div>
                   </div>
@@ -350,7 +349,7 @@ export default function DNSPage() {
                           <span className="text-green-500 font-medium">{result.latency}ms</span>
                         ) : (
                           <span className="text-red-500">
-                            {result.status === "timeout" ? "Timeout" : "Error"}
+                            {result.status === "timeout" ? t("dns.timeout") : t("dns.error")}
                           </span>
                         )}
                       </div>
@@ -362,7 +361,7 @@ export default function DNSPage() {
 
             {!pingResults && !pingLoading && (
               <p className="text-sm text-sparkle-text-secondary">
-                Test all DNS servers to find the one with the lowest ping.
+                {t("dns.testLowestPing")}
               </p>
             )}
           </Card>
@@ -379,9 +378,9 @@ export default function DNSPage() {
 
                   <div>
                     <h3 className="font-semibold">
-                      {provider.name}
+                      {provider.id === "automatic" ? t("dns.autoName") : provider.name}
                       {provider.recommended && (
-                        <span className="text-xs text-sparkle-primary ml-2">Recommended</span>
+                        <span className="text-xs text-sparkle-primary ml-2">{t("dns.recommended")}</span>
                       )}
                     </h3>
 
@@ -390,7 +389,7 @@ export default function DNSPage() {
                     </p>
                   </div>
                 </div>
-                <p className="text-sm text-sparkle-text-secondary">{provider.description}</p>
+                <p className="text-sm text-sparkle-text-secondary">{t(`dns.${provider.id}Desc`)}</p>
                 <div className="flex flex-wrap gap-1 mt-3">
                   {provider.features.map((feature, index) => (
                     <span key={index} className="px-2 py-1 bg-sparkle-border text-xs rounded-md">
@@ -405,9 +404,9 @@ export default function DNSPage() {
           <Card className="p-4 mb-6">
             <div className="flex items-center gap-3 ">
               <Settings className="w-5 h-5 text-purple-500" />
-              <h2 className="font-semibold">Custom DNS</h2>
+              <h2 className="font-semibold">{t("dns.customDNS")}</h2>
               <Button onClick={() => setShowCustom(!showCustom)} size="sm">
-                {showCustom ? "Hide" : "Show"}
+                {showCustom ? t("dns.hide") : t("dns.show")}
               </Button>
             </div>
 
@@ -415,20 +414,20 @@ export default function DNSPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Primary DNS</label>
+                    <label className="block text-sm font-medium mb-2">{t("dns.primaryDNS")}</label>
                     <input
                       type="text"
                       value={customDNS.primary}
                       onChange={(e) =>
                         setCustomDNS((prev) => ({ ...prev, primary: e.target.value }))
                       }
-                      placeholder="e.g., 1.1.1.1"
+                      placeholder={t("dns.dnsPlaceholder")}
                       className="w-full px-3 py-2 bg-sparkle-border border border-sparkle-border-secondary rounded-lg text-sparkle-text focus:outline-hidden focus:border-sparkle-primary"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Secondary DNS (Optional)
+                      {t("dns.secondaryDNS")}
                     </label>
                     <input
                       type="text"
@@ -436,7 +435,7 @@ export default function DNSPage() {
                       onChange={(e) =>
                         setCustomDNS((prev) => ({ ...prev, secondary: e.target.value }))
                       }
-                      placeholder="e.g., 1.0.0.1"
+                      placeholder={t("dns.dnsPlaceholder")}
                       className="w-full px-3 py-2 bg-sparkle-border border border-sparkle-border-secondary rounded-lg text-sparkle-text focus:outline-hidden focus:border-sparkle-primary"
                     />
                   </div>
@@ -444,14 +443,14 @@ export default function DNSPage() {
 
                 <div className="flex items-center gap-2 text-sm text-sparkle-text-secondary">
                   <Info className="w-4 h-4" />
-                  <span>Enter valid IPv4 addresses for custom DNS servers</span>
+                  <span>{t("dns.enterValidIP")}</span>
                 </div>
 
                 <Button
                   onClick={() =>
                     openConfirmationModal({
                       id: "custom",
-                      name: "Custom DNS",
+                      name: t("dns.customDNSName"),
                       primary: customDNS.primary,
                       secondary: customDNS.secondary,
                     })
@@ -459,7 +458,7 @@ export default function DNSPage() {
                   disabled={!isCustomDNSValid() || loading}
                   className="w-full"
                 >
-                  Apply Custom DNS
+                  {t("dns.applyCustomDNS")}
                 </Button>
               </div>
             )}

@@ -3,6 +3,7 @@ import App from "./App"
 import ErrorBoundary from "./components/ErrorBoundary"
 import { HashRouter } from "react-router-dom"
 import { PostHogProvider } from "posthog-js/react"
+import "./i18n"
 
 const rootElement = document.getElementById("root")
 if (rootElement) {

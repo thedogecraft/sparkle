@@ -30,7 +30,16 @@
     "electron-log": "^5.4.4",
     "electron-store": "8.1.0",
     "electron-updater": "^6.8.9",
-    "systeminformation": "^5.32.0"
+    "i18next": "^26.3.6",
+    "lucide-react": "^1.20.0",
+    "posthog-js": "^1.362.0",
+    "react-i18next": "^17.0.9",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.8.2",
+    "react-toastify": "^11.1.0",
+    "remark-gfm": "^4.0.1",
+    "systeminformation": "^5.32.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",

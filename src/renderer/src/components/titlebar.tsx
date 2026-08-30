@@ -5,6 +5,7 @@ import sparkleLogo from "../../../../resources/sparklelogo.png"
 import Card from "./ui/Card"
 import useAppInstallStore from "@/store/appInstallStore"
 import InstallConsoleModal from "./installConsoleModal"
+import { useTranslation } from "react-i18next"
 
 interface TitleBarProps {
   onToggleSidebar: () => void
@@ -17,9 +18,10 @@ function TitleBar({
   sidebarCollapsed: _sidebarCollapsed,
   adminStatus,
 }: TitleBarProps): React.ReactElement {
+  const { t } = useTranslation()
   const { apps, action } = useAppInstallStore()
   const [consoleOpen, setConsoleOpen] = useState(false)
-  const actionText = action === "uninstall" ? "Uninstalling" : "Installing"
+  const actionText = action === "uninstall" ? t("titlebar.uninstalling") : t("titlebar.installing")
 
   const currentApp = apps.find((app) => app.status === "installing")
   const remainingCount = apps.filter((app) => app.status === "pending").length
@@ -42,7 +44,7 @@ function TitleBar({
           <img src={sparkleLogo} alt="Sparkle" className="h-5 w-5" />
           <span className="text-sparkle-text text-sm font-medium">Sparkle</span>
           <div className="bg-sparkle-card border border-sparkle-border-secondary p-1 rounded-xl w-16 text-center text-sm text-sparkle-text">
-            Beta
+            {t("titlebar.beta")}
           </div>
         </div>
         <div>
@@ -57,7 +59,7 @@ function TitleBar({
               {apps.length === 1
                 ? `${actionText} ${apps[0].name}`
                 : currentApp
-                  ? `${actionText} ${currentApp.name}, ${remainingCount} Left`
+                  ? `${actionText} ${currentApp.name}, ${remainingCount} ${t("titlebar.left")}`
                   : `${actionText} ${apps.length} apps`}
               <Terminal className="w-3 h-3 text-sparkle-primary" />
             </Card>

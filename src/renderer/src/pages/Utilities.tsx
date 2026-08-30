@@ -17,13 +17,14 @@ import {
   BluetoothIcon,
   SearchIcon,
 } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { invoke } from "@/lib/electron"
 import { toast } from "react-toastify"
 import log from "electron-log/renderer"
 import { Dropdown } from "@/components/ui/dropdown"
 import Modal from "@/components/ui/modal"
 import { LargeInput } from "@/components/ui/input"
+import { useTranslation } from "react-i18next"
 
 type Utility = {
   name: string
@@ -318,11 +319,63 @@ Write-Output "Network stack reset. Restart your PC to apply changes."
 ]
 
 function Utilities() {
+  const { t } = useTranslation()
   const [dropdownValues, setDropdownValues] = useState<Record<string, string>>({})
   const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({})
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [search, setSearch] = useState("")
+
+  const utilNameMap: Record<string, string> = useMemo(() => ({
+    "Disk Cleaner": t("utilities.diskCleaner"),
+    "Storage Sense": t("utilities.storageSense"),
+    "System Information": t("utilities.sysInfo"),
+    "Fast Startup": t("utilities.fastStartup"),
+    "Graphics Driver": t("utilities.graphicsDriver"),
+    "Windows Search and UI": t("utilities.winSearchUI"),
+    "Power Plan": t("utilities.powerPlan"),
+    "Flush DNS Cache": t("utilities.flushDNS"),
+    "Release IP": t("utilities.releaseIP"),
+    "Renew IP": t("utilities.renewIP"),
+    "Fix Bluetooth": t("utilities.fixBluetooth"),
+    "System File Checker": t("utilities.sfc"),
+    "DISM Health Restore": t("utilities.dism"),
+    "Check Disk": t("utilities.checkDisk"),
+    "Restart Audio Service": t("utilities.restartAudio"),
+    "Network Reset": t("utilities.networkReset"),
+  }), [t])
+
+  const utilDescMap: Record<string, string> = useMemo(() => ({
+    "Disk Cleaner": t("utilities.diskCleanerDesc"),
+    "Storage Sense": t("utilities.storageSenseDesc"),
+    "System Information": t("utilities.sysInfoDesc"),
+    "Fast Startup": t("utilities.fastStartupDesc"),
+    "Graphics Driver": t("utilities.graphicsDriverDesc"),
+    "Windows Search and UI": t("utilities.winSearchUIDesc"),
+    "Power Plan": t("utilities.powerPlanDesc"),
+    "Flush DNS Cache": t("utilities.flushDNSDesc"),
+    "Release IP": t("utilities.releaseIPDesc"),
+    "Renew IP": t("utilities.renewIPDesc"),
+    "Fix Bluetooth": t("utilities.fixBluetoothDesc"),
+    "System File Checker": t("utilities.sfcDesc"),
+    "DISM Health Restore": t("utilities.dismDesc"),
+    "Check Disk": t("utilities.checkDiskDesc"),
+    "Restart Audio Service": t("utilities.restartAudioDesc"),
+    "Network Reset": t("utilities.networkResetDesc"),
+  }), [t])
+
+  const utilBtnMap: Record<string, string> = useMemo(() => ({
+    "Clean Now": t("utilities.cleanNow"),
+    "View Info": t("utilities.viewInfo"),
+    "Restart": t("utilities.restart"),
+    "Flush": t("utilities.flush"),
+    "Release": t("utilities.release"),
+    "Renew": t("utilities.renew"),
+    "Fix": t("utilities.fix"),
+    "Repair": t("utilities.repair"),
+    "Check": t("utilities.check"),
+    "Reset": t("utilities.reset"),
+  }), [t])
 
   const filteredUtilities = utilities.filter(
     (util) =>
@@ -396,7 +449,7 @@ function Utilities() {
     const script = newState ? util.applyScript : util.unapplyScript
     if (script) {
       const loadingToastId = toast.loading(
-        `${newState ? "Applying" : "Unapplying"} ${util.name}...`,
+        `${newState ? "Applying" : "Unapplying"} ${utilNameMap[util.name] || util.name}...`,
       )
       try {
         const result = await invoke({
@@ -410,7 +463,7 @@ function Utilities() {
           throw new Error(result.error || "Failed to execute script")
         }
         toast.update(loadingToastId, {
-          render: `${newState ? "Applied" : "Unapplied"} ${util.name}`,
+          render: `${newState ? "Applied" : "Unapplied"} ${utilNameMap[util.name] || util.name}`,
           type: "success",
           isLoading: false,
           autoClose: 3000,
@@ -420,7 +473,7 @@ function Utilities() {
         log.error(`Error toggling ${util.name}:`, error)
         setToggleStates((prev) => ({ ...prev, [util.name]: previousState }))
         toast.update(loadingToastId, {
-          render: `Failed to ${newState ? "apply" : "unapply"} ${util.name}`,
+          render: `Failed to ${newState ? "apply" : "unapply"} ${utilNameMap[util.name] || util.name}`,
           type: "error",
           isLoading: false,
           autoClose: 3000,
@@ -438,7 +491,7 @@ function Utilities() {
       const script =
         typeof util.applyScript === "object" ? util.applyScript[value] : util.applyScript
       if (script) {
-        const loadingToastId = toast.loading(`Applying ${util.name}: ${value}...`)
+        const loadingToastId = toast.loading(`Applying ${utilNameMap[util.name] || util.name}: ${value}...`)
         try {
           const result = await invoke({
             channel: "run-powershell",
@@ -451,7 +504,7 @@ function Utilities() {
             throw new Error(result.error || "Failed to execute script")
           }
           toast.update(loadingToastId, {
-            render: `Applied ${util.name}: ${value}`,
+            render: `Applied ${utilNameMap[util.name] || util.name}: ${value}`,
             type: "success",
             isLoading: false,
             autoClose: 3000,
@@ -461,7 +514,7 @@ function Utilities() {
           log.error(`Error applying ${util.name}:`, error)
           setDropdownValues((prev) => ({ ...prev, [util.name]: previousValue }))
           toast.update(loadingToastId, {
-            render: `Failed to apply ${util.name}: ${value}`,
+            render: `Failed to apply ${utilNameMap[util.name] || util.name}: ${value}`,
             type: "error",
             isLoading: false,
             autoClose: 3000,
@@ -474,7 +527,7 @@ function Utilities() {
   const handleButtonClick = async (util: Utility) => {
     toast.dismiss()
     if (util.runScript) {
-      const loadingToastId = toast.loading(`Running ${util.name}...`)
+      const loadingToastId = toast.loading(`Running ${utilNameMap[util.name] || util.name}...`)
       try {
         const result = await invoke({
           channel: "run-powershell",
@@ -487,7 +540,7 @@ function Utilities() {
           throw new Error(result.error || "Failed to execute script")
         }
         toast.update(loadingToastId, {
-          render: `${util.name} completed`,
+          render: `${utilNameMap[util.name] || util.name} completed`,
           type: "success",
           isLoading: false,
           autoClose: 3000,
@@ -496,7 +549,7 @@ function Utilities() {
         console.error(`Error running ${util.name}:`, error)
         log.error(`Error running ${util.name}:`, error)
         toast.update(loadingToastId, {
-          render: `Failed to run ${util.name}`,
+          render: `Failed to run ${utilNameMap[util.name] || util.name}`,
           type: "error",
           isLoading: false,
           autoClose: 3000,
@@ -510,28 +563,25 @@ function Utilities() {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-2xl max-w-lg w-full mx-4 flex flex-col items-center text-center">
           <h1 className="text-3xl font-bold text-sparkle-text mb-4">
-            What's New in the Utilities Page
+            {t("utilities.whatsNew")}
           </h1>
 
           <p className="text-sparkle-text-secondary mb-6">
-            We've redesigned the Utilities page to be more useful and powerful.
+            {t("utilities.redesigned")}
           </p>
 
           <p className="text-sparkle-text-secondary mb-4 text-sm">
-            - Each utility now shows detailed descriptions and has new controls like toggles,
-            buttons, or dropdowns.
+            - {t("utilities.feature1")}
             <br />
             <br />
-            - Utilities run or apply settings directly using PowerShell scripts behind the scenes.
+            - {t("utilities.feature2")}
             <br />
             <br />
-            - The settings sync with your Windows always reflecting your current configuration no
-            matter where you toggle these settings.
+            - {t("utilities.feature3")}
             <br />
             <br />
             <p className="text-sparkle-primary">
-              - You can now manage Windows updates, restart graphics drivers, reset network, and
-              more.
+              - {t("utilities.feature4")}
             </p>
             <br /> <br />
           </p>
@@ -543,7 +593,7 @@ function Utilities() {
                 localStorage.setItem("utilitiesModalShown", "true")
               }}
             >
-              Got it
+              {t("common.gotIt")}
             </Button>
           </div>
         </div>
@@ -552,7 +602,7 @@ function Utilities() {
       <RootDiv>
         <div className="flex gap-4 flex-col mb-10 mr-4">
           <LargeInput
-            placeholder="Search utilities..."
+            placeholder={t("utilities.searchPlaceholder")}
             className="w-full"
             icon={SearchIcon}
             onChange={(e) => setSearch(e.target.value)}
@@ -560,7 +610,7 @@ function Utilities() {
           />
           {filteredUtilities.length === 0 && (
             <p className="text-sparkle-text-secondary flex text-center items-center justify-center gap-2">
-              No utilities match your search.
+              {t("utilities.noMatch")}
             </p>
           )}
           {filteredUtilities !== null &&
@@ -570,7 +620,7 @@ function Utilities() {
                   {util.icon}
                   <div>
                     <div className="flex gap-3 items-center">
-                      <h1>{util.name}</h1>{" "}
+                      <h1>{utilNameMap[util.name] || util.name}</h1>{" "}
                       {util.command && (
                         <p className="text-xs text-sparkle-primary">
                           CMD:{" "}
@@ -578,7 +628,7 @@ function Utilities() {
                         </p>
                       )}
                     </div>
-                    <p className="text-sm  text-sparkle-text-secondary">{util.description}</p>
+                    <p className="text-sm  text-sparkle-text-secondary">{utilDescMap[util.name] || util.description}</p>
                   </div>
                   <div className="flex justify-end ml-auto">
                     {util.type === "toggle" &&
@@ -591,7 +641,7 @@ function Utilities() {
                         />
                       ))}
                     {util.type === "button" && (
-                      <Button onClick={() => handleButtonClick(util)}>{util.buttonText}</Button>
+                      <Button onClick={() => handleButtonClick(util)}>{util.buttonText ? utilBtnMap[util.buttonText] || util.buttonText : ""}</Button>
                     )}
                     {util.type === "dropdown" &&
                       (loadingStates[util.name] ? (

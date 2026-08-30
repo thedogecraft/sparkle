@@ -20,10 +20,12 @@ import useOnlineStore from "./store/online"
 import { CURRENT_VERSION } from "./lib/version"
 
 import { toast } from "react-toastify"
+import { useTranslation } from "react-i18next"
 import Debloat from "./pages/Debloat"
 import NoAdmin from "./components/noAdmin"
 
 function App() {
+  const { t } = useTranslation()
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     localStorage.getItem("sidebarCollapsed") === "true",
@@ -39,11 +41,11 @@ function App() {
       },
       "install-complete": () => {
         clearApps()
-        toast.success("Operation completed successfully!")
+        toast.success(t("app.operationSuccess"))
       },
       "install-error": () => {
         clearApps()
-        toast.error("There was an error during the operation. Please try again.")
+        toast.error(t("app.operationError"))
       },
     }
 
@@ -56,7 +58,7 @@ function App() {
         window.electron.ipcRenderer.removeListener(channel, listeners[channel])
       })
     }
-  }, [setAppStatus, clearApps])
+  }, [setAppStatus, clearApps, t])
 
   useEffect(() => {
     const applyTheme = (theme) => {

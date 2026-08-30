@@ -23,6 +23,7 @@ import GithubIcon from "./githubicon"
 import Button from "./ui/button"
 import Modal from "./ui/modal"
 import useOnlineStore from "../store/online"
+import { useTranslation } from "react-i18next"
 
 const tabIcons = {
   home: <Home size={20} />,
@@ -36,22 +37,23 @@ const tabIcons = {
   settings: <Settings size={20} />,
 }
 
-const tabs = {
-  home: { label: "Dashboard", path: "/" },
-  tweaks: { label: "Tweaks", path: "/tweaks" },
-  debloat: { label: "Debloat+", path: "/debloat" },
-  utilities: { label: "Utilities", path: "/utilities" },
-  clean: { label: "Cleaner", path: "/clean" },
-  backup: { label: "Restore", path: "/backup" },
-  dns: { label: "DNS Manager", path: "/dns" },
-  apps: { label: "Apps", path: "/apps" },
-  settings: { label: "Settings", path: "/settings" },
-}
-
 function Nav({ collapsed }) {
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const { needsRestart } = useRestartStore()
+
+  const tabs = {
+    home: { label: t("nav.dashboard"), path: "/" },
+    tweaks: { label: t("nav.tweaks"), path: "/tweaks" },
+    debloat: { label: t("nav.debloat"), path: "/debloat" },
+    utilities: { label: t("nav.utilities"), path: "/utilities" },
+    clean: { label: t("nav.cleaner"), path: "/clean" },
+    backup: { label: t("nav.restore"), path: "/backup" },
+    dns: { label: t("nav.dnsManager"), path: "/dns" },
+    apps: { label: t("nav.apps"), path: "/apps" },
+    settings: { label: t("nav.settings"), path: "/settings" },
+  }
 
   const tabRefs = useRef<Record<string, HTMLElement | null>>({})
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -169,17 +171,17 @@ function Nav({ collapsed }) {
             className={`flex text-center items-center gap-2 text-red-500 ${collapsed ? "justify-center" : ""}`}
             title="Restart Windows to apply some changes"
           >
-            <RotateCw size={16} /> {!collapsed && "Restart Required"}
+            <RotateCw size={16} /> {!collapsed && t("nav.restartRequired")}
           </span>
         </button>
       )}
       <Modal open={showRestartModal} onOpenChange={setShowRestartModal}>
         <div className="bg-sparkle-card p-4 rounded-2xl border border-sparkle-border text-sparkle-text w-[90vw] max-w-md">
-          <h2 className="text-lg font-semibold">Confirm Restart</h2>
-          <p>Are you sure you want to restart your computer now?</p>
+          <h2 className="text-lg font-semibold">{t("nav.confirmRestart")}</h2>
+          <p>{t("nav.confirmRestartDesc")}</p>
           <div className="flex gap-2 justify-end">
             <Button onClick={() => setShowRestartModal(false)} variant="secondary">
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={() => {
@@ -188,7 +190,7 @@ function Nav({ collapsed }) {
               }}
               variant="danger"
             >
-              Restart
+              {"Restart"}
             </Button>
           </div>
         </div>
@@ -199,36 +201,31 @@ function Nav({ collapsed }) {
             <div className="p-2 bg-red-500/20 rounded-full">
               <WifiOff className="w-6 h-6 text-red-500" />
             </div>
-            <h2 className="text-lg font-semibold">You're Offline</h2>
+            <h2 className="text-lg font-semibold">{t("nav.offline")}</h2>
           </div>
           <p className="text-sparkle-text-secondary mb-4">
-            Some features require an internet connection to work. The following features have been
-            disabled:
+            {t("nav.offlineDesc")}
           </p>
           <ul className="list-disc list-inside text-sparkle-text-secondary mb-4 space-y-1">
             <li>
-              <span className="font-medium text-sparkle-text">DNS Manager</span> - Requires internet
-              to change DNS servers
+              <span className="font-medium text-sparkle-text">{t("nav.offlineDNS")}</span> - {t("nav.offlineDNSDesc")}
             </li>
             <li>
-              <span className="font-medium text-sparkle-text">Apps</span> - Requires internet to
-              install/uninstall apps
+              <span className="font-medium text-sparkle-text">{t("nav.offlineApps")}</span> - {t("nav.offlineAppsDesc")}
             </li>
             <li>
-              <span className="font-medium text-sparkle-text">Some Tweaks</span> - May fail without
-              internet
+              <span className="font-medium text-sparkle-text">{t("nav.offlineTweaks")}</span> - {t("nav.offlineTweaksDesc")}
             </li>
             <li>
-              <span className="font-medium text-sparkle-text">Auto Updates</span> - Will fail
-              without internet
+              <span className="font-medium text-sparkle-text">{t("nav.offlineUpdates")}</span> - {t("nav.offlineUpdatesDesc")}
             </li>
           </ul>
           <p className="text-sm text-sparkle-text-secondary mb-4">
-            Please reconnect to the internet to use these features.
+            {t("nav.offlineReconnect")}
           </p>
           <div className="flex justify-end">
             <Button onClick={() => setShowOfflineModal(false)} variant="secondary">
-              Understood
+              {t("common.understood")}
             </Button>
           </div>
         </div>

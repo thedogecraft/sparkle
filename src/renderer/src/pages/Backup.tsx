@@ -27,6 +27,7 @@ import {
   TableCell,
 } from "@/components/ui/table"
 import { Tweak } from "@/types/index"
+import { useTranslation } from "react-i18next"
 
 type RestorePoint = {
   SequenceNumber: number
@@ -39,6 +40,7 @@ type RestorePoint = {
 type RestorePointList = RestorePoint[]
 
 function RestorePointsTab() {
+  const { t } = useTranslation()
   const [restorePoints, setRestorePoints] = useState<RestorePointList>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
@@ -72,11 +74,11 @@ function RestorePointsTab() {
         })
         setRestorePoints(sorted)
       } else {
-        toast.error("Failed to load restore points. Please check logs")
+        toast.error(t("backup.failedLoadRestore"))
         log.error("Failed to load restore points:", response)
       }
     } catch (error) {
-      toast.error(`Failed to load restore points. Please check logs`)
+      toast.error(t("backup.failedLoadRestore"))
       console.error(error)
       log.error("Failed to load restore points:", error)
     } finally {
@@ -93,10 +95,10 @@ function RestorePointsTab() {
     setProcessing(true)
     try {
       await invoke({ channel: "create-sparkle-restore-point" })
-      toast.success("Restore point created!")
+      toast.success(t("backup.restorePointCreated"))
       await fetchRestorePoints()
     } catch (err) {
-      toast.error("Failed to create restore point.")
+      toast.error(t("backup.failedCreateRestore"))
       log.error("Failed to create restore point:", err)
     }
     setProcessing(false)
@@ -113,9 +115,9 @@ function RestorePointsTab() {
         channel: "restore-restore-point",
         payload: modalState.restorePoint.SequenceNumber,
       })
-      toast.success("System restore started. Your PC may restart.")
+      toast.success(t("backup.restoreStarted"))
     } catch (err) {
-      toast.error("Failed to start system restore.")
+      toast.error(t("backup.failedStartRestore"))
       log.error("Failed to start system restore:", err)
     }
     setProcessing(false)
@@ -126,17 +128,17 @@ function RestorePointsTab() {
     setProcessing(true)
     try {
       if (!customName.trim()) {
-        toast.error("Please enter a name for the restore point.")
+        toast.error(t("backup.enterNameError"))
         setProcessing(false)
         return
       }
       await invoke({ channel: "create-restore-point", payload: customName })
-      toast.success("Restore point created!")
+      toast.success(t("backup.restorePointCreated"))
       setCustomModalOpen(false)
       setCustomName("")
       await fetchRestorePoints()
     } catch (err) {
-      toast.error("Failed to create restore point.")
+      toast.error(t("backup.failedCreateRestore"))
       log.error("Failed to create restore point:", err)
     }
     setProcessing(false)
@@ -145,7 +147,7 @@ function RestorePointsTab() {
     setConfirmDeleteAll(false)
     setProcessing(true)
     await invoke({ channel: "delete-all-restore-points" })
-    toast.success("All restore points deleted successfully.")
+    toast.success(t("backup.allDeleted"))
     setProcessing(false)
     await fetchRestorePoints()
   }
@@ -158,7 +160,7 @@ function RestorePointsTab() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="relative w-full md:w-64 ml-1 mt-1">
             <LargeInput
-              placeholder="Search Restore Points..."
+              placeholder={t("backup.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               icon={Search}
@@ -172,7 +174,7 @@ function RestorePointsTab() {
               disabled={loading || processing || restorePoints.length === 0}
               className="flex items-center gap-2"
             >
-              <Trash size={16} /> Delete All
+              <Trash size={16} /> {t("backup.deleteAll")}
             </Button>
             <Button
               variant="secondary"
@@ -180,7 +182,7 @@ function RestorePointsTab() {
               className="flex items-center gap-2"
               disabled={loading || processing}
             >
-              <RotateCw size={16} /> Refresh
+              <RotateCw size={16} /> {t("backup.refresh")}
             </Button>
             <Button
               variant="primary"
@@ -193,14 +195,14 @@ function RestorePointsTab() {
               ) : (
                 <PlusCircle size={16} />
               )}
-              Quick Restore Point
+              {t("backup.quickRestorePoint")}
             </Button>
             <Button
               variant="primary"
               onClick={() => setCustomModalOpen(true)}
               disabled={loading || processing}
             >
-              Custom Restore Point
+              {t("backup.customRestorePoint")}
             </Button>
           </div>
         </div>
@@ -214,11 +216,11 @@ function RestorePointsTab() {
             <div className="p-4 bg-sparkle-secondary rounded-full mb-4">
               <Shield size={28} className="text-sparkle-text" />
             </div>
-            <h3 className="text-lg font-medium mb-2 text-sparkle-text">No Restore Points Found</h3>
+            <h3 className="text-lg font-medium mb-2 text-sparkle-text">{t("backup.noRestorePoints")}</h3>
             <p className="text-sparkle-text-secondary max-w-sm mb-4">
               {searchQuery
-                ? "No restore points match your search."
-                : "Create a restore point to preserve your system state. You can restore your system to any point when needed."}
+                ? t("backup.noRestorePointsSearch")
+                : t("backup.noRestorePointsDesc")}
             </p>
             {!searchQuery && (
               <Button
@@ -227,7 +229,7 @@ function RestorePointsTab() {
                 onClick={handleCreateRestorePoint}
                 disabled={processing}
               >
-                Create a Quick Restore Point
+                {t("backup.createQuickRestore")}
               </Button>
             )}
           </div>
@@ -235,8 +237,8 @@ function RestorePointsTab() {
           <Table className="max-h-96">
             <TableHeader>
               <TableRow>
-                <TableHead>Description</TableHead>
-                <TableHead className="w-32 text-center">Actions</TableHead>
+                <TableHead>{t("backup.description")}</TableHead>
+                <TableHead className="w-32 text-center">{t("backup.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -249,10 +251,10 @@ function RestorePointsTab() {
                       className="p-2! gap-2"
                       onClick={() => handleRestore(rp)}
                       disabled={processing}
-                      title="Restore System"
+                      title={t("backup.restoreSystem")}
                     >
                       <RotateCcw size={16} />
-                      Restore
+                      {t("backup.confirmRestore")}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -261,8 +263,7 @@ function RestorePointsTab() {
           </Table>
         )}
         <p className="text-center text-sparkle-text-muted mt-4">
-          Listing restore points is a beta feature and may be unreliable, but creating restore
-          points works as expected.
+          {t("backup.betaFeature")}
         </p>
       </div>
       <Modal
@@ -273,18 +274,11 @@ function RestorePointsTab() {
       >
         {modalState.type === "restore" && modalState.restorePoint && (
           <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4 pb-0">
-            <h3 className="text-lg font-medium text-sparkle-text">Restore System</h3>
+            <h3 className="text-lg font-medium text-sparkle-text">{t("backup.confirmRestore")}</h3>
 
             <div className="p-4 pr-0">
               <p className="text-sparkle-text-secondary mb-4">
-                Are you sure you want to restore your system to{" "}
-                <span className="font-bold">"{modalState.restorePoint.Description}"?</span> Your PC
-                will restart shortly. and the restore point will be applied. <br /> <br />
-                Your files will not be affected, but recently installed applications and settings
-                may be lost.
-                <br /> <br />
-                This will revert all changes sparkle has made to your system since this restore
-                point was created.
+                {t("backup.confirmRestoreDesc", { name: modalState.restorePoint.Description })}
               </p>
               <div className="flex justify-end gap-3">
                 <Button
@@ -294,10 +288,10 @@ function RestorePointsTab() {
                   }
                   disabled={processing}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button variant="primary" onClick={executeRestore} disabled={processing}>
-                  {processing ? <Loader2 size={16} className="animate-spin" /> : "Restore"}
+                  {processing ? <Loader2 size={16} className="animate-spin" /> : t("backup.confirmRestore")}
                 </Button>
               </div>
             </div>
@@ -306,14 +300,14 @@ function RestorePointsTab() {
       </Modal>
       <Modal open={customModalOpen} onClose={() => !processing && setCustomModalOpen(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4 pb-0">
-          <h3 className="text-lg font-medium text-sparkle-text">Create Custom Restore Point</h3>
+          <h3 className="text-lg font-medium text-sparkle-text">{t("backup.createCustomTitle")}</h3>
 
           <div className="p-4 space-y-4">
             <Input
               type="text"
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
-              placeholder="Enter restore point name"
+              placeholder={t("backup.enterName")}
               disabled={processing}
             />
             <div className="flex justify-end gap-3">
@@ -322,30 +316,28 @@ function RestorePointsTab() {
                 onClick={() => !processing && setCustomModalOpen(false)}
                 disabled={processing}
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button
                 variant="primary"
                 onClick={handleCustomRestorePoint}
                 disabled={processing || !customName.trim()}
               >
-                {processing ? <Loader2 size={16} className="animate-spin" /> : "Create"}
+                {processing ? <Loader2 size={16} className="animate-spin" /> : t("backup.create")}
               </Button>
             </div>
             <p className="text-xs text-center text-sparkle-text-muted">
-              This may take a while depending on your hardware
+              {t("backup.mayTakeAWhile")}
             </p>
           </div>
         </div>
       </Modal>
       <Modal open={confirmDeleteAll} onClose={() => !processing && setConfirmDeleteAll(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4 pb-0">
-          <h3 className="text-lg font-medium text-sparkle-text">Delete All Restore Points</h3>
+          <h3 className="text-lg font-medium text-sparkle-text">{t("backup.deleteAllTitle")}</h3>
           <div className="p-4 pr-0">
             <p className="text-sparkle-text-secondary mb-4">
-              Are you sure you want to delete all {restorePoints.length} restore point
-              {restorePoints.length !== 1 ? "s" : ""}? This action cannot be undone and will remove
-              all system restore points from your computer.
+              {t("backup.deleteAllDesc", { count: restorePoints.length, plural: restorePoints.length !== 1 ? "s" : "" })}
             </p>
             <div className="flex justify-end gap-3">
               <Button
@@ -353,13 +345,13 @@ function RestorePointsTab() {
                 onClick={() => !processing && setConfirmDeleteAll(false)}
                 disabled={processing}
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button variant="danger" onClick={handleDeleteAll} disabled={processing}>
                 {processing ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
-                  `Delete All (${restorePoints.length})`
+                  t("backup.deleteAllButton", { count: restorePoints.length })
                 )}
               </Button>
             </div>
@@ -371,6 +363,7 @@ function RestorePointsTab() {
 }
 
 function AppliedTweaksTab() {
+  const { t } = useTranslation()
   const [tweaks, setTweaks] = useState<Tweak[]>([])
   const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({})
   const [loading, setLoading] = useState(true)
@@ -402,10 +395,10 @@ function AppliedTweaksTab() {
     loadData()
   }, [])
 
-  const appliedTweaks = tweaks.filter((t) => toggleStates[t.name])
+  const appliedTweaks = tweaks.filter((tw) => toggleStates[tw.name])
 
   const appliedTweakFiltered = appliedTweaks.filter(
-    (t) => t.reversible === true || t.reversible === undefined,
+    (tw) => tw.reversible === true || tw.reversible === undefined,
   )
 
   const saveToggleStates = async (newStates: Record<string, boolean>) => {
@@ -416,7 +409,7 @@ function AppliedTweaksTab() {
     toast.dismiss()
     setUndoingTweak(tweak.name)
     setProcessing(true)
-    const loadingToastId = toast.loading(`Undoing tweak: ${tweak.title || tweak.name}`)
+    const loadingToastId =       toast.loading(t("backup.undoingTweak", { name: tweak.title || tweak.name }))
     try {
       const newStates = { ...toggleStates, [tweak.name]: false }
       setToggleStates(newStates)
@@ -425,14 +418,14 @@ function AppliedTweaksTab() {
       const result = await invoke({ channel: "tweak:unapply", payload: tweak.name })
       if (result?.success) {
         toast.update(loadingToastId, {
-          render: `Undid tweak: ${tweak.title || tweak.name}`,
+          render: t("backup.undidTweak", { name: tweak.title || tweak.name }),
           type: "success",
           isLoading: false,
           autoClose: 3000,
         })
       } else {
         toast.update(loadingToastId, {
-          render: `Failed to undo tweak: ${tweak.title || tweak.name}`,
+          render: t("backup.failedUndoTweak", { name: tweak.title || tweak.name }),
           type: "error",
           isLoading: false,
           autoClose: 3000,
@@ -444,7 +437,7 @@ function AppliedTweaksTab() {
     } catch (error) {
       log.error(`Error undoing tweak ${tweak.name}:`, error)
       toast.update(loadingToastId, {
-        render: `Failed to undo tweak: ${tweak.title || tweak.name}`,
+        render: t("backup.failedUndoTweak", { name: tweak.title || tweak.name }),
         type: "error",
         isLoading: false,
         autoClose: 3000,
@@ -464,7 +457,7 @@ function AppliedTweaksTab() {
     const newStates = { ...toggleStates }
     for (const tweak of appliedTweaks) {
       if (tweak.reversible === false) continue
-      const loadingToastId = toast.loading(`Undoing tweak: ${tweak.title || tweak.name}`)
+      const loadingToastId =       toast.loading(t("backup.undoingTweak", { name: tweak.title || tweak.name }))
       try {
         newStates[tweak.name] = false
         setToggleStates({ ...newStates })
@@ -473,14 +466,14 @@ function AppliedTweaksTab() {
         const result = await invoke({ channel: "tweak:unapply", payload: tweak.name })
         if (result?.success) {
           toast.update(loadingToastId, {
-            render: `Undid tweak: ${tweak.title || tweak.name}`,
+            render: t("backup.undidTweak", { name: tweak.title || tweak.name }),
             type: "success",
             isLoading: false,
             autoClose: 3000,
           })
         } else {
           toast.update(loadingToastId, {
-            render: `Failed to undo tweak: ${tweak.title || tweak.name}`,
+            render: t("backup.failedUndoTweak", { name: tweak.title || tweak.name }),
             type: "error",
             isLoading: false,
             autoClose: 3000,
@@ -492,7 +485,7 @@ function AppliedTweaksTab() {
       } catch (error) {
         log.error(`Error undoing tweak ${tweak.name}:`, error)
         toast.update(loadingToastId, {
-          render: `Failed to undo tweak: ${tweak.title || tweak.name}`,
+          render: t("backup.failedUndoTweak", { name: tweak.title || tweak.name }),
           type: "error",
           isLoading: false,
           autoClose: 3000,
@@ -513,7 +506,7 @@ function AppliedTweaksTab() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <p className="text-sparkle-text-secondary text-sm">
-              {appliedTweaks.length} tweak{appliedTweaks.length !== 1 ? "s" : ""} currently applied
+              {t("backup.appliedTweaksCount", { count: appliedTweaks.length, plural: appliedTweaks.length !== 1 ? "s" : "" })}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 justify-end">
@@ -523,7 +516,7 @@ function AppliedTweaksTab() {
               className="flex items-center gap-2"
               disabled={loading || processing}
             >
-              <RotateCw size={16} /> Refresh
+              <RotateCw size={16} /> {t("backup.refresh")}
             </Button>
             <Button
               variant="danger"
@@ -531,7 +524,7 @@ function AppliedTweaksTab() {
               disabled={loading || processing || appliedTweakFiltered.length === 0}
               className="flex items-center gap-2"
             >
-              <Undo2 size={16} /> Undo All Tweaks
+              <Undo2 size={16} /> {t("backup.undoAllTweaks")}
             </Button>
           </div>
         </div>
@@ -545,17 +538,17 @@ function AppliedTweaksTab() {
             <div className="p-4 bg-sparkle-secondary rounded-full mb-4">
               <Wrench size={28} className="text-sparkle-text" />
             </div>
-            <h3 className="text-lg font-medium mb-2 text-sparkle-text">No Applied Tweaks</h3>
+            <h3 className="text-lg font-medium mb-2 text-sparkle-text">{t("backup.noAppliedTweaks")}</h3>
             <p className="text-sparkle-text-secondary max-w-sm mb-4">
-              You don't have any tweaks applied. Go to the Tweaks page to apply some.
+              {t("backup.noAppliedTweaksDesc")}
             </p>
           </div>
         ) : (
           <Table className="max-h-96">
             <TableHeader>
               <TableRow>
-                <TableHead>Tweak</TableHead>
-                <TableHead className="w-32 text-center">Actions</TableHead>
+                <TableHead>{t("backup.tweak")}</TableHead>
+                <TableHead className="w-32 text-center">{t("backup.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -576,17 +569,19 @@ function AppliedTweaksTab() {
                         className="p-2! gap-2"
                         onClick={() => handleUndo(tweak)}
                         disabled={processing}
-                        title="Undo Tweak"
+                        title={t("backup.undoTweak")}
                       >
                         {undoingTweak === tweak.name ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : (
                           <Undo2 size={16} />
                         )}
-                        Undo
+                        {t("backup.undoTweak")}
                       </Button>
                     ) : (
-                      <span className="text-sparkle-text-secondary text-xs">Not reversible</span>
+                      <span className="text-sparkle-text-secondary text-xs">
+                        {t("backup.notReversible")}
+                      </span>
                     )}
                   </TableCell>
                 </TableRow>
@@ -600,23 +595,21 @@ function AppliedTweaksTab() {
             onClick={() => setShowWhyNotReversible(true)}
             className="flex items-center gap-2"
           >
-            <HelpCircle size={16} /> Why are some tweaks not reversible?
+            <HelpCircle size={16} /> {t("backup.whyNotReversible")}
           </Button>
         </div>
         {appliedTweaks.length > 0 && (
           <p className="text-center text-amber-600 text-sm">
-            Note: Some undo scripts reinstall apps, so this process may take a while.
+            {t("backup.undoScriptNote")}
           </p>
         )}
       </div>
       <Modal open={confirmUndoAll} onClose={() => !processing && setConfirmUndoAll(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4 pb-0">
-          <h3 className="text-lg font-medium text-sparkle-text">Undo All Tweaks</h3>
+          <h3 className="text-lg font-medium text-sparkle-text">{t("backup.confirmUndoAll")}</h3>
           <div className="p-4 pr-0">
             <p className="text-sparkle-text-secondary mb-4">
-              Are you sure you want to undo all {appliedTweakFiltered.length} applied tweak
-              {appliedTweakFiltered.length !== 1 ? "s" : ""}? This will run the unapply script for
-              each tweak and may require a restart.
+              {t("backup.confirmUndoAllDesc", { count: appliedTweakFiltered.length, plural: appliedTweakFiltered.length !== 1 ? "s" : "" })}
             </p>
             <div className="flex justify-end gap-3">
               <Button
@@ -624,13 +617,13 @@ function AppliedTweaksTab() {
                 onClick={() => !processing && setConfirmUndoAll(false)}
                 disabled={processing}
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button variant="danger" onClick={handleUndoAll} disabled={processing}>
                 {processing ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
-                  `Undo All (${appliedTweakFiltered.length})`
+                  t("backup.undoAllButton", { count: appliedTweakFiltered.length })
                 )}
               </Button>
             </div>
@@ -640,39 +633,33 @@ function AppliedTweaksTab() {
       <Modal open={showWhyNotReversible} onClose={() => setShowWhyNotReversible(false)}>
         <div className="bg-sparkle-card border border-sparkle-border rounded-2xl p-4 shadow-xl max-w-lg w-full mx-4">
           <h3 className="text-lg font-medium text-sparkle-text mb-4">
-            Why are some tweaks not reversible?
+            {t("backup.whyNotReversible")}
           </h3>
           <div className="text-sparkle-text-secondary text-sm leading-6 space-y-3">
             <p>
-              Some tweaks make changes that can't be automatically reversed by Sparkle. However,
-              most of these changes can still be undone manually:
+              {t("backup.whyNotReversibleDesc1")}
             </p>
             <ul className="list-disc list-inside space-y-2 ml-2">
               <li>
-                <strong className="text-sparkle-text">Debloating Windows:</strong> Removed apps can
-                be reinstalled from the Microsoft Store
+                <strong className="text-sparkle-text">{t("backup.debloatingWindows")}</strong> {t("backup.debloatingWindowsDesc")}
               </li>
               <li>
-                <strong className="text-sparkle-text">Optimize NVIDIA Settings:</strong> Settings
-                can be reset through the NVIDIA Control Panel
+                <strong className="text-sparkle-text">{t("backup.optimizeNvidia")}</strong> {t("backup.optimizeNvidiaDesc")}
               </li>
               <li>
-                <strong className="text-sparkle-text">Service modifications:</strong> Services can
-                be re-enabled through Windows Services Manager
+                <strong className="text-sparkle-text">{t("backup.serviceMods")}</strong> {t("backup.serviceModsDesc")}
               </li>
             </ul>
             <p>
-              While these tweaks don't have an automatic undo button, you can always create a
-              restore point before applying them.
+              {t("backup.whyNotReversibleDesc2")}
             </p>
             <p className="text-orange-400 text-xs">
-              Tip: Create a restore point before applying non-reversible tweaks so you have an easy
-              fallback option.
+              {t("backup.tipNonReversible")}
             </p>
           </div>
           <div className="flex justify-end mt-6">
             <Button variant="primary" onClick={() => setShowWhyNotReversible(false)}>
-              Got it
+              {t("common.gotIt")}
             </Button>
           </div>
         </div>
