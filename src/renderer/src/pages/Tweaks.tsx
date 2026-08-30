@@ -151,10 +151,13 @@ function Tweaks() {
       await saveToggleStates(newStates)
 
       if (newState) {
-        await invoke({
+        const result = await invoke({
           channel: "tweak:apply",
           payload: tweak.name,
         })
+        if (result?.success === false) {
+          throw new Error(result.error || `Failed to apply tweak: ${tweak.title}`)
+        }
         if (tweak.restart) {
           setNeedsRestart(true)
         }
@@ -165,10 +168,13 @@ function Tweaks() {
           autoClose: 3000,
         })
       } else {
-        await invoke({
+        const result = await invoke({
           channel: "tweak:unapply",
           payload: tweak.name,
         })
+        if (result?.success === false) {
+          throw new Error(result.error || `Failed to unapply tweak: ${tweak.title}`)
+        }
         if (tweak.restart) {
           setNeedsRestart(true)
         }
@@ -219,10 +225,13 @@ function Tweaks() {
 
     try {
       await saveToggleStates(newStates)
-      await invoke({
+      const result = await invoke({
         channel: "tweak:apply",
         payload: tweak.name,
       })
+      if (result?.success === false) {
+        throw new Error(result.error || `Failed to apply tweak: ${tweak.title}`)
+      }
       if (tweak.restart) {
         setNeedsRestart(true)
       }
@@ -235,6 +244,20 @@ function Tweaks() {
     } catch (error) {
       console.error(`Error applying tweak ${tweak.title}:`, error)
       log.error(`Error applying tweak ${tweak.title}:`, error)
+
+      const revertedStates = {
+        ...toggleStates,
+        [tweak.name]: toggleStates[tweak.name],
+      }
+      setToggleStates(revertedStates)
+
+      try {
+        await saveToggleStates(revertedStates)
+      } catch (err) {
+        console.error("Error reverting toggle state:", err)
+        log.error("Error reverting toggle state:", err)
+      }
+
       toast.update(loadingToastId, {
         render: t("tweaks.failedApply", { title: tweak.title }),
         type: "error",
@@ -275,10 +298,13 @@ function Tweaks() {
     const loadingToastId = toast.loading(t("tweaks.reapplyingTweak", { title: tweak.title }))
 
     try {
-      await invoke({
+      const result = await invoke({
         channel: "tweak:apply",
         payload: tweak.name,
       })
+      if (result?.success === false) {
+        throw new Error(result.error || `Failed to reapply tweak: ${tweak.title}`)
+      }
       if (tweak.restart) {
         setNeedsRestart(true)
       }
@@ -326,10 +352,13 @@ function Tweaks() {
         setToggleStates({ ...newStates })
         await saveToggleStates(newStates)
 
-        await invoke({
+        const result = await invoke({
           channel: "tweak:apply",
           payload: tweak.name,
         })
+        if (result?.success === false) {
+          throw new Error(result.error || `Failed to apply tweak: ${tweak.title}`)
+        }
 
         if (tweak.restart) {
           setNeedsRestart(true)
@@ -344,6 +373,10 @@ function Tweaks() {
       } catch (error) {
         console.error(`Error applying tweak ${tweak.title}:`, error)
         log.error(`Error applying tweak ${tweak.title}:`, error)
+
+        newStates[tweak.name] = false
+        setToggleStates({ ...newStates })
+        await saveToggleStates(newStates)
 
         toast.update(loadingToastId, {
           render: t("tweaks.failedApply", { title: tweak.title }),
@@ -519,10 +552,15 @@ function Tweaks() {
 
                   try {
                     await saveToggleStates(newStates)
-                    await invoke({
+                    const result = await invoke({
                       channel: "tweak:apply",
                       payload: selectedTweak.name,
                     })
+                    if (result?.success === false) {
+                      throw new Error(
+                        result.error || `Failed to apply tweak: ${selectedTweak.title}`,
+                      )
+                    }
                     if (selectedTweak.restart) {
                       setNeedsRestart(true)
                     }
@@ -542,6 +580,13 @@ function Tweaks() {
                     }
                     setToggleStates(revertedStates)
                     await saveToggleStates(revertedStates)
+
+                    toast.update(loadingToastId, {
+                      render: `Failed to apply tweak: ${selectedTweak.title}`,
+                      type: "error",
+                      isLoading: false,
+                      autoClose: 3000,
+                    })
                   }
                 }}
                 >

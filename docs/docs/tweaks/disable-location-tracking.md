@@ -7,11 +7,13 @@
 
 
 
-
+!!! note 
+    This tweak was last updated in 2.21.1
+  
 
 ## Details
 
-- Disables telemetry, location access, diagnostic tracking, and automatic Windows updates by setting related registry values, reducing background data collection and improving system privacy and performance.
+- Disables location access (including the Location service and sensor permissions) and telemetry data collection (including the DiagTrack service) by setting the relevant registry policies, reducing background data collection and giving you more control over the system.
 
 
 
@@ -22,17 +24,42 @@
 ## Apply
 
 ```powershell { .no-copy }  
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "Allow" -Value "Deny" -Type String -Force
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "SensorPermissionState" -Value 0 -Type DWord -Force
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" -Name "Status" -Value 0 -Type DWord -Force
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" -Name "AutoUpdateEnabled" -Value 0 -Type DWord -Force
+$path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
+if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null }
+Set-ItemProperty -Path $path -Name "AllowTelemetry" -Value 0 -Type DWord -Force
+
+Stop-Service -Name "DiagTrack" -Force -ErrorAction SilentlyContinue
+Set-Service -Name "DiagTrack" -StartupType Disabled -ErrorAction SilentlyContinue
+
+$path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location"
+if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null }
+Set-ItemProperty -Path $path -Name "Value" -Value "Deny" -Type String -Force
+
+$path = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}"
+if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null }
+Set-ItemProperty -Path $path -Name "SensorPermissionState" -Value 0 -Type DWord -Force
+
+Stop-Service -Name "lfsvc" -Force -ErrorAction SilentlyContinue
+Set-Service -Name "lfsvc" -StartupType Disabled -ErrorAction SilentlyContinue
 ```
 
 ## Unapply
 
 ```powershell
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "Allow" -Value "Allow" -Type String -Force
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "SensorPermissionState" -Value 1 -Type DWord -Force
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" -Name "Status" -Value 1 -Type DWord -Force
-  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" -Name "AutoUpdateEnabled" -Value 1 -Type DWord -Force
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -ErrorAction SilentlyContinue
+
+Set-Service -Name "DiagTrack" -StartupType Automatic -ErrorAction SilentlyContinue
+Start-Service -Name "DiagTrack" -ErrorAction SilentlyContinue
+
+$path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location"
+if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null }
+Set-ItemProperty -Path $path -Name "Value" -Value "Allow" -Type String -Force
+
+$path = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}"
+if (Test-Path $path) {
+    Set-ItemProperty -Path $path -Name "SensorPermissionState" -Value 1 -Type DWord -Force
+}
+
+Set-Service -Name "lfsvc" -StartupType Manual -ErrorAction SilentlyContinue
+Start-Service -Name "lfsvc" -ErrorAction SilentlyContinue
 ```

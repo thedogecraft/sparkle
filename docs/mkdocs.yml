@@ -1,7 +1,7 @@
 site_name: Sparkle Docs
 site_description: "The ultimate documentation for Sparkle"
-site_url: "https://docs.getsparkle.net"
-repo_url: "https://github.com/parcoil/sparkle"
+site_url: "https://sparkledocs.parcoil.com"
+repo_url: "https://github.com/thedogecraft/sparkle"
 repo_name: "Sparkle"
 
 edit_uri: edit/v2/docs/docs/
@@ -12,8 +12,8 @@ extra_javascript:
 
 theme:
   name: material
-  logo: "https://raw.githubusercontent.com/Parcoil/logos/refs/heads/main/logos/sparklelogo.png"
-  favicon: "https://raw.githubusercontent.com/Parcoil/logos/refs/heads/main/logos/sparklelogo.png"
+  logo: "https://raw.githubusercontent.com/parcoil/logos/refs/heads/main/logos/sparklelogo.png"
+  favicon: "https://raw.githubusercontent.com/parcoil/logos/refs/heads/main/logos/sparklelogo.png"
   palette:
     # Auto light/dark mode
     - media: "(prefers-color-scheme)"
@@ -113,7 +113,7 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/parcoil/sparkle
+      link: https://github.com/thedogecraft/sparkle
     - icon: fontawesome/brands/discord
       link: https://discord.com/invite/En5YJYWj3Z
   # announcement: "⭐ Star Sparkle on GitHub!"

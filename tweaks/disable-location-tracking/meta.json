@@ -4,6 +4,7 @@
   "risk": "safe",
   "category": ["Privacy"],
   "recommended": true,
+  "updatedversion": "2.21.1",
   "description": "Disables Windows location tracking.",
-  "deepDescription": "Disables telemetry, location access, diagnostic tracking, and automatic Windows updates by setting related registry values, reducing background data collection and improving system privacy and performance."
+  "deepDescription": "Disables location access (including the Location service and sensor permissions) and telemetry data collection (including the DiagTrack service) by setting the relevant registry policies, reducing background data collection and giving you more control over the system."
 }

@@ -7,6 +7,16 @@ console.log = log.log
 console.error = log.error
 console.warn = log.warn
 
+function sanitizeIP(ip: string): string {
+  const valid =
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+  return valid.test(ip) ? ip : ""
+}
+
+function sanitizeHostname(hostname: string): string {
+  return hostname.replace(/[^a-zA-Z0-9.-]/g, "")
+}
+
 interface DNSConfig {
   primary: string
   secondary: string
@@ -112,7 +122,7 @@ export const setupDNSHandlers = (): void => {
       }
       `
 
-      const result = await executePowerShell(null, { script, name: "Get-DNS" })
+      const result = await executePowerShell({ script, name: "Get-DNS" })
 
       if (result.success) {
         const lines = result
@@ -149,10 +159,12 @@ export const setupDNSHandlers = (): void => {
 
         let config: DNSConfig
         if (normalizedType === "custom") {
-          if (!primaryDNS) {
-            return { success: false, error: "Primary DNS is required for custom DNS" }
+          const safePrimary = sanitizeIP(primaryDNS)
+          if (!safePrimary) {
+            return { success: false, error: "Invalid primary DNS server address" }
           }
-          config = { primary: primaryDNS, secondary: secondaryDNS, name: "Custom" }
+          const safeSecondary = sanitizeIP(secondaryDNS)
+          config = { primary: safePrimary, secondary: safeSecondary, name: "Custom" }
         } else {
           config = DNS_CONFIGS[normalizedType]
         }
@@ -229,16 +241,17 @@ export const setupDNSHandlers = (): void => {
     async (_event: IpcMainInvokeEvent, props: TestDNSProps): Promise<any> => {
       try {
         const { hostname = "google.com" } = props
+        const safeHostname = sanitizeHostname(hostname) || "google.com"
         const script = `
         try {
-          $result = nslookup ${hostname} 2>&1
-          Write-Host "DNS Test Results for ${hostname}:"
+          $result = nslookup ${safeHostname} 2>&1
+          Write-Host "DNS Test Results for ${safeHostname}:"
           Write-Host $result
         } catch {
           Write-Host "Error testing DNS: $($_.Exception.Message)"
         }
       `
-        const result = await executePowerShell(null, { script, name: "Test-DNS" })
+        const result = await executePowerShell({ script, name: "Test-DNS" })
         return result
       } catch (error: any) {
         return { success: false, error: error.message }
@@ -258,13 +271,11 @@ export const setupDNSHandlers = (): void => {
           { name: "AdGuard DNS", server: "94.140.14.14" },
         ]
 
-        const results: PingResult[] = []
-
         const pingServer = (
           server: string,
         ): Promise<{ latency: number | null; status: "success" | "timeout" | "error" }> => {
           return new Promise((resolve) => {
-            exec(`ping -n 2 -w 1000 ${server}`, { shell: "cmd.exe" }, (error, stdout) => {
+            exec(`ping -n 1 -w 1000 ${server}`, { shell: "cmd.exe" }, (error, stdout) => {
               if (error) {
                 resolve({ latency: null, status: "error" })
                 return
@@ -283,14 +294,16 @@ export const setupDNSHandlers = (): void => {
           })
         }
 
-        for (const dns of dnsServers) {
-          const pingResult = await pingServer(dns.server)
-          results.push({
-            name: dns.name,
-            server: dns.server,
-            ...pingResult,
-          })
-        }
+        const settled = await Promise.allSettled(
+          dnsServers.map(async (dns) => {
+            const pingResult = await pingServer(dns.server)
+            return { name: dns.name, server: dns.server, ...pingResult }
+          }),
+        )
+
+        const results = settled
+          .filter((r): r is PromiseFulfilledResult<PingResult> => r.status === "fulfilled")
+          .map((r) => r.value)
 
         return { success: true, data: results }
       } catch (error: any) {
@@ -306,7 +319,7 @@ export const setupDNSHandlers = (): void => {
           Write-Host "$($_.Name)|$($_.InterfaceDescription)|$($_.Status)"
         }
       `
-      const result = await executePowerShell(null, { script, name: "Get-Adapters" })
+      const result = await executePowerShell({ script, name: "Get-Adapters" })
 
       if (result.success) {
         const lines = result
@@ -333,7 +346,7 @@ export const setupDNSHandlers = (): void => {
         ipconfig /flushdns
         Write-Host "DNS cache flushed successfully!"
       `
-      const result = await executePowerShell(null, { script, name: "Flush-DNS" })
+      const result = await executePowerShell({ script, name: "Flush-DNS" })
       return result
     } catch (error: any) {
       return { success: false, error: error.message }

@@ -9,7 +9,7 @@ _New to tweaks? Read [What Are Tweaks?](./what-are-tweaks) for an overview._
 
 _This page is auto-generated._
 
-## All Tweaks (39)
+## All Tweaks (40)
 - [24-hour-clock](24-hour-clock.md)
 - [align-taskbar-left](align-taskbar-left.md)
 - [debloat-windows](debloat-windows.md)
@@ -26,6 +26,7 @@ _This page is auto-generated._
 - [disable-location-tracking](disable-location-tracking.md)
 - [disable-lockscreen-tips](disable-lockscreen-tips.md)
 - [disable-mouse-acceleration](disable-mouse-acceleration.md)
+- [disable-rdp-warnings](disable-rdp-warnings.md)
 - [disable-windows-recall](disable-windows-recall.md)
 - [disable-telemetry](disable-telemetry.md)
 - [disable-wifi-sense](disable-wifi-sense.md)

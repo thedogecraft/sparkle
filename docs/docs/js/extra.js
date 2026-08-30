@@ -1,3 +1,5 @@
+/* global document$, posthog */
+
 // this is posthog
 // add more js below it
 

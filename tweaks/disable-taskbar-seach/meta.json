@@ -1,0 +1,9 @@
+{
+  "name": "disable-taskbar-seach",
+  "title": "Disable Taskbar Search",
+  "risk": "safe",
+  "description": "Hides the search box from the taskbar.",
+  "category": ["General", "Appearance"],
+  "deepDescription": "Disables the search box on the Windows taskbar by setting 'SearchboxTaskbarMode' to 0 under HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search. Explorer is restarted to apply the change.",
+  "addedversion": "2.22.0"
+}

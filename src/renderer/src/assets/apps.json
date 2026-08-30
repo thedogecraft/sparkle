@@ -1381,6 +1381,57 @@
       "info": "A simple and private file sharing app for Windows.",
       "link": "https://localsend.org/?ref=sparkle",
       "icon": "https://avatars.githubusercontent.com/u/120677616?s=200&v=4"
+    },
+    {
+      "name": "Itch.io",
+      "id": "ItchIo.Itch",
+      "chocolatey": "itch.io",
+      "category": "games",
+      "info": "A platform for indie games and game development.",
+      "link": "https://itch.io/?ref=sparkle",
+      "icon": "https://itch.io/static/images/itchio-square-144.png"
+    },
+    {
+      "name": "Cursor",
+      "chocolatey": "cursoride",
+      "category": "development",
+      "info": "A AI Powered code editor.",
+      "link": "https://cursor.sh/?ref=sparkle",
+      "icon": "https://cursor.sh/favicon.ico"
+    },
+    {
+      "name": "Claude Desktop",
+      "chocolatey": "claude",
+      "category": "development",
+      "info": "Chat with claude AI on your desktop.",
+      "link": "https://claude.com/download",
+      "icon": "https://claude.com/favicon.ico"
+    },
+    {
+      "name": "Claude Code",
+      "chocolatey": "claudecode",
+      "category": "development",
+      "info": "Chat with claude AI on your desktop.",
+      "link": "https://claude.com/download",
+      "icon": "https://claude.com/favicon.ico"
+    },
+    {
+      "name": "VSCodium",
+      "id": "VSCodium.VSCodium",
+      "chocolatey": "vscodium",
+      "category": "development",
+      "info": "A free and open-source code editor.",
+      "link": "https://vscodium.com/?ref=sparkle",
+      "icon": "https://vscodium.com/img/codium_cnl.svg"
+    },
+    {
+      "name": "UniGetUI",
+      "id": "Devolutions.UniGetUI",
+      "chocolatey": "unigetui",
+      "category": "utilities",
+      "info": "A simple and lightweight GUI package manager for Winget.",
+      "link": "https://devolutions.net/unigetui/?ref=sparkle",
+      "icon": "https://devolutions.net/favicon-32x32.png"
     }
   ]
 }

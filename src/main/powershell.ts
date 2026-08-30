@@ -12,14 +12,30 @@ console.log = log.log
 console.error = log.error
 console.warn = log.warn
 
+function isSafeId(id: string): boolean {
+  return /^[a-zA-Z0-9._-]+$/.test(id)
+}
+
 function ensureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true })
   }
 }
 
-export async function executePowerShell(_, props) {
-  const { script, name = "script" } = props
+export interface ExecutePowerShellOptions {
+  script: string
+  name?: string
+  output?: boolean
+}
+
+export type PowerShellResult =
+  | { success: true; output?: string; error?: never }
+  | { success: false; error: string; output?: string }
+
+export async function executePowerShell(
+  props: ExecutePowerShellOptions,
+): Promise<PowerShellResult> {
+  const { script, name = "script", output = true } = props
 
   try {
     const tempDir = path.join(app.getPath("userData"), "scripts")
@@ -38,12 +54,15 @@ export async function executePowerShell(_, props) {
       console.warn(`PowerShell stderr [${name}]:`, stderr)
     }
 
-    console.log(`PowerShell stdout [${name}]:`, stdout)
+    if (output == true) {
+      console.log(`PowerShell stdout [${name}]:`, stdout)
+    }
 
     return { success: true, output: stdout }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
     console.error(`PowerShell execution error [${name}]:`, error)
-    return { success: false, error: error.message }
+    return { success: false, error: message }
   }
 }
 
@@ -62,10 +81,17 @@ function sendOutput(appId: string, text: string) {
   }
 }
 
+export interface ExecutePowerShellStreamingOptions {
+  script: string
+  name?: string
+  appId: string
+}
+
 export function executePowerShellStreaming(
-  _,
-  { script, name = "script", appId }: { script: string; name: string; appId: string }
-): Promise<{ success: boolean; output?: string; error?: string }> {
+  props: ExecutePowerShellStreamingOptions,
+): Promise<PowerShellResult> {
+  const { script, name = "script", appId } = props
+
   return new Promise(async (resolve) => {
     const tempDir = path.join(app.getPath("userData"), "scripts")
     ensureDirectoryExists(tempDir)
@@ -115,7 +141,17 @@ export function executePowerShellStreaming(
   })
 }
 
-async function runPowerShellInWindow(_, { script, name = "script", noExit = true }) {
+interface RunPowerShellInWindowOptions {
+  script: string
+  name?: string
+  noExit?: boolean
+}
+
+async function runPowerShellInWindow(
+  props: RunPowerShellInWindowOptions,
+): Promise<PowerShellResult> {
+  const { script, name = "script", noExit = true } = props
+
   try {
     const tempDir = path.join(app.getPath("userData"), "scripts")
     ensureDirectoryExists(tempDir)
@@ -132,9 +168,10 @@ async function runPowerShellInWindow(_, { script, name = "script", noExit = true
     })
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
     console.error(`Error in runPowerShellInWindow [${name}]:`, error)
-    return { success: false, error: error.message }
+    return { success: false, error: message }
   }
 }
 
@@ -155,17 +192,21 @@ export async function checkChocolatey(): Promise<{ success: boolean; installed: 
 }
 
 export const setupPowerShellHandlers = (): void => {
-  ipcMain.handle("run-powershell-window", runPowerShellInWindow)
-  ipcMain.handle("run-powershell", executePowerShell)
+  ipcMain.handle("run-powershell-window", (_event, props: RunPowerShellInWindowOptions) =>
+    runPowerShellInWindow(props),
+  )
+  ipcMain.handle("run-powershell", (_event, props: ExecutePowerShellOptions) =>
+    executePowerShell(props),
+  )
   ipcMain.handle("check-chocolatey", async () => checkChocolatey())
-  ipcMain.handle("install-chocolatey", async (event) => {
+  ipcMain.handle("install-chocolatey", async () => {
     try {
-      const result = await executePowerShell(event, {
+      const result = await executePowerShell({
         script: "winget install --id chocolatey.chocolatey --source winget",
         name: "install-chocolatey",
       })
       if (result.success) {
-        return { installed: true, version: (result as any).output.trim() }
+        return { installed: true, version: result.output?.trim() ?? "" }
       } else {
         return { installed: false }
       }
@@ -174,10 +215,15 @@ export const setupPowerShellHandlers = (): void => {
       return { installed: false }
     }
   })
-  ipcMain.handle("handle-apps", async (event, { action, apps, source }) => {
+  ipcMain.handle("handle-apps", async (_event, { action, apps, source }) => {
     switch (action) {
       case "install":
         for (const appId of apps) {
+          if (!isSafeId(appId)) {
+            console.error(`Rejected unsafe app ID: ${appId}`)
+            sendToRenderer("install-app-error", { appId })
+            continue
+          }
           let command
           if (source === "Chocolatey") {
             command = `choco install ${appId} -y`
@@ -186,7 +232,7 @@ export const setupPowerShellHandlers = (): void => {
           }
 
           sendToRenderer("install-start", { appId })
-          const result = await executePowerShellStreaming(event, {
+          const result = await executePowerShellStreaming({
             script: command,
             name: `Install-${appId}`,
             appId,
@@ -204,7 +250,7 @@ export const setupPowerShellHandlers = (): void => {
             console.log(`Initial install failed for ${appId}, retrying with --pre flag`)
             sendToRenderer("install-output", { appId, line: "\nRetrying with --pre flag...\n" })
             const retryCommand = `choco install ${appId} -y --pre`
-            const retryResult = await executePowerShellStreaming(event, {
+            const retryResult = await executePowerShellStreaming({
               script: retryCommand,
               name: `Install-${appId}-pre`,
               appId,
@@ -230,6 +276,11 @@ export const setupPowerShellHandlers = (): void => {
 
       case "uninstall":
         for (const appId of apps) {
+          if (!isSafeId(appId)) {
+            console.error(`Rejected unsafe app ID: ${appId}`)
+            sendToRenderer("install-app-error", { appId })
+            continue
+          }
           let command
           if (source === "Chocolatey") {
             command = `choco uninstall ${appId} -y`
@@ -238,7 +289,7 @@ export const setupPowerShellHandlers = (): void => {
           }
 
           sendToRenderer("install-start", { appId })
-          const result = await executePowerShellStreaming(event, {
+          const result = await executePowerShellStreaming({
             script: command,
             name: `Uninstall-${appId}`,
             appId,
@@ -257,7 +308,7 @@ export const setupPowerShellHandlers = (): void => {
 
       case "check-installed":
         try {
-          const result = await executePowerShell(event, {
+          const result = await executePowerShell({
             script: "winget list",
             name: "check-installed",
           })
@@ -272,7 +323,7 @@ export const setupPowerShellHandlers = (): void => {
 
           const installedAppIds = apps.filter((appId) => {
             const regex = new RegExp(`\\b${escapeRegExp(appId)}\\b`, "i")
-            return regex.test((result as any).output)
+            return regex.test(result.output ?? "")
           })
 
           if (mainWindow) {

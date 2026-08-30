@@ -1,4 +1,4 @@
-import { execSync, spawn } from "child_process"
+import { execSync } from "child_process"
 import path from "path"
 import fs from "fs"
 
@@ -47,8 +47,13 @@ setTimeout(() => {
   if (isRunning(pid)) {
     console.log("App is still running after smoke test - PASS")
     try {
-      execSync(`powershell -Command "Stop-Process -Id ${pid} -Force"`, { stdio: "pipe", windowsHide: true })
-    } catch {}
+      execSync(`powershell -Command "Stop-Process -Id ${pid} -Force"`, {
+        stdio: "pipe",
+        windowsHide: true,
+      })
+    } catch {
+      // process already exited
+    }
     process.exit(0)
   } else {
     console.error("App crashed or exited before smoke test completed - FAIL")
@@ -59,7 +64,12 @@ setTimeout(() => {
 setTimeout(() => {
   console.error("Smoke test timed out - FAIL")
   try {
-    execSync(`powershell -Command "Stop-Process -Id ${pid} -Force"`, { stdio: "pipe", windowsHide: true })
-  } catch {}
+    execSync(`powershell -Command "Stop-Process -Id ${pid} -Force"`, {
+      stdio: "pipe",
+      windowsHide: true,
+    })
+  } catch {
+    // process already exited
+  }
   process.exit(1)
 }, TIMEOUT)

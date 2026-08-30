@@ -1,0 +1,12 @@
+{
+  "name": "remove-edge",
+  "title": "Remove Microsoft Edge",
+  "risk": "caution",
+  "deepDescription": "Removes Microsoft Edge from Windows by uninstalling it.",
+  "recommended": true,
+  "top": true,
+  "description": "Removes Microsoft Edge from Windows.",
+  "warning": "Removing Microsoft Edge may cause issues with windows services/apps that rely on it.",
+  "category": ["System", "Privacy"],
+  "addedversion": "2.22.0"
+}

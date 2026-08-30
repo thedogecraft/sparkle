@@ -11,7 +11,25 @@ $registrySettings = @(
     @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection"; Name="AllowTelemetry"; Value=0 },
     @{ Path="HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name="Start_TrackProgs"; Value=0 },
     @{ Path="HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"; Name="PublishUserActivities"; Value=0 },
-    @{ Path="HKCU:\Software\Microsoft\Siuf\Rules"; Name="NumberOfSIUFInPeriod"; Value=0 }
+    @{ Path="HKCU:\Software\Microsoft\Siuf\Rules"; Name="NumberOfSIUFInPeriod"; Value=0 },
+
+    # disable windows Error Reporting
+    @{ Path="HKLM:\Software\Policies\Microsoft\Windows\Windows Error Reporting"; Name="Disabled"; Value=1 },
+    @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting"; Name="Disabled"; Value=1 },
+    @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting"; Name="DontSendAdditionalData"; Value=1 },
+    @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting"; Name="LoggingDisabled"; Value=1 },
+    @{ Path="HKLM:\Software\Microsoft\Windows\Windows Error Reporting\Consent"; Name="DefaultConsent"; Value=0 },
+    @{ Path="HKLM:\Software\Microsoft\Windows\Windows Error Reporting\Consent"; Name="DefaultOverrideBehavior"; Value=1 },
+
+    # disable start menu tile suggestions and ads
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="ContentDeliveryAllowed"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="SubscribedContentEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="OemPreInstalledAppsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="PreInstalledAppsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="PreInstalledAppsEverEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="SilentInstalledAppsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="SystemPaneSuggestionsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="FeatureManagementEnabled"; Value=0 }
 )
 
 foreach ($reg in $registrySettings) {

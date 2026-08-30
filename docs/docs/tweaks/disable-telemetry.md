@@ -7,7 +7,9 @@
 
 
 
-
+!!! note 
+    This tweak was last updated in 2.21.1
+  
 !!! note 
     This tweak was added in 2.14.0, Sparkle 2.14.0+ is required.
   
@@ -96,6 +98,9 @@ Set-Service -Name diagtrack -StartupType Automatic
 
 # Enable Windows Error Reporting Manager service
 Set-Service -Name wermgr -StartupType Automatic
+
+# Reset SvcHostSplitThresholdInKB to default value
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Value 399360 -Type DWord
 
 Write-Output "Telemetry settings have been reverted to default."
 ```

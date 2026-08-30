@@ -55,14 +55,30 @@ Write-Host "[✓] Latest version: $tag" -ForegroundColor Green
 Write-Host "[✓] Found installer: $fileName" -ForegroundColor Green
 Write-Host "[>] Downloading to: $downloadPath" -ForegroundColor Cyan
 
+# Ensure BITS service is running
+$bitsService = Get-Service BITS
+if ($bitsService.Status -ne "Running") {
+    Write-Host "[>] Starting BITS service..." -ForegroundColor Cyan
+    Start-Service BITS -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+}
+
 # Download the installer
 try {
     Start-BitsTransfer -Source $asset.browser_download_url -Destination $downloadPath
     Write-Host "`n[✔] Download complete!" -ForegroundColor Green
 }
 catch {
-    Write-Host "[X] Failed to download installer." -ForegroundColor Red
-    exit 1
+    Write-Host "[>] BITS transfer failed, falling back to Invoke-WebRequest..." -ForegroundColor Yellow
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $downloadPath -UseBasicParsing
+        Write-Host "`n[✔] Download complete!" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "[X] Failed to download installer." -ForegroundColor Red
+        exit 1
+    }
 }
 
 # Launch installer as admin and delete installer immediately after

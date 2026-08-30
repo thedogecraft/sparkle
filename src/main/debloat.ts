@@ -3,6 +3,8 @@ import { executePowerShell } from "@main/powershell"
 import { mainWindow } from "@main/windowState"
 import log from "electron-log"
 import fs from "fs"
+import path from "path"
+import crypto from "crypto"
 
 console.log = log.log
 console.error = log.error
@@ -11,6 +13,7 @@ console.warn = log.warn
 interface InstalledApp {
   id: string
   name: string
+  publisher: string
   version: string
   installDate: string
   icon?: string
@@ -69,7 +72,7 @@ Get-AppxPackage |
         version = $_.Version.ToString()
         installDate = ''
         displayIcon = ''
-        publisher = $_.Publisher
+        publisher = if ($_.Publisher -match 'O=([^,]+)') { $matches[1].Trim() } elseif ($_.Publisher -match 'CN=([^,]+)') { $matches[1].Trim() } else { $_.Publisher }
         installLocation = $_.InstallLocation
         uninstallString = ''
         quietUninstallString = ''
@@ -89,62 +92,88 @@ $jsonParts = $list | ForEach-Object { $_ | ConvertTo-Json -Compress }
 return "[$($jsonParts -join ',')]"
 `
 
-async function getInstalledApps(): Promise<InstalledApp[]> {
-  let result: { success: boolean; output?: string; error?: string } | null = null
+const iconCacheDir = path.join(app.getPath("userData"), "icon-cache")
+
+function getIconCacheKey(filePath: string): string {
+  return crypto.createHash("md5").update(filePath.toLowerCase()).digest("hex")
+}
+
+async function getCachedIcon(filePath: string): Promise<string | null> {
+  const cachePath = path.join(iconCacheDir, `${getIconCacheKey(filePath)}.png`)
   try {
-    if (cache) {
-      return cache
-    } else {
-      result = await executePowerShell(null, {
-        script: getInstalledAppsScript,
-        name: "Get-InstalledApps",
-      })
-    }
+    const data = await fs.promises.readFile(cachePath)
+    return `data:image/png;base64,${data.toString("base64")}`
+  } catch {
+    return null
+  }
+}
+
+async function setCachedIcon(filePath: string, dataUrl: string): Promise<void> {
+  const cachePath = path.join(iconCacheDir, `${getIconCacheKey(filePath)}.png`)
+  const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "")
+  await fs.promises.writeFile(cachePath, Buffer.from(base64Data, "base64"))
+}
+
+async function resolveIcon(displayIcon: string): Promise<string | undefined> {
+  if (!displayIcon) return undefined
+
+  const cached = await getCachedIcon(displayIcon)
+  if (cached) return cached
+
+  try {
+    await fs.promises.access(displayIcon)
+  } catch {
+    return undefined
+  }
+
+  try {
+    const nativeIcon = await app.getFileIcon(displayIcon, { size: "small" })
+    const dataUrl = nativeIcon.toDataURL()
+    setCachedIcon(displayIcon, dataUrl).catch(() => {})
+    return dataUrl
+  } catch {
+    return undefined
+  }
+}
+
+async function getInstalledApps(): Promise<InstalledApp[]> {
+  if (cache) return cache
+
+  try {
+    const result = await executePowerShell({
+      script: getInstalledAppsScript,
+      name: "Get-InstalledApps",
+      output: false,
+    })
 
     if (!result.success) {
       console.error("Failed to get installed apps:", result.error)
       return []
     }
 
-    const rawApps: Array<{
-      id: string
-      name: string
-      version: string
-      installDate: string
-      displayIcon: string
-      installLocation: string
-      uninstallString: string
-      quietUninstallString: string
-      isStoreApp: boolean
-      packageName: string
-    }> = JSON.parse(result.output!)
+    const rawApps = JSON.parse(result.output!)
     const rawList = Array.isArray(rawApps) ? rawApps : [rawApps]
 
-    const apps: InstalledApp[] = []
-    for (const raw of rawList) {
-      let iconDataUrl: string | undefined
+    fs.promises.mkdir(iconCacheDir, { recursive: true }).catch(() => {})
 
-      if (raw.displayIcon && fs.existsSync(raw.displayIcon)) {
-        try {
-          const nativeIcon = await app.getFileIcon(raw.displayIcon, { size: "small" })
-          iconDataUrl = nativeIcon.toDataURL()
-        } catch {
-          // fall through
-        }
-      }
+    const apps = await Promise.all(
+      rawList.map(async (raw) => {
+        const iconDataUrl = await resolveIcon(raw.displayIcon)
+        return {
+          id: raw.id,
+          name: raw.name,
+          publisher: raw.publisher || "",
+          version: raw.version || "Unknown",
+          installDate: raw.installDate || "Unknown",
+          icon: iconDataUrl,
+          uninstallString: raw.uninstallString || "",
+          quietUninstallString: raw.quietUninstallString || "",
+          isStoreApp: raw.isStoreApp || false,
+          packageName: raw.packageName || "",
+        } as InstalledApp
+      }),
+    )
 
-      apps.push({
-        id: raw.id,
-        name: raw.name,
-        version: raw.version || "Unknown",
-        installDate: raw.installDate || "Unknown",
-        icon: iconDataUrl,
-        uninstallString: raw.uninstallString || "",
-        quietUninstallString: raw.quietUninstallString || "",
-        isStoreApp: raw.isStoreApp || false,
-        packageName: raw.packageName || "",
-      })
-    }
     cache = apps
     return apps
   } catch (error) {
@@ -179,7 +208,7 @@ async function uninstallApps(
     try {
       if (isStoreApp) {
         const script = `Remove-AppxPackage "${packageName}"`
-        const result = await executePowerShell(null, { script, name: `Uninstall-${name}` })
+        const result = await executePowerShell({ script, name: `Uninstall-${name}` })
         const success = result.success
         console.log(`Uninstall Store app ${name}: ${success ? "success" : "failed"}`)
         results.push({ name, success, error: success ? undefined : result.error })
@@ -204,7 +233,7 @@ async function uninstallApps(
         const exeArgs = exeMatch[2].trim()
         const script = `$p = Start-Process '${exePath.replace(/'/g, "''")}' -ArgumentList '${exeArgs || "/S"}' -PassThru; $p.WaitForExit(); Start-Sleep -Seconds 2; $p.ExitCode`
 
-        const result = await executePowerShell(null, { script, name: `Uninstall-${name}` })
+        const result = await executePowerShell({ script, name: `Uninstall-${name}` })
         const exitCode = parseInt(result.output?.trim() ?? "1", 10)
         const success = result.success && (exitCode === 0 || exitCode === 3010)
         console.log(`Uninstall ${name}: exit ${exitCode}`)
@@ -214,7 +243,7 @@ async function uninstallApps(
 
       const script = `$p = Start-Process msiexec.exe -ArgumentList '${msiMatch[1].trim()} /quiet /norestart' -PassThru; $p.WaitForExit(); $p.ExitCode`
 
-      const result = await executePowerShell(null, {
+      const result = await executePowerShell({
         script,
         name: `Uninstall-${name}`,
       })

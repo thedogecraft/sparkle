@@ -74,6 +74,7 @@ function RootDiv({ children, ...props }: RootDivProps): React.ReactElement {
         overflowY: "auto",
       }}
       {...props}
+      className="overflow-x-hidden"
     >
       {children}
     </div>

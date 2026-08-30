@@ -5,7 +5,7 @@ import Checkbox from "@/components/ui/Checkbox"
 import Button from "@/components/ui/button"
 import Modal from "@/components/ui/modal"
 import { invoke } from "@/lib/electron"
-import { RefreshCw, Search, Trash2, TriangleAlert } from "lucide-react"
+import { RotateCw, Search, Trash2, TriangleAlert } from "lucide-react"
 import { toast } from "react-toastify"
 import { LargeInput } from "@/components/ui/input"
 import sparkleLogo from "../../../../resources/sparklelogo.png"
@@ -215,7 +215,7 @@ function Debloat() {
               disabled={loading || uninstalling}
               className="flex items-center gap-2"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              <RotateCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
             <Button
