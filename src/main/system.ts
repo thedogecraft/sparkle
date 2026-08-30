@@ -1,5 +1,5 @@
 import os from "os"
-import { ipcMain } from "electron"
+import { app, ipcMain } from "electron"
 import si from "systeminformation"
 import { exec, execFile } from "child_process"
 import util from "util"
@@ -8,6 +8,7 @@ import path from "path"
 import log from "electron-log"
 import { shell } from "electron"
 import { executePowerShell } from "@main/powershell"
+import type { PowerShellResult } from "@main/powershell"
 import { detectGPU, clearGpuCache } from "@main/gpu"
 import { mainWindow } from "@main/windowState"
 import { TtlCache } from "@main/cache"
@@ -20,12 +21,6 @@ const execFilePromise = util.promisify(execFile)
 console.log = log.log
 console.error = log.error
 console.warn = log.warn
-
-interface PowerShellResult {
-  success: boolean
-  output?: string
-  error?: string
-}
 
 interface ClearCacheResult {
   success: boolean
@@ -47,7 +42,7 @@ async function getSystemInfo(): Promise<SystemInfo> {
     const memoryType = (memLayout as any).length > 0 ? (memLayout as any)[0].type : "Unknown"
 
     const versionScript = `(Get-ItemProperty -Path "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion").DisplayVersion`
-    const versionPsResult = await executePowerShell(null, {
+    const versionPsResult = await executePowerShell({
       script: versionScript,
       name: "GetWindowsVersion",
     })
@@ -148,13 +143,25 @@ function getUserName(): string {
   return os.userInfo().username
 }
 
+export async function getAdminStatus(): Promise<boolean> {
+  console.log("[Sparkle]: Checking admin status...")
+  try {
+    const { execSync } = await import("child_process")
+    execSync("net session", { stdio: "pipe" })
+    console.log("[Sparkle]: Admin status: true")
+    return true
+  } catch (error) {
+    console.log("[Sparkle]: Not running as admin")
+    return false
+  }
+}
 function clearSparkleCache(): ClearCacheResult {
   systemInfoCache.clear()
   clearGpuCache()
   try {
-    const appDataPath = process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming")
-    const scriptsPath = path.join(appDataPath, "sparkle", "scripts")
-    const logsPath = path.join(appDataPath, "sparkle", "logs")
+    const userDataPath = app.getPath("userData")
+    const scriptsPath = path.join(userDataPath, "scripts")
+    const logsPath = path.join(userDataPath, "logs")
 
     let scriptsCleared = false
     let logsCleared = false
@@ -214,11 +221,7 @@ function clearSparkleCache(): ClearCacheResult {
 }
 
 function openLogFolder(): { success: boolean; error?: string } {
-  const logPath = path.join(
-    process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming"),
-    "sparkle",
-    "logs",
-  )
+  const logPath = path.join(app.getPath("userData"), "logs")
   if (fs.existsSync(logPath)) {
     shell.openPath(logPath)
     return { success: true }
@@ -465,11 +468,10 @@ if ($TestMode -or -not (Check-Winget)) {
 export { ensureWingetScript }
 
 function ensureWinget(): Promise<PowerShellResult> {
-  const result = executePowerShell(null, {
+  return executePowerShell({
     script: ensureWingetScript,
     name: "Ensure-Winget",
   })
-  return result
 }
 
 export { ensureWinget }
@@ -493,6 +495,7 @@ export const setupSystemHandlers = (): void => {
   ipcMain.handle("get-user-name", getUserName)
   ipcMain.handle("restart-explorer", restartExplorer)
   ipcMain.handle("check-winget", async () => checkWinget())
+  ipcMain.handle("get-admin-status", async () => getAdminStatus())
   ipcMain.handle("install-winget", ensureWinget)
   console.log("[Sparkle main/system.ts]: System handlers setup complete")
 }

@@ -3,6 +3,7 @@
   "name": "detailed-bsod",
   "risk": "safe",
   "category": ["General"],
+  "updatedversion": "2.21.1",
   "description": "Adds detailed information to the Blue Screen of Death (BSOD) screen",
   "deepDescription": "Enables detailed technical information on the Blue Screen of Death by setting DisplayParameters to 1 in the CrashControl registry."
 }

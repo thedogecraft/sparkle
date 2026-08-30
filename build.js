@@ -60,14 +60,14 @@ async function buildRegistry() {
 
       try {
         applyScript = await fs.readFile(applyPath, "utf8")
-      } catch (e) {
+      } catch {
         console.warn(`⚠️ No apply.ps1 found for ${folder}`)
       }
 
       if (baseTweak.reversible) {
         try {
           unapplyScript = await fs.readFile(unapplyPath, "utf8")
-        } catch (e) {
+        } catch {
           console.warn(`⚠️ No unapply.ps1 found for ${folder}`)
         }
       }

@@ -1,5 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, Tray } from "electron"
-import path, { join } from "path"
+import { join } from "path"
 import log from "electron-log"
 import { createTray } from "@main/tray"
 import { setupPowerShellHandlers } from "@main/powershell"
@@ -11,7 +11,8 @@ import { setupDebloatHandlers } from "@main/debloat"
 import { initAutoUpdater } from "@main/updates"
 import { setMainWindow } from "@main/windowState"
 import Store from "electron-store"
-import { is } from "@main/utils"
+import { is, getResourcePath } from "@main/utils"
+import { startDiscordRPC } from "@main/rpc"
 
 console.log = log.log
 console.error = log.error
@@ -64,7 +65,7 @@ let mainWindow: BrowserWindow | null = null
 function createWindow(): void {
   console.log("[Sparkle]: createWindow called")
   console.log("[Sparkle]: __dirname =", __dirname)
-  console.log("[Sparkle]: icon path =", path.join(__dirname, "../../resources/sparkle2.ico"))
+  console.log("[Sparkle]: icon path =", getResourcePath("sparkle2.ico"))
   console.log("[Sparkle]: preload path =", join(__dirname, "../preload/index.js"))
   console.log("[Sparkle]: renderer path =", join(__dirname, "../renderer/index.html"))
 
@@ -80,7 +81,7 @@ function createWindow(): void {
       frame: false,
       show: false,
       autoHideMenuBar: true,
-      icon: path.join(__dirname, "../../resources/sparkle2.ico"),
+      icon: getResourcePath("sparkle2.ico"),
       webPreferences: {
         preload: join(__dirname, "../preload/index.js"),
         devTools: app.isPackaged ? false : true,
@@ -148,6 +149,9 @@ app
     setupDNSHandlers()
     setupBackupHandlers()
     setupDebloatHandlers()
+    if (store.get("rpcEnabled") !== false) {
+      startDiscordRPC()
+    }
     console.log("[Sparkle]: Handlers setup complete")
 
     ipcMain.on("window-minimize", () => {

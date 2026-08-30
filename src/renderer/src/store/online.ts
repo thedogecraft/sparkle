@@ -6,23 +6,49 @@ interface OnlineState {
   checkOnline: () => Promise<void>
 }
 
+const CHECK_ENDPOINTS = [
+  "https://1.1.1.1/cdn-cgi/trace",
+  "https://cloudflare.com/cdn-cgi/trace",
+  "https://www.google.com/generate_204",
+]
+
 const useOnlineStore = create<OnlineState>((set) => ({
-  online: true,
+  online: typeof navigator !== "undefined" ? navigator.onLine : true,
   setOnline: (online: boolean) => set({ online }),
   checkOnline: async () => {
-    try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 3000)
-      await fetch("https://jsonplaceholder.typicode.com/todos/1", {
-        method: "GET",
-        signal: controller.signal,
-      })
-      clearTimeout(timeout)
-      set({ online: true })
-    } catch {
+    if (typeof navigator === "undefined") return
+
+    if (!navigator.onLine) {
       set({ online: false })
+      return
     }
+
+    for (const endpoint of CHECK_ENDPOINTS) {
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 3000)
+        const res = await fetch(endpoint, {
+          method: "HEAD",
+          signal: controller.signal,
+          cache: "no-cache",
+          mode: "no-cors",
+        })
+        clearTimeout(timeout)
+        if (res.type === "opaque" || res.ok) {
+          set({ online: true })
+          return
+        }
+      } catch {
+        continue
+      }
+    }
+    set({ online: false })
   },
 }))
+
+if (typeof window !== "undefined") {
+  window.addEventListener("online", () => useOnlineStore.getState().setOnline(true))
+  window.addEventListener("offline", () => useOnlineStore.getState().setOnline(false))
+}
 
 export default useOnlineStore

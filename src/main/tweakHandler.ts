@@ -179,7 +179,7 @@ export const setupTweaksHandlers = (): void => {
       console.log(logo, "Running Nvidia settings optimization...")
       await NvidiaProfileInspector()
     } else {
-      return executePowerShell(null, { script: tweak.psapply, name })
+      return executePowerShell({ script: tweak.psapply, name })
     }
   })
 
@@ -189,7 +189,7 @@ export const setupTweaksHandlers = (): void => {
     if (!tweak || !tweak.psunapply) {
       throw new Error(`No unapply script found for tweak: ${name}`)
     }
-    return executePowerShell(null, { script: tweak.psunapply, name })
+    return executePowerShell({ script: tweak.psunapply, name })
   })
 
   ipcMain.handle("nvidia-inspector", (_: any, _args: any): Promise<string> => {

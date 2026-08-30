@@ -7,7 +7,9 @@
 
 
 
-
+!!! note 
+    This tweak was last updated in 2.21.1
+  
 
 ## Details
 
@@ -20,13 +22,15 @@
 ## Apply
 
 ```powershell { .no-copy }  
-Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\CrashControl" -Name "Value" -Type DWord -Value 1
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\CrashControl" -Name "DisplayParameters" -Type DWord -Value 1
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\CrashControl" -Name "DisableEmoticon" -Type DWord -Value 1
 
 ```
 
 ## Unapply
 
 ```powershell
-Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\CrashControl" -Name "Value" -Type DWord -Value 0
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\CrashControl" -Name "DisplayParameters" -Type DWord -Value 0
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\CrashControl" -Name "DisableEmoticon" -Type DWord -Value 0
 
 ```

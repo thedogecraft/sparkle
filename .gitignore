@@ -14,7 +14,6 @@ firstsparkle2build.zip
 
 __pycache__/
 *.py[oc]
-build/
 dist/
 wheels/
 *.egg-info
@@ -25,3 +24,4 @@ wheels/
 # docs
 site
 docs/tweaks
+!packages/discord-rpc-new/dist/

@@ -1,0 +1,39 @@
+{
+  "name": "discord-rpc-new",
+  "type": "module",
+  "version": "1.4.1",
+  "description": "A lightweight, typed Discord RPC client",
+  "license": "MIT",
+  "keywords": [
+    "discord",
+    "rpc",
+    "rich presence",
+    "remote procedural call"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CuteNikki/discord-rpc-new.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CuteNikki/discord-rpc-new/issues"
+  },
+  "homepage": "https://github.com/CuteNikki/discord-rpc-new#readme",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "types": "./dist/index.d.mts"
+}

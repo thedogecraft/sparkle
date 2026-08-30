@@ -14,12 +14,15 @@ import Settings from "./pages/Settings"
 import Backup from "./pages/Backup"
 import FirstTime from "./components/firsttime"
 import UpdateManager from "./components/updatemanager"
+import ChangelogModal from "./components/changelogModal"
 import useAppInstallStore from "./store/appInstallStore"
 import useOnlineStore from "./store/online"
+import { CURRENT_VERSION } from "./lib/version"
 
 import { toast } from "react-toastify"
 import { useTranslation } from "react-i18next"
 import Debloat from "./pages/Debloat"
+import NoAdmin from "./components/noAdmin"
 
 function App() {
   const { t } = useTranslation()
@@ -27,6 +30,7 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     localStorage.getItem("sidebarCollapsed") === "true",
   )
+  const [adminStatus, setAdminStatus] = useState<boolean | null>(null)
   const { setAppStatus, clearApps } = useAppInstallStore()
   const { setOnline } = useOnlineStore()
 
@@ -113,10 +117,39 @@ function App() {
     }
   }, [setOnline])
 
+  const [changelogOpen, setChangelogOpen] = useState(false)
+
+  useEffect(() => {
+    const lastSeen = localStorage.getItem("sparkle:changelogSeenVersion")
+    if (lastSeen !== CURRENT_VERSION) {
+      const timer = setTimeout(() => setChangelogOpen(true), 500)
+      return () => clearTimeout(timer)
+    }
+    return undefined
+  }, [])
+
+  useEffect(() => {
+    window.electron.ipcRenderer.invoke("get-admin-status").then((isAdmin: boolean) => {
+      setAdminStatus(isAdmin)
+    })
+  }, [])
+
   return (
     <div className="flex flex-col h-screen bg-sparkle-bg text-sparkle-text overflow-hidden">
       <FirstTime />
-      <TitleBar onToggleSidebar={toggleSidebar} sidebarCollapsed={sidebarCollapsed} />
+      <ChangelogModal
+        open={changelogOpen}
+        onClose={() => {
+          localStorage.setItem("sparkle:changelogSeenVersion", CURRENT_VERSION)
+          setChangelogOpen(false)
+        }}
+      />
+      <NoAdmin open={adminStatus === false} onClose={() => setAdminStatus(true)} />
+      <TitleBar
+        onToggleSidebar={toggleSidebar}
+        sidebarCollapsed={sidebarCollapsed}
+        adminStatus={adminStatus}
+      />
       <Nav collapsed={sidebarCollapsed} />
       <div className="flex flex-1 pt-[50px] relative">
         <main

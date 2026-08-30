@@ -4,6 +4,7 @@
   "risk": "caution",
   "category": ["Performance", "Gaming"],
   "recommended": true,
+  "updatedversion": "2.21.1",
   "description": "Sets various Windows services to Manual startup type to improve performance.",
   "deepDescription": "Modifies the startup type of selected Windows services using Set-Service to disable or delay non-essential processes, reducing boot time, CPU usage, RAM consumption, and background activity for improved overall performance."
 }
