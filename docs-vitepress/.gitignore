@@ -1,0 +1,5 @@
+.vitepress/cache
+
+# Auto-generated tweak pages (keep the static overview)
+docs/tweaks/*
+!docs/tweaks/what-are-tweaks.md
