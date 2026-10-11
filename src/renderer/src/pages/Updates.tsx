@@ -7,7 +7,15 @@ import Modal from "@/components/ui/modal"
 import { toast } from "react-toastify"
 import log from "electron-log/renderer"
 import useRestartStore from "@/store/restartState"
-import { AlertTriangle, Check, Download, LoaderCircle, RefreshCw, ShieldCheck } from "lucide-react"
+import {
+  AlertTriangle,
+  Check,
+  Download,
+  ExternalLink,
+  LoaderCircle,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react"
 import WindowsIcon from "@/components/windowsIcon"
 
 type UpdateModeId = "default" | "recommended" | "disabled"
@@ -369,6 +377,11 @@ function Updates() {
               )}
               <span>Refresh</span>
             </Button>
+            <a href="https://docs.getsparkle.net/updates" target="_blank" rel="noopener noreferrer">
+              <Button className="flex items-center gap-2">
+                View Docs <ExternalLink size={16} />
+              </Button>
+            </a>
           </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
