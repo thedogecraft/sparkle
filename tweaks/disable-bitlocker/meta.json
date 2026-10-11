@@ -1,0 +1,11 @@
+{
+  "name": "disable-bitlocker",
+  "title": "Disable BitLocker",
+  "risk": "safe",
+  "description": "Disables BitLocker encryption for drives.",
+  "reversible": false,
+  "category": ["General", "Privacy"],
+  "modal": "Disabling BitLocker will make encrypted drives accessible without a password or recovery key. Are you sure?",
+  "addedversion": "2.25.0",
+  "deepDescription": "This tweak disables BitLocker encryption for drives, making them accessible without the need for a password or recovery key."
+}
