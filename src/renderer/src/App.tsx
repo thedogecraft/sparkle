@@ -12,6 +12,7 @@ import Utilities from "./pages/Utilities"
 import DNS from "./pages/DNS"
 import Settings from "./pages/Settings"
 import Backup from "./pages/Backup"
+import Updates from "./pages/Updates"
 import FirstTime from "./components/firsttime"
 import UpdateManager from "./components/updatemanager"
 import ChangelogModal from "./components/changelogModal"
@@ -159,6 +160,7 @@ function App() {
             <Route path="/debloat" element={<Debloat />} />
             <Route path="/clean" element={<Clean />} />
             <Route path="/backup" element={<Backup />} />
+            <Route path="/updates" element={<Updates />} />
             <Route path="/utilities" element={<Utilities />} />
             <Route path="/dns" element={<DNS />} />
             <Route path="/apps" element={<Apps />} />

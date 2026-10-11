@@ -3,6 +3,7 @@ import { broom } from "@lucide/lab"
 import { clsx } from "clsx"
 import {
   Box,
+  Download,
   EthernetPort,
   Folder,
   Home,
@@ -31,6 +32,7 @@ const tabIcons = {
   debloat: <Bubbles size={20} />,
   clean: <Icon iconNode={broom} size={20} />,
   backup: <Folder size={20} />,
+  updates: <Download size={20} />,
   utilities: <Box size={20} />,
   dns: <EthernetPort size={20} />,
   apps: <LayoutGrid size={20} />,
@@ -44,6 +46,7 @@ const tabs = {
   utilities: { label: "Utilities", path: "/utilities" },
   clean: { label: "Cleaner", path: "/clean" },
   backup: { label: "Restore", path: "/backup" },
+  updates: { label: "Updates", path: "/updates" },
   dns: { label: "DNS Manager", path: "/dns" },
   apps: { label: "Apps", path: "/apps" },
   settings: { label: "Settings", path: "/settings" },
