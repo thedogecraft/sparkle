@@ -124,41 +124,52 @@ function Nav({ collapsed }) {
         />
         {Object.entries(tabs).map(([id, { label, path }]) => {
           const isDisabled = !online && disabledTabs.includes(id)
+          const badge = id === "debloat" ? "Beta" : id === "updates" ? "New" : null
+
           return (
-            <Tooltip  content={!collapsed ? "" : label} side="right" delay={0} key={id}>
-            <Button
-              variant=""
-              key={id}
-              ref={(el) => (tabRefs.current[id] = el)}
-              onClick={() => {
-                if (isDisabled) {
-                  setShowOfflineModal(true)
-                } else {
-                  navigate(path)
-                }
-              }}
-              disabled={isDisabled}
-              className={clsx(
-                `flex items-center gap-3 py-2 rounded-lg transition-all duration-200 border relative ${collapsed ? "px-2 justify-center" : "px-3"}`,
-                activeTab === id
-                  ? "border-transparent text-sparkle-primary"
-                  : isDisabled
-                    ? "opacity-50 cursor-not-allowed text-sparkle-text-secondary border-transparent"
-                    : "text-sparkle-text-secondary hover:bg-sparkle-border-secondary hover:text-sparkle-text border-transparent",
-              )}
-            >
-              <div>{tabIcons[id]}</div>
-              {!collapsed && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{label}</span>
-                  {id === "debloat" && (
-                    <span className="rounded-full bg-sparkle-primary/10 text-sparkle-primary text-[10px] uppercase tracking-[0.08em] px-2 py-0.5">
-                      Beta
-                    </span>
-                  )}
-                </div>
-              )}
-            </Button>
+            <Tooltip content={!collapsed ? "" : label} side="right" delay={0} key={id}>
+              <Button
+                variant=""
+                key={id}
+                ref={(el: HTMLButtonElement | null) => {
+                  tabRefs.current[id] = el
+                }}
+                onClick={() => {
+                  if (isDisabled) {
+                    setShowOfflineModal(true)
+                  } else {
+                    navigate(path)
+                  }
+                }}
+                disabled={isDisabled}
+                className={clsx(
+                  `flex items-center gap-3 py-2 rounded-lg transition-all duration-200 border relative ${collapsed ? "px-2 justify-center" : "px-3"}`,
+                  activeTab === id
+                    ? "border-transparent text-sparkle-primary"
+                    : isDisabled
+                      ? "opacity-50 cursor-not-allowed text-sparkle-text-secondary border-transparent"
+                      : "text-sparkle-text-secondary hover:bg-sparkle-border-secondary hover:text-sparkle-text border-transparent",
+                )}
+              >
+                <div>{tabIcons[id]}</div>
+                {!collapsed && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{label}</span>
+                    {badge && (
+                      <span
+                        className={clsx(
+                          "rounded-full text-[10px] uppercase tracking-[0.08em] px-2 py-0.5",
+                          id === "debloat"
+                            ? "bg-sparkle-primary/10 text-sparkle-primary"
+                            : "bg-emerald-500/10 text-emerald-400",
+                        )}
+                      >
+                        {badge}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </Button>
             </Tooltip>
           )
         })}
