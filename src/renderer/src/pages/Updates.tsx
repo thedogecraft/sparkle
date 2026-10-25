@@ -339,7 +339,9 @@ function Updates() {
           <p className="text-sparkle-text-secondary mb-4 text-sm">
             Disabling Windows Update stops update services, disables scheduled tasks, and clears
             downloaded update files. Security updates will not be installed until defaults are
-            restored. Continue?
+            restored.{" "}
+            <b>Sparkle is not responsible for any issues that may occur from disabling updates.</b>{" "}
+            Continue?
           </p>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setPendingMode(null)}>
@@ -494,7 +496,7 @@ export function UpdatesModal() {
           This page allows you to change Windows Update settings. You can switch between
           recommended, default, or disabled updates. Please note that disabling updates is not
           recommended for security reasons.
-          <b>Sparkle is not responsible for any issues that may arise from disabling updates.</b>
+          <b>Sparkle is not responsible for any issues that may occur from disabling updates.</b>
         </p>
         <div className="flex justify-end">
           <Button onClick={handleClose}>Got it</Button>
