@@ -377,7 +377,7 @@ function Updates() {
               ) : (
                 <RefreshCw size={16} />
               )}
-              <span>Refresh</span>
+              <span>{checking ? "Checking" : "Refresh"}</span>
             </Button>
             <a href="https://docs.getsparkle.net/updates" target="_blank" rel="noopener noreferrer">
               <Button className="flex items-center gap-2">
