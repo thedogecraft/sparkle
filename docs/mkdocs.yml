@@ -12,8 +12,11 @@ extra_javascript:
 
 theme:
   name: material
+  custom_dir: overrides
   logo: "https://raw.githubusercontent.com/parcoil/logos/refs/heads/main/logos/sparklelogo.png"
   favicon: "https://raw.githubusercontent.com/parcoil/logos/refs/heads/main/logos/sparklelogo.png"
+  static_templates:
+    - 404.html
   palette:
     # Auto light/dark mode
     - media: "(prefers-color-scheme)"

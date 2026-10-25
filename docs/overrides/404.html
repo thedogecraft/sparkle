@@ -1,0 +1,15 @@
+{% extends "main.html" %}
+
+{% block content %}
+  <div class="error-page" style="text-align: center; padding: 4rem 1rem;">
+    <h1 style="font-size: 5rem; margin-bottom: 0;">404</h1>
+    <h2 style="margin: 0;">Page not found</h2>
+    <p>The docs may not be up to date with the latest Sparkle version yet. Check Back Later!</p>
+    <a href="{{ config.site_url }}" class="md-button md-button--primary">
+      Back to home
+    </a>
+        <a href="https://github.com/thedogecraft/sparkle" class="md-button">
+      Sparkle GitHub
+    </a>
+  </div>
+{% endblock %}
