@@ -352,6 +352,8 @@ function Updates() {
         </div>
       </Modal>
 
+      <UpdatesModal />
+
       <RootDiv>
         <div className="flex flex-col gap-6 pb-10 mr-4">
           <Card className="flex items-center gap-4 p-4">
@@ -471,4 +473,34 @@ function Updates() {
   )
 }
 
+export function UpdatesModal() {
+  const [isOpen, setIsOpen] = useState(false)
+  useEffect(() => {
+    if (localStorage.getItem("updatesPageModalShown") !== "true") {
+      setIsOpen(true)
+    }
+  }, [])
+
+  const handleClose = () => {
+    setIsOpen(false)
+    localStorage.setItem("updatesPageModalShown", "true")
+  }
+
+  return (
+    <Modal open={isOpen} onClose={handleClose}>
+      <div className="bg-sparkle-card p-5 rounded-2xl border border-sparkle-border text-sparkle-text w-[90vw] max-w-md">
+        <h2 className="text-lg font-semibold mb-4">Welcome to the Updates Page</h2>
+        <p className="text-sm text-sparkle-text-secondary mb-4">
+          This page allows you to change Windows Update settings. You can switch between
+          recommended, default, or disabled updates. Please note that disabling updates is not
+          recommended for security reasons.
+          <b>Sparkle is not responsible for any issues that may arise from disabling updates.</b>
+        </p>
+        <div className="flex justify-end">
+          <Button onClick={handleClose}>Got it</Button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
 export default Updates
