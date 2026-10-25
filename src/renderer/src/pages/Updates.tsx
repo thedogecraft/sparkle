@@ -329,7 +329,7 @@ function Updates() {
   return (
     <>
       <Modal open={!!pendingMode} onClose={() => setPendingMode(null)}>
-        <div className="bg-sparkle-card p-5 rounded-2xl border border-sparkle-border text-sparkle-text w-[90vw] max-w-md">
+        <div className="bg-sparkle-card p-5 rounded-2xl border-2 border-red-500 text-sparkle-text w-[90vw] max-w-md">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-red-500/20 rounded-full">
               <AlertTriangle className="w-6 h-6 text-red-500" />
