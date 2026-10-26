@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-11T01:08:00.974Z",
+  "version": "2026-10-26T00:47:05.725Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -85,6 +85,24 @@
       "scripts": {
         "apply": "$path = \"HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications\"\r\n$name = \"GlobalUserDisabled\"\r\n$newValue = 1\r\n  \r\n# Ensure the key exists\r\nIf (-Not (Test-Path $path)) {\r\n  New-Item -Path $path -Force | Out-Null\r\n}\r\n  \r\n# Set the value\r\nSet-ItemProperty -Path $path -Name $name -Type DWord -Value $newValue\r\n  \r\nWrite-Host \"$name set to $newValue (Background Access Disabled)\"",
         "unapply": " $path = \"HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications\"\r\n  $name = \"GlobalUserDisabled\"\r\n  $originalValue = 0\r\n  \r\n  # Ensure the key exists\r\n  If (-Not (Test-Path $path)) {\r\n      New-Item -Path $path -Force | Out-Null\r\n  }\r\n  \r\n  # Revert the value\r\n  Set-ItemProperty -Path $path -Name $name -Type DWord -Value $originalValue\r\n  \r\n  Write-Host \"$name reverted to $originalValue (Background Access Restored)\" -ForegroundColor Yellow"
+      }
+    },
+    {
+      "id": "disable-bitlocker",
+      "title": "Disable BitLocker",
+      "description": "Disables BitLocker encryption for drives.",
+      "category": [
+        "General",
+        "Privacy"
+      ],
+      "recommended": false,
+      "reversible": false,
+      "addedversion": "2.25.0",
+      "docsurl": "https://docs.getsparkle.net/tweaks/disable-bitlocker",
+      "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-bitlocker/meta.json",
+      "scripts": {
+        "apply": "Disable-BitLocker -MountPoint $Env:SystemDrive",
+        "unapply": null
       }
     },
     {

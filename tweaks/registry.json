@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-11T01:08:00.974Z",
+  "version": "2026-10-26T00:47:05.725Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -66,6 +66,20 @@
       "reversible": true,
       "docsurl": "https://docs.getsparkle.net/tweaks/disable-background-ms-store-apps",
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-background-ms-store-apps/meta.json"
+    },
+    {
+      "id": "disable-bitlocker",
+      "title": "Disable BitLocker",
+      "description": "Disables BitLocker encryption for drives.",
+      "category": [
+        "General",
+        "Privacy"
+      ],
+      "recommended": false,
+      "reversible": false,
+      "addedversion": "2.25.0",
+      "docsurl": "https://docs.getsparkle.net/tweaks/disable-bitlocker",
+      "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-bitlocker/meta.json"
     },
     {
       "id": "consumer-features",
