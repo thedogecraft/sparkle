@@ -1,6 +1,11 @@
+---
+title: "Remove OneDrive"
+---
+
 # Remove OneDrive
 
 ## Overview
+
 - **ID/URL**: `remove-onedrive`
 - **Description**: Removes OneDrive from the system
 - **Risk Level**: <span style="color:#ff9800">Caution</span>
@@ -9,9 +14,13 @@
 
 
 
+
+
 ## Details
 
-- Uses registry, file system, and process commands to uninstall OneDrive, clean leftovers, and restore defaults-freeing RAM, CPU, and I/O by eliminating its background sync and startup tasks.
+Uses registry, file system, and process commands to uninstall OneDrive, clean leftovers, and restore defaults-freeing RAM, CPU, and I/O by eliminating its background sync and startup tasks.
+
+
 
 
 
@@ -19,7 +28,7 @@
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 $OneDrivePath = $($env:OneDrive)
         Write-Host "Removing OneDrive"
         $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\OneDriveSetup.exe"
@@ -98,6 +107,7 @@ $OneDrivePath = $($env:OneDrive)
         Write-Host "Something went Wrong during the Unistallation of OneDrive" -ForegroundColor Red
         }
 ```
+
 
 ## Unapply
 

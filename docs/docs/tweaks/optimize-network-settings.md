@@ -1,19 +1,30 @@
+---
+title: "Optimize Network Settings"
+---
+
 # Optimize Network Settings
 
 ## Overview
+
 - **ID/URL**: `optimize-network-settings`
 - **Description**: Changes various Windows settings to improve network latency and speeds.
 - **Risk Level**: <span style="color:#4caf50">Safe</span>
 
 
 
-!!! note 
-    This tweak was last updated in 2.9.0
-  
+::: note Last Updated
+
+This tweak was last updated in 2.9.0.
+
+:::
+
+
 
 ## Details
 
-- Applies a comprehensive set of netsh TCP/IP tweaks to disable latency-inducing features, enable fast open, offload networking tasks to hardware, fine-tune congestion control, and set optimal MTU, all to maximize speed, reduce CPU load, and improve responsiveness for gaming and high-performance internet use.
+Applies a comprehensive set of netsh TCP/IP tweaks to disable latency-inducing features, enable fast open, offload networking tasks to hardware, fine-tune congestion control, and set optimal MTU, all to maximize speed, reduce CPU load, and improve responsiveness for gaming and high-performance internet use.
+
+
 
 
 
@@ -21,7 +32,7 @@
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 Write-Host "Applying network tweaks..."
 
 netsh int tcp set heuristics disabled
@@ -36,6 +47,7 @@ netsh int tcp set supplemental template=custom icw=10
 Write-Host "Network tweaks applied successfully."
 
 ```
+
 
 ## Unapply
 

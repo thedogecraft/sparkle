@@ -1,6 +1,11 @@
+---
+title: "Remove Microsoft Bing Integration"
+---
+
 # Remove Microsoft Bing Integration
 
 ## Overview
+
 - **ID/URL**: `remove-ms-bing-integration`
 - **Description**: Removes Bing apps and disables Bing web search in Windows Search.
 - **Risk Level**: <span style="color:#4caf50">Safe</span>
@@ -9,9 +14,13 @@
 
 
 
+
+
 ## Details
 
-- Removes all Microsoft Bing apps (News, Weather, Finance, etc.) and disables Bing web search results from appearing in Windows Search. This improves privacy and speeds up local searches.
+Removes all Microsoft Bing apps (News, Weather, Finance, etc.) and disables Bing web search results from appearing in Windows Search. This improves privacy and speeds up local searches.
+
+
 
 
 
@@ -19,7 +28,7 @@
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 # Remove all Bing apps
 Get-AppxPackage *BingNews* | Remove-AppxPackage -ErrorAction SilentlyContinue
 Get-AppxPackage *BingWeather* | Remove-AppxPackage -ErrorAction SilentlyContinue
@@ -45,6 +54,7 @@ Set-ItemProperty -Path $explorerPath -Name "DisableSearchBoxSuggestions" -Type D
 
 Write-Host "Bing apps removed and Bing search disabled."
 ```
+
 
 ## Unapply
 

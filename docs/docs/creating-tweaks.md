@@ -22,9 +22,10 @@ All tweaks should follow this format:
         └── meta.json
 ```
 
-!!! tip
+::: tip
 
-    If the tweak does not have an unapply script, do **not** create a `unapply.ps1`. it will be changed from a toggle to an apply button in the UI
+  If the tweak does not have an unapply script, do **not** create a `unapply.ps1`. it will be changed from a toggle to an apply button in the UI
+:::
 
 ---
 
@@ -52,9 +53,10 @@ Each tweak **must** have a `meta.json`. The available properties are:
 
 ---
 
-!!! note
+::: note
 
-    `addedversion` is required for new tweaks. `updatedversion` is required when updating an existing tweak.
+  `addedversion` is required for new tweaks. `updatedversion` is required when updating an existing tweak.
+:::
 
 ## Tweak Categories
 
@@ -75,10 +77,10 @@ Tweaks can be grouped into these categories:
 
 Here’s an example of a `meta.json` for a tweak:
 
-!!! note
+::: note
 
-    This is an example and is not a real tweak or contains real links
-
+  This is an example and is not a real tweak or contains real links
+:::
 ```json
 {
   "name": "disable-animations",

@@ -1,6 +1,11 @@
+---
+title: "Ultimate Performance Power Plan"
+---
+
 # Ultimate Performance Power Plan
 
 ## Overview
+
 - **ID/URL**: `ultimate-performance-plan`
 - **Description**: Enables And Applies The Windows Ultimate Powerplan for better performance
 - **Risk Level**: <span style="color:#ff9800">Caution</span>
@@ -9,19 +14,25 @@
 
 
 
+
+
 ## Details
 
-- Enables the Ultimate Performance power plan by creating it if missing, retrieving its GUID, and activating it to maximize system responsiveness and performance by preventing power-saving limitations.
+Enables the Ultimate Performance power plan by creating it if missing, retrieving its GUID, and activating it to maximize system responsiveness and performance by preventing power-saving limitations.
 
 
 
-!!! tip "Recommended"
-    This tweak is recommended.
 
+
+::: tip Recommended
+
+This tweak is recommended.
+
+:::
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 $ultimatePlan = powercfg -l | Select-String "Ultimate Performance"
   
   if (-not $ultimatePlan) {
@@ -39,6 +50,7 @@ $ultimatePlan = powercfg -l | Select-String "Ultimate Performance"
   
   Write-Host "Ultimate Performance power plan is now active." 
 ```
+
 
 ## Unapply
 

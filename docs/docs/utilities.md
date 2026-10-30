@@ -6,10 +6,10 @@ hide:
 
 # Utilities Page
 
-!!! note "Comprehensive System Utilities"
+::: tip Comprehensive System Utilities
 
-    The Utilities page provides direct access to system maintenance tools and settings management with intuitive controls. All utilities run PowerShell scripts behind the scenes and sync with your Windows configuration.
-
+  The Utilities page provides direct access to system maintenance tools and settings management with intuitive controls. All utilities run PowerShell scripts behind the scenes and sync with your Windows configuration.
+:::
 ## Overview
 
 The Utilities page offers 14 different system utilities. Each utility automatically detects your current system settings and provides appropriate controls - toggles, buttons, or dropdowns - to manage Windows features and perform maintenance tasks.

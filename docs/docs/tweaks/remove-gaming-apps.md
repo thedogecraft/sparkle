@@ -1,12 +1,23 @@
+---
+title: "Remove Gaming Apps"
+---
+
 # Remove Gaming Apps
 
 ## Overview
+
 - **ID/URL**: `remove-gaming-apps`
 - **Description**: Removes Xbox app, Xbox Game Bar, and Xbox Game Overlay
 - **Risk Level**: <span style="color:#ff9800">Caution</span>
 
-!!! info "Irreversible"
-    This tweak cannot be reversed and must be undone manually.
+::: info Irreversible
+
+This tweak cannot be reversed and must be undone manually.
+
+:::
+
+
+
 
 
 
@@ -19,7 +30,7 @@
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 $appsList = 'Microsoft.GamingApp', 'Microsoft.XboxGameOverlay', 'Microsoft.XboxGamingOverlay'
 
 foreach ($app in $appsList) {
@@ -31,5 +42,7 @@ foreach ($app in $appsList) {
 
 
 
+
 ## Links
+
 - [Reinstall Xbox App](https://apps.microsoft.com/detail/9mv0b5hzvk9z)

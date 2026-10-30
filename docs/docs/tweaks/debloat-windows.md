@@ -1,41 +1,52 @@
+---
+title: "Debloat Windows"
+---
+
 # Debloat Windows
 
 ## Overview
+
 - **ID/URL**: `debloat-windows`
 - **Description**: Choose between Sparkle Debloat script or Raphire's Win11Debloat script to remove built-in Windows apps and bloatware.
 - **Risk Level**: <span style="color:#4caf50">Safe</span>
 
-!!! info "Irreversible"
-    This tweak cannot be reversed and must be undone manually.
+::: info Irreversible
+
+This tweak cannot be reversed and must be undone manually.
+
+:::
+
+::: note Last Updated
+
+This tweak was last updated in 2.14.0.
+
+:::
 
 
-!!! note 
-    This tweak was last updated in 2.14.0
-  
 
 ## Details
 
-## The user can choose between two methods to debloat Windows:
+## The user can choose between two methods to debloat Windows
 
-## 1. Sparkle Custom Selective Script:
+- 1. Sparkle Custom Selective Script: This method allows users to select which apps they want to keep. A WPF Window is presented where users can check or uncheck apps from a list.
 
-- This method allows users to select which apps they want to keep. A WPF Window is presented where users can check or uncheck apps from a list.
-
-##  2. Raphire's Win11Debloat Script:
-
-- This method uses a well-known script that removes a wide range of built-in Windows apps and features. It is comprehensive and suitable for users who want a quick and effective way to debloat their system.
+ 2. Raphire's Win11Debloat Script: This method uses a well-known script that removes a wide range of built-in Windows apps and features. It is comprehensive and suitable for users who want a quick and effective way to debloat their system.
 
  Both remove bloatware and improve privacy by removing unnecessary Microsoft components, but they cater to different user preferences regarding control and convenience.
 
 
 
-!!! tip "Recommended"
-    This tweak is recommended.
 
+
+::: tip Recommended
+
+This tweak is recommended.
+
+:::
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 # Sparkle Debloat Script
 # This script provides options for different debloat methods
 # Made by Parcoil
@@ -891,7 +902,9 @@ catch {
 
 
 
+
 ## Links
+
 - [Debloat Windows Script (Raphire)](https://github.com/Raphire/Win11Debloat)
 - [Use Sparkle Debloat Script without Sparkle](https://getsparkle.net/debloat)
 - [Sparkle Debloat Script](https://github.com/Parcoil/Sparkle/blob/v2/resources/tweaks/debloat-windows/apply.ps1)

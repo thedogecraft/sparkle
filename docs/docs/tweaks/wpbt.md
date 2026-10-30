@@ -1,6 +1,11 @@
+---
+title: "Disable Windows Platform Binary Table"
+---
+
 # Disable Windows Platform Binary Table
 
 ## Overview
+
 - **ID/URL**: `wpbt`
 - **Description**: Prevents your computer vendor from executing programs at boot, reducing potential security risks.
 - **Risk Level**: <span style="color:#ff9800">Caution</span>
@@ -8,21 +13,30 @@
 
 
 
-!!! note 
-    This tweak was added in 2.14.1, Sparkle 2.14.1+ is required.
-  
+
+::: note Added Version
+
+This tweak was added in 2.14.1, Sparkle 2.14.1+ is required.
+
+:::
+
 ## Details
 
-- Windows Platform Binary Table (WPBT) allows manufacturers to execute software each boot, including drivers or anti-theft software. Disabling WPBT improves security by blocking this mechanism.
+Windows Platform Binary Table (WPBT) allows manufacturers to execute software each boot, including drivers or anti-theft software. Disabling WPBT improves security by blocking this mechanism.
 
 
-!!! warning "Tweak Warning"
-    Some vendor software may not run at startup.
+
+::: warning Tweak Warning
+
+Some vendor software may not run at startup.
+
+:::
+
 
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 # Credit to Chris Titus Tech
 
 $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager"
@@ -37,6 +51,7 @@ Set-ItemProperty -Path $regPath -Name $regName -Value $applyValue -Type DWord
 
 Write-Host "WPBT execution disabled."
 ```
+
 
 ## Unapply
 

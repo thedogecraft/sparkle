@@ -12,7 +12,7 @@ If you would like to restore your system to a point before you used tweaks insid
 <!-- ![Sparkle Screenshot showing the user how to restore](images/sparklerestore.png) -->
 
 
-<img src="../images/sparklerestore.png" alt="Sparkle Screenshot showing the user how to restore" title="Sparkle Screenshot showing the user how to restore" style="width:850px;"/>
+<img src="/images/sparklerestore.png" alt="Sparkle Screenshot showing the user how to restore" title="Sparkle Screenshot showing the user how to restore" style="width:850px;"/>
 
 
 ## Step 1: Revert Tweaks

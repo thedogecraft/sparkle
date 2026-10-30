@@ -19,10 +19,10 @@ The app allows users to select and apply various DNS providers:
 | **AdGuard DNS**      | 94.140.14.14   | 94.140.15.15    | Blocks ads, trackers, malware             | Security, Threat blocking, Privacy      |
 | **Automatic (DHCP)** | Auto           | Auto            | Use your ISP's default DNS servers        | Default, ISP provided, No configuration |
 
-!!! info
+::: info
 
-    Users can select a provider to apply DNS changes the active Wifi And Ethernet adapters.
-
+  Users can select a provider to apply DNS changes the active Wifi And Ethernet adapters.
+::: 
 ---
 
 ## Current DNS Settings
@@ -43,6 +43,7 @@ Users can optionally configure custom DNS servers:
 - Apply button enabled only when input is valid.
 - Info message explains correct input requirements.
 
-!!! info
+::: info
 
-    Custom DNS changes are applied to The active Wifi And Ethernet adapters and flush the DNS cache.
+  Custom DNS changes are applied to The active Wifi And Ethernet adapters and flush the DNS cache.
+:::

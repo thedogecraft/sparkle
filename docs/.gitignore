@@ -1,10 +1,5 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+.vitepress/cache
 
-# Virtual environments
-.venv
+# Auto-generated tweak pages (keep the static overview)
+docs/tweaks/*
+!docs/tweaks/what-are-tweaks.md

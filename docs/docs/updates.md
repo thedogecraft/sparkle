@@ -1,14 +1,16 @@
 ---
-title: "Updates"
+title: Updates
 hide:
   - navigation
 ---
 
 # Windows Updates
 
-!!! note "Available in Sparkle 2.25+"
+::: info Available in Sparkle 2.25+
 
-    The Updates page gives you three update modes so you can choose how aggressively Windows Update is managed on your system. Sparkle automatically detects your current mode and highlights it on the page.
+The Updates page gives you three update modes so you can choose how aggressively Windows Update is managed on your system. Sparkle automatically detects your current mode and highlights it on the page.
+
+:::
 
 After switching modes, give Windows a moment to apply the changes then it's recommended to restart your pc afterwards.
 
@@ -18,14 +20,17 @@ After switching modes, give Windows a moment to apply the changes then it's reco
 - **Windows Default**: Restores default Windows Update behavior.
 - **Disable Updates**: Blocks Windows Update completely and should only be used with extreme caution.
 
-!!! warning "Not all Scripts may be up to date."
+::: warning 
 
+Not all Scripts may be up to date with the versions in the latest Sparkle version.
+
+:::
 
 ## Recommended
 
 Applies a more conservative update strategy designed for most users.
 
-- **Feature updates**: Delayed by **365 days** to <span style="color:var(--md-primary-fg-color);">reduce the chance of installing a broken windows update</span>.
+- **Feature updates**: Delayed by **365 days** to <span style="color:var(--vp-c-brand-1);">reduce the chance of installing a broken windows update</span>.
 - **Quality updates**: Delayed by **4 days**.
 - **Drivers**: Excluded from Windows quality updates.
 - **Installation**: Updates download automatically and notify you when they are ready to install.
@@ -142,11 +147,13 @@ foreach ($Task in $Tasks) {
 
 ## Disable Updates
 
-!!! danger "NOT RECOMMENDED!"
+::: danger NOT RECOMMENDED!
 
-    - **What it does**: Disables automatic updates, stops and disables update services, disables update scheduled tasks, and clears downloaded update files.
-    - **Warning**: This leaves the system without security patches and significantly increases security risk.
-    - **Recommendation**: Avoid this mode unless you fully understand the tradeoffs, and security risks and have a specific reason to use it.
+- **What it does**: Disables automatic updates, stops and disables update services, disables update scheduled tasks, and clears downloaded update files.
+- **Warning**: This leaves the system without security patches and significantly increases security risk.
+- **Recommendation**: Avoid this mode unless you fully understand the tradeoffs, and security risks and have a specific reason to use it.
+
+:::
 
 Sparkle asks for confirmation before applying this mode.
 
@@ -197,7 +204,5 @@ if ($noAuto -eq 1) {
     Write-Output "default"
 }
 ```
-
-
 
 Credits to Chris Titus Tech.

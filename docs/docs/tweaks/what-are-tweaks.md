@@ -2,6 +2,8 @@
 title: "What Are Tweaks?"
 ---
 
+
+
 # What Are Tweaks?
 
 Tweaks are small, targeted changes to Windows settings, registry keys, or system services that modify how your PC behaves. In Sparkle, each tweak is a self-contained PowerShell script that applies a specific optimization or customization.
@@ -18,10 +20,10 @@ Each tweak follows a simple structure:
 
 When you toggle a tweak on in Sparkle, it runs the `apply.ps1` script. When you toggle it off, it runs `unapply.ps1`.
 
-!!! note
+::: note
 
-    Some tweaks don't have an unapply script. These show an "Apply" button instead of a toggle, since the change can't be automatically reversed.
-
+Some tweaks don't have an unapply script. These show an "Apply" button instead of a toggle, since the change can't be automatically reversed.
+:::
 ---
 
 ## Categories
@@ -63,6 +65,8 @@ Sparkle provides several safeguards when using tweaks:
 
 ---
 
+
+
 ## Reapplying Tweaks <span style="color: #ff9800;">(Sparkle 2.18.0+  Required)</span>
 
 After applying a tweak, you can force it to reapply at any time:
@@ -80,12 +84,12 @@ This is useful if you've modified system settings manually and want the tweak to
 You can explore all available tweaks in two ways:
 
 - **In the app** - Open the Tweaks page to browse, search, and filter by category.
-- **In the docs** - See the [All Tweaks](/tweaks) page for a full list with detailed descriptions and related links.
+- **In the docs** - See the [All Tweaks](/tweaks/) page for a full list with detailed descriptions and related links.
 
-!!! tip
+::: tip
 
-    Look for the <span style="color: var(--md-primary-fg-color);">&#9733; Recommended</span> icon in the app. These are tweaks that are generally safe and beneficial for most users.
-
+Look for the <span style="color: var(--md-primary-fg-color);">&#9733; Recommended</span> icon in the app. These are tweaks that are generally safe and beneficial for most users.
+:::
 ---
 
 ## Creating Your Own Tweaks
