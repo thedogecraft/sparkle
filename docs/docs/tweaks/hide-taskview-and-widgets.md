@@ -1,6 +1,11 @@
+---
+title: "Hide Taskview and Widgets"
+---
+
 # Hide Taskview and Widgets
 
 ## Overview
+
 - **ID/URL**: `hide-taskview-and-widgets`
 - **Description**: Hides the Taskview and Widgets buttons on the taskbar.
 - **Risk Level**: <span style="color:#4caf50">Safe</span>
@@ -9,9 +14,13 @@
 
 
 
+
+
 ## Details
 
-- Disables both the Task View button and the Widgets panel by updating the user's Explorer taskbar settings in the registry, removing the icons and preventing them from appearing on the taskbar.
+Disables both the Task View button and the Widgets panel by updating the user's Explorer taskbar settings in the registry, removing the icons and preventing them from appearing on the taskbar.
+
+
 
 
 
@@ -19,7 +28,7 @@
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 # Hide Task View button
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowTaskViewButton" -Type DWord -Value 0
 
@@ -33,6 +42,7 @@ Write-Host "Widgets removed and Task View hidden."
 
 
 ```
+
 
 ## Unapply
 

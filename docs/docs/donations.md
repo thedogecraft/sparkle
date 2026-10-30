@@ -23,4 +23,4 @@ If you find Sparkle useful, consider supporting the project through one of the p
 - Star the project on [GitHub](https://github.com/parcoil/sparkle)
 - Share Sparkle with others
 - Report bugs or suggest features on [GitHub Issues](https://github.com/parcoil/sparkle/issues)
-- Contribute code, apps, or tweaks - see [Contributing](/contributing/)
+- Contribute code, apps, or tweaks - see [Contributing](/contributing)

@@ -1,31 +1,46 @@
+---
+title: "Disable Telemetry"
+---
+
 # Disable Telemetry
 
 ## Overview
+
 - **ID/URL**: `disable-telemetry`
 - **Description**: Disables Windows telemetry and data collection for improved privacy and performance.
 - **Risk Level**: <span style="color:#4caf50">Safe</span>
 
 
 
-!!! note 
-    This tweak was last updated in 2.21.1
-  
-!!! note 
-    This tweak was added in 2.14.0, Sparkle 2.14.0+ is required.
-  
+::: note Last Updated
+
+This tweak was last updated in 2.21.1.
+
+:::
+
+::: note Added Version
+
+This tweak was added in 2.14.0, Sparkle 2.14.0+ is required.
+
+:::
+
 ## Details
 
-- Disables Windows telemetry by modifying registry keys to prevent data collection and reporting to ~~Microsoft~~ Microslop. This tweak was previously in sparkle but was removed issues with the tweak not applying correctly. It has been re-added.
+Disables Windows telemetry by modifying registry keys to prevent data collection and reporting to ~~Microsoft~~ Microslop. This tweak was previously in sparkle but was removed issues with the tweak not applying correctly. It has been re-added.
 
 
 
-!!! tip "Recommended"
-    This tweak is recommended.
 
+
+::: tip Recommended
+
+This tweak is recommended.
+
+:::
 
 ## Apply
 
-```powershell { .no-copy }  
+```powershell
 # Registry tweaks
 $registrySettings = @(
     @{ Path="HKCU:\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo"; Name="Enabled"; Value=0 },
@@ -39,7 +54,25 @@ $registrySettings = @(
     @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection"; Name="AllowTelemetry"; Value=0 },
     @{ Path="HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name="Start_TrackProgs"; Value=0 },
     @{ Path="HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"; Name="PublishUserActivities"; Value=0 },
-    @{ Path="HKCU:\Software\Microsoft\Siuf\Rules"; Name="NumberOfSIUFInPeriod"; Value=0 }
+    @{ Path="HKCU:\Software\Microsoft\Siuf\Rules"; Name="NumberOfSIUFInPeriod"; Value=0 },
+
+    # disable windows Error Reporting
+    @{ Path="HKLM:\Software\Policies\Microsoft\Windows\Windows Error Reporting"; Name="Disabled"; Value=1 },
+    @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting"; Name="Disabled"; Value=1 },
+    @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting"; Name="DontSendAdditionalData"; Value=1 },
+    @{ Path="HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting"; Name="LoggingDisabled"; Value=1 },
+    @{ Path="HKLM:\Software\Microsoft\Windows\Windows Error Reporting\Consent"; Name="DefaultConsent"; Value=0 },
+    @{ Path="HKLM:\Software\Microsoft\Windows\Windows Error Reporting\Consent"; Name="DefaultOverrideBehavior"; Value=1 },
+
+    # disable start menu tile suggestions and ads
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="ContentDeliveryAllowed"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="SubscribedContentEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="OemPreInstalledAppsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="PreInstalledAppsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="PreInstalledAppsEverEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="SilentInstalledAppsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="SystemPaneSuggestionsEnabled"; Value=0 },
+    @{ Path="HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"; Name="FeatureManagementEnabled"; Value=0 }
 )
 
 foreach ($reg in $registrySettings) {
@@ -66,10 +99,10 @@ Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Siuf\Rules" -Name "PeriodInN
 Write-Output "Telemetry settings have been applied. Bye Bye Microslop"
 ```
 
+
 ## Unapply
 
 ```powershell
-
 # Registry cleanup (removes entries we added)
 $registrySettings = @(
     "HKCU:\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo\Enabled",
@@ -83,7 +116,25 @@ $registrySettings = @(
     "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection\AllowTelemetry",
     "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\Start_TrackProgs",
     "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System\PublishUserActivities",
-    "HKCU:\Software\Microsoft\Siuf\Rules\NumberOfSIUFInPeriod"
+    "HKCU:\Software\Microsoft\Siuf\Rules\NumberOfSIUFInPeriod",
+
+    # enable windows Error Reporting
+    "HKLM:\Software\Policies\Microsoft\Windows\Windows Error Reporting\Disabled",
+    "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\Disabled",
+    "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\DontSendAdditionalData",
+    "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LoggingDisabled",
+    "HKLM:\Software\Microsoft\Windows\Windows Error Reporting\Consent\DefaultConsent",
+    "HKLM:\Software\Microsoft\Windows\Windows Error Reporting\Consent\DefaultOverrideBehavior",
+
+    # enable start menu tile suggestions and ads
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\ContentDeliveryAllowed",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\SubscribedContentEnabled",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\OemPreInstalledAppsEnabled",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\PreInstalledAppsEnabled",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\PreInstalledAppsEverEnabled",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\SilentInstalledAppsEnabled",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\SystemPaneSuggestionsEnabled",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\FeatureManagementEnabled"
 )
 
 foreach ($reg in $registrySettings) {
@@ -104,3 +155,8 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSp
 
 Write-Output "Telemetry settings have been reverted to default."
 ```
+
+
+## Links
+
+- [Disable Windows Error reporting source](https://www.ninjaone.com/blog/enable-or-disable-windows-error-reporting/)
