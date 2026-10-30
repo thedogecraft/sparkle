@@ -7,6 +7,6 @@
   "top": true,
   "description": "Removes Microsoft Edge from Windows.",
   "warning": "Removing Microsoft Edge may cause issues with windows services/apps that rely on it.",
-  "category": ["System", "Privacy"],
+  "category": ["Privacy"],
   "addedversion": "2.22.0"
 }

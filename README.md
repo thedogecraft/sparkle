@@ -23,7 +23,7 @@
 Install with Powershell (non admin) :
 
 ```powershell
-irm https://parcoil.com/sparkle/get | iex
+irm https://getsparkle.net/get | iex
 ```
 
 <a href="https://github.com/Parcoil/Sparkle/releases/latest">Download Installer/Portable</a>

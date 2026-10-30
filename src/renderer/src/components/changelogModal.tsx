@@ -46,6 +46,11 @@ function ChangelogContent({ body }: { body: string }) {
               {children}
             </a>
           ),
+          h1: ({ children, ...props }) => (
+            <h1 {...props} className="font-semibold">
+              {children}
+            </h1>
+          ),
           img: ({ ...props }) => (
             <img
               {...props}

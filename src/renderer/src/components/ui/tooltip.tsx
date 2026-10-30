@@ -44,7 +44,7 @@ const Tooltip = ({
     top: { left: "50%", bottom: "100%" },
     bottom: { left: "50%", top: "100%" },
     left: { right: "100%", top: "50%" },
-    right: { left: "100%", top: "50%" },
+    right: { left: "100%", top: "20%" },
   }
 
   const transformStyle = isVisible

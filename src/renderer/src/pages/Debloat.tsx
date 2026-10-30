@@ -5,10 +5,11 @@ import Checkbox from "@/components/ui/Checkbox"
 import Button from "@/components/ui/button"
 import Modal from "@/components/ui/modal"
 import { invoke } from "@/lib/electron"
-import { RotateCw, Search, Trash2, TriangleAlert } from "lucide-react"
+import {   RotateCw, Search, ShieldAlert, Star, Trash2, TriangleAlert } from "lucide-react"
 import { toast } from "react-toastify"
 import { LargeInput } from "@/components/ui/input"
 import sparkleLogo from "../../../../resources/sparklelogo.png"
+import Tooltip from "@/components/ui/tooltip"
 
 interface InstalledApp {
   id: string
@@ -277,17 +278,38 @@ function Debloat() {
                   </td>
                   <td className="align-middle text-sparkle-text">
                     <div className="flex items-center gap-2">
+                      {app.name.includes("Microsoft") && <>
+                     <div className="flex items-center gap-1 backdrop:blur-sm bg-yellow-500/20 rounded-md px-1 py-1">
+                       <Tooltip content="This is a Microsoft app. Uninstalling it may cause issues with your system." side="top" delay={0}>
+                        <ShieldAlert className="w-5 h-5 text-yellow-500" />
+                      </Tooltip>
+                     </div>
+                      </>}
+                           {app.name.startsWith("sparkle") && <>
+                     <div className="flex items-center gap-1 backdrop:blur-sm bg-cyan-500/20 rounded-md px-1 py-1">
+                       <Tooltip content="Do not uninstall sparkle this way. Close Sparkle and uninstall it another way." side="top" delay={0}>
+                        <ShieldAlert className="w-5 h-5 text-cyan-500" />
+                      </Tooltip>
+                     </div>
+                      </>}
                       {app.icon ? (
                         <img src={app.icon} alt={app.name} className="w-5 h-5" />
                       ) : (
                         <img src={sparkleLogo} alt={app.name} className="w-5 h-5" />
                       )}
-                      <span>{app.name}</span>
+                      <span className="select-text">{app.name}</span>
+                      {app.publisher.includes("parcoil") || app.publisher.includes("Parcoil") ? (
+                        <div className="flex items-center gap-1 backdrop:blur-sm bg-purple-500/20 rounded-md px-1 py-1">
+                          <Tooltip content="This is a Parcoil app.  " side="top" delay={0}>
+                            <Star className="w-5 h-5 text-purple-500" />
+                          </Tooltip>
+                        </div>
+                      ) : null}
                     </div>
                   </td>
-                  <td className="p-4 align-middle text-sparkle-text">{app.publisher}</td>
-                  <td className="p-4 align-middle text-sparkle-text">{app.version}</td>
-                  <td className="p-4 align-middle text-sparkle-text">{app.installDate}</td>
+                  <td className="p-4 align-middle text-sparkle-text select-text">{app.publisher}</td>
+                  <td className="p-4 align-middle text-sparkle-text select-text">{app.version}</td>
+                  <td className="p-4 align-middle text-sparkle-text select-text">{app.installDate}</td>
                 </tr>
               ))
             )}

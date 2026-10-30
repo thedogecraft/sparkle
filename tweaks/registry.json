@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-16T00:18:49.219Z",
+  "version": "2026-10-26T00:47:05.725Z",
   "tweaks": [
     {
       "id": "24-hour-clock",
@@ -68,6 +68,20 @@
       "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-background-ms-store-apps/meta.json"
     },
     {
+      "id": "disable-bitlocker",
+      "title": "Disable BitLocker",
+      "description": "Disables BitLocker encryption for drives.",
+      "category": [
+        "General",
+        "Privacy"
+      ],
+      "recommended": false,
+      "reversible": false,
+      "addedversion": "2.25.0",
+      "docsurl": "https://docs.getsparkle.net/tweaks/disable-bitlocker",
+      "source": "https://github.com/Parcoil/Sparkle/blob/v2/tweaks/disable-bitlocker/meta.json"
+    },
+    {
       "id": "consumer-features",
       "title": "Disable Consumer Features",
       "description": "Prevents Windows from automatically installing games, third-party apps, or app links from the Microsoft Store.",
@@ -86,7 +100,8 @@
       "description": "Removes Microsoft's Copilot feature. (will fail if copilot is not installed)",
       "category": [
         "Performance",
-        "Privacy"
+        "Privacy",
+        "AI"
       ],
       "recommended": true,
       "reversible": true,
@@ -226,7 +241,8 @@
       "title": "Disable Windows Recall",
       "description": "Disables the Windows Recall feature for better privacy.",
       "category": [
-        "Privacy"
+        "Privacy",
+        "AI"
       ],
       "recommended": false,
       "reversible": true,
@@ -403,7 +419,6 @@
       "title": "Remove Microsoft Edge",
       "description": "Removes Microsoft Edge from Windows.",
       "category": [
-        "System",
         "Privacy"
       ],
       "recommended": true,

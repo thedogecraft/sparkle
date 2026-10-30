@@ -25,12 +25,85 @@ interface InstalledApp {
 
 let cache: InstalledApp[] | null = null
 
+const EXCLUDED_APP_NAMES: readonly string[] = [
+  "Microsoft.XboxGameCallableUI",
+  "Microsoft.Windows.StartMenuExperienceHost",
+  "Microsoft.Windows.PeopleExperienceHost",
+  "MicrosoftWindows.Speech.en-US.1",
+  "Microsoft.WebMediaExtensions",
+  "Microsoft Visual C++ 2012 Redistributable (x86) - 11.0.61030",
+  "Microsoft Visual C++ v14 Redistributable (x64) - 14.51.36247",
+  "Microsoft Visual C++ 2012 Redistributable (x64) - 11.0.61030",
+  "Microsoft.WindowsAppRuntime.CBS.1.6",
+  "Microsoft.WindowsAppRuntime.CBS.2",
+  "Microsoft.AsyncTextService",
+  "Microsoft.Ink.Handwriting.en-US.1.0",
+  "MicrosoftCorporationII.WinAppRuntime.Main.1.8",
+  "Microsoft.Ink.Handwriting.Main.en-US.1.0.1",
+  "Microsoft.AV1VideoExtension",
+  "Microsoft.WidgetsPlatformRuntime",
+  "MicrosoftCorporationII.WinAppRuntime.Main.2",
+  "MicrosoftWindows.61869836.InpApp",
+  "MicrosoftWindows.Client.CBS",
+  "Microsoft.WindowsAppRuntime.1.7",
+  "Microsoft.WindowsCamera",
+  "Microsoft.Windows.ParentalControls",
+  "Microsoft.VP9VideoExtensions",
+  "Microsoft.Windows.ShellExperienceHost",
+  "Microsoft.MicrosoftEdgeDevToolsClient",
+  "Microsoft.StartExperiencesApp",
+  "Microsoft.HEIFImageExtension",
+  "Microsoft.Windows.CapturePicker",
+  "Microsoft.HEVCVideoExtension",
+  "Microsoft.XboxIdentityProvider",
+  "MicrosoftCorporationII.WindowsSubsystemForLinux",
+  "Microsoft.WindowsAppRuntime.2",
+  "Microsoft.Windows.Apprep.ChxApp",
+  "Microsoft.SecHealthUI",
+  "Microsoft.BioEnrollment",
+  "MicrosoftWindows.Client.Photon",
+  "MicrosoftCorporationII.WinAppRuntime.Singleton",
+  "Microsoft.ApplicationCompatibilityEnhancements",
+  "Microsoft.AVCEncoderVideoExtension",
+  "MicrosoftWindows.61869722.Speion",
+  "MicrosoftWindows.UndockedDevKit",
+  "Microsoft.LockApp",
+  "Microsoft.Win32WebViewHost",
+  "MicrosoftWindows.61869720.Voiess",
+  "Microsoft.Windows.Client.FileExp",
+  "Microsoft.Windows.ContentDeliveryManager",
+  "Microsoft.Windows.XGpuEjectDialog",
+  "Microsoft.Windows.PinningConfirmationDialog",
+  "Microsoft.Windows.OOBENetworkCaptivePortal",
+  "Microsoft.DirectXRuntime",
+  "Microsoft.Windows.AugLoop.CBS",
+  "Microsoft.WindowsAppRuntime.1.8",
+  "Microsoft.XboxSpeechToTextOverlay",
+  "Microsoft.AIFabric.CBS.1.6",
+  "Microsoft.WindowsAppRuntime.1.6",
+  "Microsoft.MPEG2VideoExtension",
+  "Windows.CBS",
+];
+
+function escapeForRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+function isExcludedAppName(name: string): boolean {
+  const lower = name.toLowerCase()
+  return EXCLUDED_APP_NAMES.some((excluded) => lower.includes(excluded.toLowerCase()))
+}
+
+const excludePattern = EXCLUDED_APP_NAMES.map(escapeForRegex).join("|")
+
 const getInstalledAppsScript = `
 $paths = @(
   "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*",
   "HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*",
   "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*"
 )
+
+$exclude = '${excludePattern}'
 
 $apps = @{}
 
@@ -39,7 +112,8 @@ foreach ($path in $paths) {
     Where-Object {
       $_.DisplayName -and
       $_.SystemComponent -ne 1 -and
-      $_.DisplayName -notmatch '^(Update for|Security Update|Security Intelligence Update|Hotfix|KB\\d+|Cumulative Update|Definition Update|Update for Microsoft)'
+      $_.DisplayName -notmatch '^(Update for|Security Update|Security Intelligence Update|Hotfix|KB\\d+|Cumulative Update|Definition Update|Update for Microsoft)' -and
+      $_.DisplayName -notmatch $exclude
     } |
     ForEach-Object {
       $id = ($_.DisplayName -replace '[^a-zA-Z0-9]', '-').ToLower()
@@ -61,7 +135,9 @@ foreach ($path in $paths) {
 
 Get-AppxPackage |
   Where-Object {
-    $_.Name -notmatch 'Microsoft\\.NET|Microsoft\\.VCLibs|Microsoft\\.UI|Microsoft\\.WindowsStore|Microsoft\\.StorePurchaseApp'
+    $_.Name -notmatch 'Microsoft\\.NET|Microsoft\\.VCLibs|Microsoft\\.UI|Microsoft\\.WindowsStore|Microsoft\\.StorePurchaseApp' -and
+    $_.Name -notmatch $exclude -and
+    $_.PackageFullName -notmatch $exclude
   } |
   ForEach-Object {
     $id = ('appx-' + $_.PackageFamilyName).ToLower()
@@ -152,7 +228,9 @@ async function getInstalledApps(): Promise<InstalledApp[]> {
     }
 
     const rawApps = JSON.parse(result.output!)
-    const rawList = Array.isArray(rawApps) ? rawApps : [rawApps]
+    const rawList = (Array.isArray(rawApps) ? rawApps : [rawApps]).filter(
+      (raw) => !isExcludedAppName(raw.name ?? "") && !isExcludedAppName(raw.packageName ?? ""),
+    )
 
     fs.promises.mkdir(iconCacheDir, { recursive: true }).catch(() => {})
 
@@ -198,6 +276,12 @@ async function uninstallApps(
   const results: Array<{ name: string; success: boolean; error?: string }> = []
 
   for (const { name, uninstallString, quietUninstallString, isStoreApp, packageName } of apps) {
+    if (isExcludedAppName(name) || (packageName && isExcludedAppName(packageName))) {
+      console.log(`Skipping protected app ${name}`)
+      results.push({ name, success: false, error: "This app is protected and cannot be removed" })
+      continue
+    }
+
     if (!mainWindow) {
       results.push({ name, success: false, error: "Main window not available" })
       continue

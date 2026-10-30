@@ -1,16 +1,21 @@
 {
-  "version": "2.18.0",
+  "version": "2.23.0",
   "description": "Windows debloat and optimization tool",
   "homepage": "https://getsparkle.net",
   "license": "GPL-3.0",
-  "url": "https://github.com/thedogecraft/sparkle/releases/download/2.18.0/sparkle-2.18.0-setup.exe",
-  "hash": "1d1260f7fab9f05a04ac85c01e3b08cc88635ef50438cbf2a6abbdea15b296cb",
+  "url": "https://github.com/thedogecraft/sparkle/releases/download/2.23.0/sparkle-2.23.0-win.zip",
+  "hash": "bef7cee11a1edbfb83d8e8c30fcc2ae2ab9a4341fea97b4d00a07d4f0a86608f",
 
+  "bin": [["sparkle.exe", "sparkle"]],
   "shortcuts": [["sparkle.exe", "Sparkle"]],
   "checkver": {
     "github": "https://github.com/thedogecraft/sparkle"
   },
   "autoupdate": {
-    "url": "https://github.com/thedogecraft/sparkle/releases/download/$version/sparkle-$version-setup.exe"
+    "url": "https://github.com/thedogecraft/sparkle/releases/download/$version/sparkle-$version-win.zip",
+    "hash": {
+      "url": "https://github.com/thedogecraft/sparkle/releases/tag/$version",
+      "find": "sparkle-$version-win\\.zip:[\\s]{0,2}([a-fA-F0-9]{64})"
+    }
   }
 }
