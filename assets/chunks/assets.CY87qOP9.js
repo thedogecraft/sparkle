@@ -1,0 +1,1 @@
+var e=`/images/sparklerestore.png`;export{e as t};
