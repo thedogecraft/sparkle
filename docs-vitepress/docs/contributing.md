@@ -35,13 +35,13 @@ We welcome pull requests. To get started:
 
 You can add new applications to the Sparkle app installer by editing the `apps.json` file.
 
-See the full guide: [Contributing New Apps](/apps/#contributing-new-apps)
+See the full guide: [Contributing New Apps](/apps#contributing-new-apps)
 
 ## Creating Tweaks
 
 Want to add a new tweak? Tweaks use PowerShell scripts and a `meta.json` configuration file.
 
-See the full guide: [Creating Tweaks](/creating-tweaks/)
+See the full guide: [Creating Tweaks](/creating-tweaks)
 
 ## Development Setup
 

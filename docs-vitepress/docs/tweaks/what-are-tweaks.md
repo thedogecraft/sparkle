@@ -84,7 +84,7 @@ This is useful if you've modified system settings manually and want the tweak to
 You can explore all available tweaks in two ways:
 
 - **In the app** - Open the Tweaks page to browse, search, and filter by category.
-- **In the docs** - See the [All Tweaks](/tweaks) page for a full list with detailed descriptions and related links.
+- **In the docs** - See the [All Tweaks](/tweaks/) page for a full list with detailed descriptions and related links.
 
 ::: tip
 
