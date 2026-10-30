@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - docs
+  - docs-vitepress
 ignoredBuiltDependencies:
   - core-js
   - protobufjs

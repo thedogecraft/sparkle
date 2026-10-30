@@ -24,14 +24,22 @@ const tweaks = fs
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   srcDir: "docs",
-
+  lastUpdated: true,
   title: "Sparkle Docs",
   description: "Docs for Sparkle",
   cleanUrls: true,
-  head: [["link", { rel: "icon", href: "https://parcoil.com/sparklelogo.png" }]],
+  head: [
+    [
+      "link",
+      {
+        rel: "icon",
+        href: "https://raw.githubusercontent.com/Parcoil/logos/refs/heads/main/logos/sparklelogo.png",
+      },
+    ],
+  ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: "https://parcoil.com/sparklelogo.png",
+    logo: "https://raw.githubusercontent.com/Parcoil/logos/refs/heads/main/logos/sparklelogo.png",
     nav: [
       { text: "Home", link: "/" },
       { text: "Apps", link: "/apps" },
@@ -41,6 +49,7 @@ export default defineConfig({
       { text: "DNS Manager", link: "/dns-manager" },
       { text: "Donations", link: "/donations" },
       { text: "Uninstall", link: "/uninstall" },
+      { text: "Updates", link: "/updates" },
       { text: "Utilities", link: "/utilities" },
       { text: "Tweaks", link: "/tweaks/what-are-tweaks/" },
     ],
