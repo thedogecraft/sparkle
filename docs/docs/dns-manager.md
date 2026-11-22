@@ -13,6 +13,8 @@ The app allows users to select and apply various DNS providers:
 | Provider Name        | Primary DNS    | Secondary DNS   | Description                               | Features                                |
 | -------------------- | -------------- | --------------- | ----------------------------------------- | --------------------------------------- |
 | **Cloudflare**       | 1.1.1.1        | 1.0.0.1         | Fast, secure, and privacy-focused DNS     | Fast, Privacy-focused, Security         |
+| **Cloudflare (Malware Blocking)**     | 1.1.1.2        | 1.0.0.2         | Blocks known malware domains              | Malware blocking, Security              |
+| **Cloudflare (Malware + Adult Content Blocking)** | 1.1.1.3 | 1.0.0.3 | Blocks malware and adult content | Malware blocking, Adult content blocking |
 | **Google**           | 8.8.8.8        | 8.8.4.4         | Reliable and widely used DNS service      | Reliable, Fast, Widely supported        |
 | **OpenDNS**          | 208.67.222.222 | 208.67.220.220  | Cisco-owned DNS with content filtering    | Content filtering, Reliable, Security   |
 | **Quad9**            | 9.9.9.9        | 149.112.112.112 | Security-focused DNS with threat blocking | Security, Threat blocking, Privacy      |
@@ -21,7 +23,7 @@ The app allows users to select and apply various DNS providers:
 
 ::: info
 
-  Users can select a provider to apply DNS changes the active Wifi And Ethernet adapters.
+  Users can select a provider to apply DNS changes the active Wifi And Ethernet adapters. Clicking Cloudflare opens a menu to choose between standard, malware blocking, and malware + adult content blocking.
 ::: 
 ---
 
