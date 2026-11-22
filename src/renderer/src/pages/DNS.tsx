@@ -93,6 +93,39 @@ const dnsProviders = [
   },
 ]
 
+const cloudflareProviders: DNSProvider[] = [
+  {
+    id: "cloudflare",
+    name: "Cloudflare (Standard)",
+    primary: "1.1.1.1",
+    secondary: "1.0.0.1",
+    description: "Fast, secure, and privacy-focused DNS",
+    features: ["Fast", "Privacy-focused"],
+    color: "text-orange-500",
+    icon: <Cloud className="w-5 h-5" />,
+  },
+  {
+    id: "cloudflare-malware",
+    name: "Cloudflare (Malware Blocking)",
+    primary: "1.1.1.2",
+    secondary: "1.0.0.2",
+    description: "Blocks known malware domains",
+    features: ["Malware blocking", "Security"],
+    color: "text-orange-500",
+    icon: <Shield className="w-5 h-5" />,
+  },
+  {
+    id: "cloudflare-family",
+    name: "Cloudflare (Malware + Adult Content Blocking)",
+    primary: "1.1.1.3",
+    secondary: "1.0.0.3",
+    description: "Blocks malware and adult content",
+    features: ["Malware blocking", "Adult content blocking"],
+    color: "text-orange-500",
+    icon: <Shield className="w-5 h-5" />,
+  },
+]
+
 export default function DNSPage() {
   const [selectedProvider, setSelectedProvider] = useState<DNSProvider | null>(null)
   const [currentDNS, setCurrentDNS] = useState<Array<{ adapter: string; servers: string }> | null>(
@@ -100,6 +133,7 @@ export default function DNSPage() {
   )
   const [loading, setLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [cloudflareModalOpen, setCloudflareModalOpen] = useState(false)
   const [customDNS, setCustomDNS] = useState({ primary: "", secondary: "" })
   const [showCustom, setShowCustom] = useState(false)
   const [pingResults, setPingResults] = useState<PingResult[] | null>(null)
@@ -264,6 +298,45 @@ export default function DNSPage() {
           </div>
         </div>
       </Modal>
+      <Modal open={cloudflareModalOpen} onClose={() => setCloudflareModalOpen(false)}>
+        <div className="bg-sparkle-card p-4 rounded-2xl border border-sparkle-border text-sparkle-text w-[90vw] max-w-md">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="text-orange-500">
+              <Cloud className="w-5 h-5" />
+            </div>
+            <h2 className="text-lg font-semibold">Choose Cloudflare DNS</h2>
+          </div>
+          <p className="text-sm text-sparkle-text-secondary mb-4">
+            Select the Cloudflare DNS servers you want to use.
+          </p>
+          <div className="space-y-2 mb-4">
+            {cloudflareProviders.map((provider) => (
+              <button
+                key={provider.id}
+                type="button"
+                onClick={() => {
+                  setCloudflareModalOpen(false)
+                  openConfirmationModal(provider)
+                }}
+                className="w-full text-left p-3 rounded-lg border border-sparkle-border bg-sparkle-border-secondary hover:border-sparkle-primary transition"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">{provider.name}</span>
+                  <span className="text-xs text-sparkle-text-secondary whitespace-nowrap">
+                    {provider.primary} / {provider.secondary}
+                  </span>
+                </div>
+                <p className="text-sm text-sparkle-text-secondary mt-1">{provider.description}</p>
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-end">
+            <Button variant="secondary" onClick={() => setCloudflareModalOpen(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
       <RootDiv>
         <div className="pb-10 mr-4">
           <Card className="p-4 mb-4">
@@ -370,7 +443,13 @@ export default function DNSPage() {
             {dnsProviders.map((provider) => (
               <Card
                 key={provider.id}
-                onClick={() => openConfirmationModal(provider)}
+                onClick={() => {
+                  if (provider.id === "cloudflare") {
+                    setCloudflareModalOpen(true)
+                  } else {
+                    openConfirmationModal(provider)
+                  }
+                }}
                 disabled={loading}
                 className="bg-sparkle-card border border-sparkle-border p-4 rounded-2xl hover:border-sparkle-primary transition text-left"
               >

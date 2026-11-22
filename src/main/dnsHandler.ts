@@ -24,7 +24,17 @@ interface DNSConfig {
 }
 
 const DNS_CONFIGS: Record<string, DNSConfig> = {
-  cloudflare: { primary: "1.1.1.1", secondary: "1.0.0.1", name: "Cloudflare" },
+  cloudflare: { primary: "1.1.1.1", secondary: "1.0.0.1", name: "Cloudflare Standard" },
+  "cloudflare-malware": {
+    primary: "1.1.1.2",
+    secondary: "1.0.0.2",
+    name: "Cloudflare Malware Blocking",
+  },
+  "cloudflare-family": {
+    primary: "1.1.1.3",
+    secondary: "1.0.0.3",
+    name: "Cloudflare Malware + Adult Content Blocking",
+  },
   google: { primary: "8.8.8.8", secondary: "8.8.4.4", name: "Google" },
   opendns: { primary: "208.67.222.222", secondary: "208.67.220.220", name: "OpenDNS" },
   quad9: { primary: "9.9.9.9", secondary: "149.112.112.112", name: "Quad9" },
@@ -153,7 +163,7 @@ export const setupDNSHandlers = (): void => {
           return {
             success: false,
             error:
-              "Invalid DNS type. Available options: cloudflare, google, opendns, quad9, adguard, automatic, custom",
+              "Invalid DNS type. Available options: cloudflare, cloudflare-malware, cloudflare-family, google, opendns, quad9, adguard, automatic, custom",
           }
         }
 
