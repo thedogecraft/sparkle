@@ -261,6 +261,17 @@ export default function DNSPage() {
     return successResults.length > 0 ? successResults[0] : null
   }
 
+  const applyFastestDNS = () => {
+    const fastest = getLowestPingServer()
+    const server = fastest?.name
+
+    for (const provider of dnsProviders) {
+      if (provider.name === server) {
+        openConfirmationModal(provider)
+        return
+      }
+    }
+  }
   return (
     <>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
@@ -384,6 +395,7 @@ export default function DNSPage() {
                   <>Test All Servers</>
                 )}
               </Button>
+              {pingResults && <Button onClick={() => applyFastestDNS()}>Apply Fastest</Button>}
               {pingResults && <Button onClick={() => setPingResults(null)}>Clear</Button>}
             </div>
 
