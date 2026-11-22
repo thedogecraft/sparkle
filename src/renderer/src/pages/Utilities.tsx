@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { invoke } from "@/lib/electron"
+import { applyUltimatePerformanceScript, powerPlanCheckScript } from "@/lib/powerPlanScripts"
 import { toast } from "react-toastify"
 import log from "electron-log/renderer"
 import { Dropdown } from "@/components/ui/dropdown"
@@ -165,36 +166,12 @@ catch {
     icon: <Monitor />,
     type: "dropdown",
     options: ["Balanced", "High Performance", "Power Saver", "Ultimate Performance"],
-    checkScript: `
-$current = powercfg /getactivescheme
-if ($current -match "Power saver") { Write-Output "Power Saver" }
-elseif ($current -match "High performance") { Write-Output "High Performance" }
-elseif ($current -match "Ultimate Performance") { Write-Output "Ultimate Performance" }
-else { Write-Output "Balanced" }
-`,
+    checkScript: powerPlanCheckScript,
     applyScript: {
       Balanced: `powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e`,
       "High Performance": `powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c`,
       "Power Saver": `powercfg /setactive a1841308-3541-4fab-bc81-f71556f20b4a`,
-      "Ultimate Performance": `
-$ultimatePlan = powercfg -l | Select-String "Ultimate Performance"
-
-if (-not $ultimatePlan) {
-    Write-Host "Ultimate Performance plan not found. Creating..."
-    powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61
-} else {
-    Write-Host "Ultimate Performance plan already exists."
-}
-
-$ultimatePlanGUID = (powercfg -l | Select-String "Ultimate Performance").ToString().Split()[3]
-
-if ($ultimatePlanGUID) {
-    powercfg -setactive $ultimatePlanGUID 2>$null
-    Write-Host "Ultimate Performance power plan is now active."
-} else {
-    Write-Host "Failed to find Ultimate Performance plan GUID."
-}
-`,
+      "Ultimate Performance": applyUltimatePerformanceScript,
     },
   },
   {
