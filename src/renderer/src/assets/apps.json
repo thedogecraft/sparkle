@@ -1432,6 +1432,40 @@
       "info": "A simple and lightweight GUI package manager for Winget.",
       "link": "https://devolutions.net/unigetui/?ref=sparkle",
       "icon": "https://assets.getsparkle.net/apps/UniGetUI.png"
+    },
+    {
+      "name": "Roblox",
+      "id": "Roblox.Roblox",
+      "category": "games",
+      "info": "A popular online game platform and game creation system.",
+      "link": "https://roblox.com/?ref=sparkle",
+      "icon": "https://assets.getsparkle.net/apps/Roblox.webp"
+    },
+    {
+      "name": "EarTrumpet",
+      "id": "File-New-Project.EarTrumpet",
+      "chocolatey": "eartrumpet",
+      "category": "utilities",
+      "info": "A powerful volume control app for Windows.",
+      "link": "https://github.com/File-New-Project/EarTrumpet",
+      "icon": "https://assets.getsparkle.net/apps/EarTrumpet.png"
+    },
+    {
+      "name": "Shotcut",
+      "id": "Meltytech.Shotcut",
+      "chocolatey": "Shotcut",
+      "category": "multimedia",
+      "info": "A powerful volume control app for Windows.",
+      "link": "https://shotcut.org/",
+      "icon": "https://assets.getsparkle.net/apps/Shotcut.png"
+    },
+    {
+      "name": "GOG Galaxy",
+      "id": "GOG.Galaxy",
+      "category": "games",
+      "info": "A game client for GOG.com.",
+      "link": "https://www.gog.com/",
+      "icon": "https://assets.getsparkle.net/apps/GOG%20Galaxy.png"
     }
   ]
 }
