@@ -25,3 +25,4 @@ wheels/
 site
 docs/tweaks
 !packages/discord-rpc-new/dist/
+app-icons
