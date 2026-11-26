@@ -65,7 +65,7 @@ export function initAutoUpdater(getMainWindow: () => BrowserWindow | null): void
 
   ipcMain.handle("updater:install", () => {
     try {
-      autoUpdater.quitAndInstall(false, true)
+      autoUpdater.quitAndInstall(true, true)
       return { ok: true }
     } catch (error: any) {
       return { ok: false, error: String(error) }
