@@ -807,14 +807,6 @@
       "icon": "https://assets.getsparkle.net/apps/GIMP.png"
     },
     {
-      "name": "Guilded",
-      "id": "Guilded.Guilded",
-      "category": "communication",
-      "info": "A communication app for gamers.",
-      "link": "https://www.guilded.gg/?ref=sparkle",
-      "icon": "https://assets.getsparkle.net/apps/Guilded.png"
-    },
-    {
       "name": "Zen Browser",
       "id": "Zen-Team.Zen-Browser",
       "chocolatey": "zen-browser --pre",
