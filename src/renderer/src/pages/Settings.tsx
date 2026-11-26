@@ -10,6 +10,7 @@ import { toast } from "react-toastify"
 import Card from "@/components/ui/Card"
 import { Dropdown } from "@/components/ui/dropdown"
 import { TriangleAlert } from "lucide-react"
+import useThemeStore, { type Theme } from "@/store/theme"
 
 const themes = [
   { label: "System", value: "system" },
@@ -21,7 +22,8 @@ const themes = [
 ]
 
 function Settings() {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
+  const theme = useThemeStore((state) => state.theme)
+  const setTheme = useThemeStore((state) => state.setTheme)
   const [animationDirection, setAnimationDirection] = useState<"up" | "left" | "off">(
     (localStorage.getItem("pageAnimation") as "up" | "left" | "off") || "up",
   )
@@ -59,21 +61,6 @@ function Settings() {
       setChecking(false)
     }
   }
-
-  useEffect(() => {
-    document.body.classList.remove("light", "purple", "dark", "gray", "classic")
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light"
-      document.body.classList.add(systemTheme)
-    } else if (theme) {
-      document.body.classList.add(theme)
-    } else {
-      document.body.classList.add("dark")
-    }
-    localStorage.setItem("theme", theme || "dark")
-  }, [theme])
 
   useEffect(() => {
     invoke({ channel: "tray:get" }).then((status) => setTrayEnabled(status))
@@ -183,13 +170,23 @@ function Settings() {
                           name="theme"
                           value={t.value}
                           checked={theme === t.value}
-                          onChange={() => setTheme(t.value)}
+                          onChange={() => setTheme(t.value as Theme)}
                           className="sr-only"
                         />
                         <span className="text-sparkle-text font-medium">{t.label}</span>
                       </label>
                     ))}
                   </div>
+                  <p className="text-sm text-sparkle-text-secondary">
+                    <kbd className="rounded bg-sparkle-accent px-1.5 py-0.5 font-mono text-xs">
+                      Alt+D
+                    </kbd>{" "}
+                    toggles light/dark.{" "}
+                    <kbd className="rounded bg-sparkle-accent px-1.5 py-0.5 font-mono text-xs">
+                      Alt+S
+                    </kbd>{" "}
+                    saves screenshots of this page in both modes.
+                  </p>
                 </div>
               </SettingCard>
               <SettingCard>

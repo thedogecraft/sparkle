@@ -18,6 +18,8 @@ import UpdateManager from "./components/updatemanager"
 import ChangelogModal from "./components/changelogModal"
 import useAppInstallStore from "./store/appInstallStore"
 import useOnlineStore from "./store/online"
+import useThemeStore, { applyTheme } from "./store/theme"
+import { useThemeScreenshotShortcuts } from "./hooks/useThemeScreenshotShortcuts"
 import { CURRENT_VERSION } from "./lib/version"
 
 import { toast } from "react-toastify"
@@ -25,7 +27,8 @@ import Debloat from "./pages/Debloat"
 import NoAdmin from "./components/noAdmin"
 
 function App() {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "system")
+  const theme = useThemeStore((state) => state.theme)
+  useThemeScreenshotShortcuts()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     localStorage.getItem("sidebarCollapsed") === "true",
   )
@@ -60,45 +63,16 @@ function App() {
   }, [setAppStatus, clearApps])
 
   useEffect(() => {
-    const applyTheme = (theme) => {
-      document.body.classList.remove("light", "purple", "dark", "gray", "classic")
-      if (theme === "system" || !theme) {
-        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light"
-        document.body.classList.add(systemTheme)
-        document.body.setAttribute("data-theme", systemTheme)
-      } else {
-        document.body.classList.add(theme)
-        document.body.setAttribute("data-theme", theme)
-      }
-    }
-
     applyTheme(theme)
+  }, [theme])
 
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    const handleSystemThemeChange = () => {
-      if ((localStorage.getItem("theme") || "system") === "system") applyTheme("system")
-    }
-
-    const handleStorageChange = (e) => {
-      if (e.key === "theme") setTheme(e.newValue || "system")
-    }
-
-    mediaQuery.addEventListener("change", handleSystemThemeChange)
-    window.addEventListener("storage", handleStorageChange)
-
+  useEffect(() => {
     if (localStorage.getItem("posthogDisabled") === "true") {
       document.body.classList.add("ph-no-capture")
     } else {
       document.body.classList.remove("ph-no-capture")
     }
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleSystemThemeChange)
-      window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [theme])
+  }, [])
 
   const toggleSidebar = () => {
     const newCollapsed = !sidebarCollapsed

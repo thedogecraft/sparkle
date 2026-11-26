@@ -1,6 +1,7 @@
 process.env.UV_THREADPOOL_SIZE = "32"
 
 import { app, shell, BrowserWindow, ipcMain, Tray } from "electron"
+import { mkdir, writeFile } from "fs/promises"
 import { join } from "path"
 import log from "electron-log"
 import { createTray } from "@main/tray"
@@ -187,6 +188,34 @@ app
         mainWindow.webContents.openDevTools()
       }
     })
+
+    ipcMain.handle(
+      "screenshot:capture",
+      async (
+        event: Electron.IpcMainInvokeEvent,
+        payload: { page?: string; theme?: string } = {},
+      ): Promise<{ filePath: string; directory: string }> => {
+        const targetWindow = BrowserWindow.fromWebContents(event.sender) ?? mainWindow
+        if (!targetWindow) throw new Error("No Sparkle window is available for screenshots")
+
+        const image = await targetWindow.webContents.capturePage()
+        const directory = join(app.getPath("pictures"), "Sparkle Screenshots")
+        await mkdir(directory, { recursive: true })
+
+        const page =
+          (payload.page ?? "page")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "") || "page"
+        const theme =
+          payload.theme === "light" || payload.theme === "dark" ? payload.theme : "theme"
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
+        const filePath = join(directory, `sparkle-${page}-${theme}-${timestamp}.png`)
+
+        await writeFile(filePath, image.toPNG())
+        return { filePath, directory }
+      },
+    )
 
     app.on("activate", function () {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
